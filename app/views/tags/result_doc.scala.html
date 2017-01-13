@@ -90,6 +90,20 @@
   }
 }
 
+@subjects(subjects: Seq[JsValue]) = {
+  <tr>
+    <td>Schlagwörter</td>
+    <td>
+    @for(subject <- subjects;
+         label <- (subject \ "label").asOpt[String];
+         id = (subject \ "id").asOpt[String]) {
+      <a title="Nach weiteren Titeln zu '@label' suchen" href='@nwbib.routes.Application.search(subject=id.getOrElse(label))'/>@label</a>
+      <a title="Nach Themen mit '@label' suchen" href='@nwbib.routes.Application.topics(q=label)'><span class='octicon octicon-ellipsis'></span></a>
+      @if(subject!=subjects.last){ | }
+    }</td>
+  </tr>
+}
+
 @table(){
   @result_field("Titel", "title", doc, TableRow.VALUES)
   @result_field("Titelzusatz", "otherTitleInformation", doc, TableRow.VALUES)
@@ -157,7 +171,11 @@
   @result_field("Raumsystematik", "coverage", doc, TableRow.VALUES, valueLabel = Option(Seq()), param="raw")
   @result_field("Raumsystematik", "nwbibspatial", doc, TableRow.VALUES, valueLabel = Option(Seq()), param="nwbibspatial")
   @result_field("Sachsystematik", "nwbibsubject", doc, TableRow.VALUES, valueLabel = Option(Seq()), param="nwbibsubject")
-  @result_field("Schlagwörter", "subject", doc, TableRow.VALUES, valueLabel = gndEntities, param="subject")
+  @if(Lobid.DATA_2) {
+    @subjects((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()))
+  } else {
+    @result_field("Schlagwörter", "subject", doc, TableRow.VALUES, valueLabel = gndEntities, param="subject")
+  }
   @result_field("Schlagwortfolge", "subjectChain", doc, TableRow.VALUES, valueLabel = Option(Seq()))
 
   @if(Lobid.DATA_2) { @result_field("Inhaltsangabe", "description", doc, TableRow.LINKS) }
