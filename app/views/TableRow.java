@@ -33,7 +33,7 @@ public enum TableRow {
 		public String process(JsonNode doc, String property, String param,
 				String label, List<String> values, Optional<List<String>> keys) {
 			List<String> vs = values;
-			if (doc.has("coverage")) { // see https://github.com/hbz/nwbib/issues/276
+			if (doc.findValue("coverage") != null) { // https://github.com/hbz/nwbib/issues/276
 				List<String> remove = Arrays.asList(//
 						"http://purl.org/lobid/nwbib-spatial#n10",
 						"http://purl.org/lobid/nwbib-spatial#n12",
