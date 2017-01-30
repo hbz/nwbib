@@ -52,9 +52,12 @@ public enum TableRow {
 				vs = vs.stream().filter(v -> !remove.contains(v))
 						.collect(Collectors.toList());
 			}
-			return vs.isEmpty() ? ""
+			List<String> filtered =
+					vs.stream().filter(value -> !value.contains("http://dewey.info"))
+							.collect(Collectors.toList());
+			return filtered.isEmpty() ? ""
 					: String.format("<tr><td>%s</td><td>%s</td></tr>", label,
-							vs.stream().filter(value -> !value.contains("http://dewey.info"))
+							filtered.stream()
 									.map(val -> label(doc, property, param, val, keys))
 									.collect(Collectors.joining(
 											property.equals("subjectChain") ? " <br/> " : " | ")));
