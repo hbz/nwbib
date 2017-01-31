@@ -1,12 +1,12 @@
-/* Copyright 2015 Fabian Steeg, hbz. Licensed under the GPLv2 */
+/* Copyright 2015-2017 Fabian Steeg, hbz. Licensed under the GPLv2 */
 package views;
 
 import controllers.nwbib.Application;
-import controllers.nwbib.Lobid;
 import play.Logger;
 import play.cache.Cache;
 import play.libs.F.Promise;
 import play.libs.ws.WS;
+import play.libs.ws.WSRequestHolder;
 
 /**
  * Reverse lookup of a given geolocation to get a label for it.
@@ -15,6 +15,7 @@ import play.libs.ws.WS;
  */
 public class ReverseGeoLookup {
 
+	private static final int TIMEOUT = 1000;
 	private String labelLookupURl;
 	private String idLookupUrl;
 	private int timeout;
@@ -28,7 +29,7 @@ public class ReverseGeoLookup {
 		return new ReverseGeoLookup(
 				"https://wdq.wmflabs.org/api?q=around[625,%s,0.1]",
 				"https://www.wikidata.org/w/api.php?action=wbgetentities&props=labels&ids=Q%s&languages=de&format=json",
-				Lobid.API_TIMEOUT).lookup(location);
+				TIMEOUT).lookup(location);
 	}
 
 	private ReverseGeoLookup(String idLookupUrl, String labelLookupURl,
@@ -44,19 +45,20 @@ public class ReverseGeoLookup {
 			Logger.debug("Using location label from cache for: " + location);
 			return (String) cached;
 		}
-		//@formatter:off
-		Promise<String> promise =
-				WS.url(String.format(idLookupUrl,location)).get().flatMap(idResponse -> 
-						WS.url(String.format(labelLookupURl,
-								idResponse.asJson().get("items").elements().next().asInt()))
-						.get().map(labelResponse -> 
-								labelResponse.asJson().findValue("value").asText()))
-				.recoverWith(throwable -> {
-					Logger.error("Could not look up location", throwable);
-					return Promise.pure(String.format("Unbekannter Ort (%s)", location));
-				});
-		//@formatter:on
-		promise.onRedeem(label -> Cache.set(location, label, Application.ONE_DAY));
-		return promise.get(timeout);
+		try {
+			WSRequestHolder idRequest = WS.url(String.format(idLookupUrl, location));
+			Promise<String> promise = idRequest.get().flatMap(idResponse -> {
+				WSRequestHolder labelRequest = WS.url(String.format(labelLookupURl,
+						idResponse.asJson().get("items").elements().next().asInt()));
+				return labelRequest.get().map(labelResponse -> labelResponse.asJson()
+						.findValue("value").asText());
+			});
+			promise
+					.onRedeem(label -> Cache.set(location, label, Application.ONE_DAY));
+			return promise.get(timeout);
+		} catch (Throwable t) {
+			Logger.error("Could not look up location", t);
+			return "1 Ort";
+		}
 	}
 }
