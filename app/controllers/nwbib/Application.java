@@ -341,11 +341,11 @@ public class Application extends Controller {
 			String csv = new String(Streams.copyToByteArray(stream), Charsets.UTF_8);
 			List<String> lines = Arrays.asList(csv.split("\n"));
 			List<HashMap<String, String>> maps = lines.stream()
-					.filter(line -> line.split(",").length == 2).map(line -> {
+					.filter(line -> line.split("\",\"").length == 2).map(line -> {
 						HashMap<String, String> map = new HashMap<>();
-						String[] strings = line.replace("\"", "").split(",");
-						map.put("label", strings[0]);
-						map.put("value", strings[1]);
+						String[] strings = line.split("\",\"");
+						map.put("label", strings[0].replace("\"\"", "'").replace("\"", ""));
+						map.put("value", strings[1].replace("\"", ""));
 						return map;
 					}).collect(Collectors.toList());
 			String journals = Json.toJson(maps).toString();

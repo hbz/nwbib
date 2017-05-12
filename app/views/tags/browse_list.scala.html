@@ -32,7 +32,7 @@
     <dt></dt><dd><a href="#" id="collapseAll">alle einklappen</a> | <a href="#" id="expandAll">alle ausklappen</a></dd>
     }
     @if(t=="Zeitschriften"){
-    <p style="margin-top:10px">In der Nordrhein-Westfälischen Bibliographie laufend ausgewertete Zeitschriften:</p>
+    <p style="margin-top:10px">@Json.parse(tops).asOpt[Seq[JsValue]].getOrElse(Seq()).size in der Nordrhein-Westfälischen Bibliographie laufend ausgewertete Zeitschriften:</p>
     }
 </dl>
 @if(flash.get("error")!=null){
