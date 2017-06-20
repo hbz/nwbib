@@ -41,7 +41,9 @@
 @with_icon(label: String, property: String, fullField: String) = {
   @if(!(doc\\property).isEmpty) {
     @defining(if(Lobid.DATA_2 && property != "type") { nestedIds(property) } else { singleOrMultiString(property) }){ v =>
-      <tr><td>@label</td><td><span class="@Lobid.facetIcon(v,fullField)"></span> @Lobid.facetLabel(v,fullField,"")</td></tr>
+      @defining((Lobid.facetIcon(v,fullField), Lobid.facetLabel(v,fullField,""))) { case (icon, value) =>
+        @if(!icon.isEmpty && !value.isEmpty) { <tr><td>@label</td><td><span class="@icon"></span> @value</td></tr> }
+      }
     }
   }
 }
