@@ -363,6 +363,9 @@ public class Application extends Controller {
 		if (cachedResult != null)
 			return cachedResult;
 		Result result = null;
+		if (t.equals("Wikidata")) {
+			return ok(WikidataLocations.load());
+		}
 		if (t.isEmpty()) {
 			result = ok(classification.render());
 		} else {
