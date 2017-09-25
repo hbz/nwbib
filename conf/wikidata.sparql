@@ -15,7 +15,7 @@ SELECT DISTINCT ?item ?itemLabel ?partOf
   FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q2520712 } # Ohne Verwaltungskooperationen 
   FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q478847 } # Ohne Ämter
   FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q2740635 } # Ohne Stadtbezirke
-  SERVICE wikibase:label {  bd:serviceParam wikibase:language "de" }
+  SERVICE wikibase:label {  bd:serviceParam wikibase:language "de,en" }
   OPTIONAL {?item wdt:P131 ?partOf .}
   #OPTIONAL {?item wdt:P150 ?hasPart .}
 }
