@@ -363,8 +363,10 @@ public class Application extends Controller {
 		if (cachedResult != null)
 			return cachedResult;
 		Result result = null;
+		String placeholder = t + " filtern";
 		if (t.equals("Wikidata")) {
-			return ok(WikidataLocations.load());
+			return classificationResultWikidata(WikidataLocations.load(), t,
+					placeholder);
 		}
 		if (t.isEmpty()) {
 			result = ok(classification.render());
@@ -376,11 +378,21 @@ public class Application extends Controller {
 				return internalServerError(
 						browse_classification.render(null, null, t, ""));
 			}
-			String placeholder = t + " filtern";
 			result = classificationResult(response, t, placeholder);
 		}
 		Cache.set("classification." + t, result, ONE_DAY);
 		return result;
+	}
+
+	// Prototype, see https://github.com/hbz/nwbib/issues/392
+	private static Result classificationResultWikidata(JsonNode json, String t,
+			String placeholder) {
+		List<JsonNode> topClasses = new ArrayList<>();
+		Map<String, List<JsonNode>> subClasses = new HashMap<>();
+		Classification.buildHierarchyWikidata(json, topClasses, subClasses);
+		String topClassesJson = Json.toJson(topClasses).toString();
+		return ok(browse_classification.render(topClassesJson, subClasses, t,
+				placeholder));
 	}
 
 	private static Result classificationResult(SearchResponse response, String t,
