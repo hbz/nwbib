@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import play.Logger;
 import play.Play;
 import play.cache.Cache;
 import play.libs.F.Promise;
@@ -37,9 +38,9 @@ public class WikidataLocations {
 	 */
 	public static JsonNode load() {
 		try {
-			File jsonFile = Play.application().getFile("conf/wikidata.json");
+			File jsonFile = wikidataFile();
 			if (!jsonFile.exists()) {
-				// TODO Don't block, return Promise
+				// TODO Don't block, return Promise (but /classification no Promise yet)
 				Iterator<JsonNode> elements = request().get(Integer.MAX_VALUE).asJson()
 						.findValue("bindings").elements();
 				List<JsonNode> items = new ArrayList<>();
@@ -59,6 +60,10 @@ public class WikidataLocations {
 		}
 	}
 
+	static File wikidataFile() {
+		return Play.application().getFile("conf/wikidata.json");
+	}
+
 	private static String pretty(JsonNode x) {
 		try {
 			return new ObjectMapper().writer().withDefaultPrettyPrinter()
@@ -73,7 +78,7 @@ public class WikidataLocations {
 		File sparqlFile = Play.application().getFile("conf/wikidata.sparql");
 		String sparqlString = Files.readAllLines(Paths.get(sparqlFile.toURI()))
 				.stream().collect(Collectors.joining("\n"));
-
+		Logger.info("Getting data from Wikidata, using query: \n{}", sparqlString);
 		return cachedRequest(sparqlString,
 				WS.url("https://query.wikidata.org/sparql")
 						.setQueryParameter("query", sparqlString)
@@ -94,4 +99,5 @@ public class WikidataLocations {
 		}
 		return promise;
 	}
+
 }

@@ -359,6 +359,12 @@ public class Application extends Controller {
 	 * @return Classification data for the given type
 	 */
 	public static Result classification(final String t) {
+		if (t.equals("WikidataImport")) {
+			File data = WikidataLocations.wikidataFile();
+			boolean deleteSuccess = data.delete();
+			Logger.debug("Deleting local data: {}, success: {}", data, deleteSuccess);
+			return redirect(routes.Application.classification("Wikidata"));
+		}
 		Result cachedResult = (Result) Cache.get("classification." + t);
 		if (cachedResult != null)
 			return cachedResult;
