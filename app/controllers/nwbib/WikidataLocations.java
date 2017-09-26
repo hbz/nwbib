@@ -100,4 +100,32 @@ public class WikidataLocations {
 		return promise;
 	}
 
+	// Prototype, see https://github.com/hbz/nwbib/issues/392
+	// Not actually used, would require ES facet, but this structure
+	@SuppressWarnings("javadoc")
+	public static String searchLink(String id) {
+		try {
+			int cacheDuration = ONE_DAY;
+			return Cache.getOrElse(id, () -> {
+				String baseUrl = "http://staging.lobid.org/resources/search";
+				// TODO remove nested variant when index is fixed
+				String qParamValue = String
+						.format("spatial.id:\"%s\" OR spatial.spatial.id:\"%s\"", id, id);
+				long hits = WS.url(baseUrl).setQueryParameter("q", qParamValue)
+						.execute().get(Application.ONE_HOUR * 1000).asJson()
+						.get("totalItems").longValue();
+				String fullUrl = baseUrl + "?q=" + qParamValue;
+				Logger.debug("Calling {}", fullUrl);
+				String html = String.format(
+						"<a href='%s'><span class='glyphicon glyphicon-search'></span></a> (%s)",
+						fullUrl, hits);
+				return hits == 0 ? "" : html;
+			}, cacheDuration);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		}
+
+	}
+
 }

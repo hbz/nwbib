@@ -1,6 +1,6 @@
 # Get administrative areas (with some exemptions) in North Rhine-Westphalia with German labels
 
-SELECT DISTINCT ?item ?itemLabel ?partOf 
+SELECT DISTINCT ?item ?itemLabel ?partOf ?gnd
                 #(GROUP_CONCAT(DISTINCT ?hasPart ; separator = "; ") AS ?hasParts)
                 WHERE {
   hint:Query hint:optimizer "None".
@@ -15,8 +15,9 @@ SELECT DISTINCT ?item ?itemLabel ?partOf
   FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q2520712 } # Ohne Verwaltungskooperationen 
   FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q478847 } # Ohne Ämter
   FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q2740635 } # Ohne Stadtbezirke
-  SERVICE wikibase:label {  bd:serviceParam wikibase:language "de,en" }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "de,en" }
   OPTIONAL {?item wdt:P131 ?partOf .}
+  OPTIONAL {?item wdt:P227 ?gnd .}
   #OPTIONAL {?item wdt:P150 ?hasPart .}
 }
-GROUP BY ?item ?itemLabel ?partOf
+GROUP BY ?item ?itemLabel ?partOf ?gnd

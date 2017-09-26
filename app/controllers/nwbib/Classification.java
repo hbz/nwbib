@@ -214,6 +214,8 @@ public class Classification {
 			String id = item.get("item").get("value").textValue();
 			String label = item.get("itemLabel").get("value").textValue();
 			String broaderId = item.get("partOf").get("value").textValue();
+			String gnd =
+					item.has("gnd") ? item.get("gnd").get("value").textValue() : "";
 			String nrw = "http://www.wikidata.org/entity/Q1198";
 			String topLevelLabelPrefix = "Regierungsbezirk";
 			if (id.equals(nrw)) {
@@ -221,14 +223,15 @@ public class Classification {
 						Json.toJson(ImmutableMap.of("value", id, "label", "Sonstige")));
 			} else if (broaderId.equals(nrw)
 					&& label.startsWith(topLevelLabelPrefix)) {
-				topClasses
-						.add(Json.toJson(ImmutableMap.of("value", id, "label", label)));
+				topClasses.add(Json
+						.toJson(ImmutableMap.of("value", id, "label", label, "gnd", gnd)));
 			}
 			if (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))) {
 				if (!subClasses.containsKey(broaderId))
 					subClasses.put(broaderId, new ArrayList<JsonNode>());
 				List<JsonNode> sub = subClasses.get(broaderId);
-				sub.add(Json.toJson(ImmutableMap.of("value", id, "label", label)));
+				sub.add(Json
+						.toJson(ImmutableMap.of("value", id, "label", label, "gnd", gnd)));
 				Collections.sort(sub, comparator);
 			}
 		});
