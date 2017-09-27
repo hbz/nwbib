@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 
 import play.Logger;
 import play.Play;
@@ -32,11 +33,13 @@ import play.mvc.Http;
 public class WikidataLocations {
 
 	private static final int ONE_DAY = 60 * 60 * 24;
+	private static int requestCounter;
 
 	/**
 	 * @return The Wikidata locations as JSON
 	 */
 	public static JsonNode load() {
+		requestCounter = 0;
 		try {
 			File jsonFile = wikidataFile();
 			if (!jsonFile.exists()) {
@@ -101,31 +104,45 @@ public class WikidataLocations {
 	}
 
 	// Prototype, see https://github.com/hbz/nwbib/issues/392
-	// Not actually used, would require ES facet, but this structure
 	@SuppressWarnings("javadoc")
 	public static String searchLink(String id) {
 		try {
-			int cacheDuration = ONE_DAY;
-			return Cache.getOrElse(id, () -> {
-				String baseUrl = "http://staging.lobid.org/resources/search";
+			int cacheDuration = Integer.MAX_VALUE;
+			return Cache.getOrElse("spatialQuery." + id, () -> {
+				String baseUrl = "http://stage.lobid.org/resources/search";
 				// TODO remove nested variant when index is fixed
 				String qParamValue = String
 						.format("spatial.id:\"%s\" OR spatial.spatial.id:\"%s\"", id, id);
-				long hits = WS.url(baseUrl).setQueryParameter("q", qParamValue)
-						.execute().get(Application.ONE_HOUR * 1000).asJson()
-						.get("totalItems").longValue();
 				String fullUrl = baseUrl + "?q=" + qParamValue;
-				Logger.debug("Calling {}", fullUrl);
+				Thread.sleep(35); // slight delay to avoid too much load on server
+				JsonNode json = WS.url(baseUrl).setQueryParameter("q", qParamValue)
+						.setQueryParameter("format", "json").execute().get(60 * 1000)
+						.asJson();
+				requestCounter++;
+				long hits = json.get("totalItems").longValue();
+				String coverage = collectCoverageValues(json.findValues("coverage"));
+				if (requestCounter == 1 || requestCounter % 500 == 0) {
+					Logger.debug("Request {}", requestCounter);
+				}
+				Logger.trace("{}: {} -> {} hits, coverage: {}", requestCounter, id,
+						hits, coverage);
 				String html = String.format(
-						"<a href='%s'><span class='glyphicon glyphicon-search'></span></a> (%s)",
-						fullUrl, hits);
+						"<a title='Nach Titeln suchen' href='%s'><span class='glyphicon glyphicon-search'></span></a> (%s | %s)",
+						fullUrl, hits, coverage);
 				return hits == 0 ? "" : html;
 			}, cacheDuration);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.error("Could not query for " + id, e);
 			return "";
 		}
 
+	}
+
+	private static String collectCoverageValues(List<JsonNode> coverageNodes) {
+		return coverageNodes.stream()
+				.flatMap((JsonNode cs) -> Lists.newArrayList(cs.elements()).stream())
+				.map(c -> c.textValue().replace("<", "&lt;").replace(">", "&gt;"))
+				.distinct().collect(Collectors.joining(", "));
 	}
 
 }

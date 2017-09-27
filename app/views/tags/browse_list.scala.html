@@ -18,10 +18,10 @@
                     case "Wikidata" => value
                     case "Raumsystematik" => nwbib.routes.Application.search(nwbibspatial=value)
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
-                     case _ => value
+                    case _ => value
                  }}">@((json\"label").as[String])</a>
                 @if(t=="Wikidata"){
-                    <a title='Nach Titeln suchen' href='http://stage.lobid.org/resources/search?q=spatial.id:"@value" OR spatial.spatial.id:"@value"'><span class='glyphicon glyphicon-search'></span></a>
+                    @Html(controllers.nwbib.WikidataLocations.searchLink(value))
                     @for(gnd <- (json\"gnd").asOpt[String]; if !gnd.isEmpty){
                         <a title='In der GND anzeigen' href='http://d-nb.info/gnd/@gnd'><small><span class="label label-info">gnd</span></small></a>
                     }
