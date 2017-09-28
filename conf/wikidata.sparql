@@ -1,14 +1,16 @@
 # Get administrative areas (with some exemptions) in North Rhine-Westphalia with German labels
 
-SELECT DISTINCT ?item ?itemLabel ?partOf ?gnd
+SELECT DISTINCT ?item ?itemLabel ?partOf ?gnd ?inceptionDate ?dissolutionDate
                 #(GROUP_CONCAT(DISTINCT ?hasPart ; separator = "; ") AS ?hasParts)
                 WHERE {
   hint:Query hint:optimizer "None".
-  { ?item wdt:P131* wd:Q1198;
-        wdt:P31/wdt:P279* wd:Q387917. }
+  { ?item wdt:P131* wd:Q1198; # liegt in (einer Untereinheit von) Nordrhein-Westfalen
+        wdt:P31/wdt:P279* wd:Q387917. } # ist Instanz (einer Unterklasse) von "Verwaltungseinheit in Deutschland"
   UNION
-  {  ?item wdt:P131* wd:Q1198 ;
-       wdt:P31 wd:Q82794 }
+  {  ?item wdt:P131* wd:Q1198 ; # liegt in (einer Untereinheit von) Nordrhein-Westfalen
+       wdt:P31 wd:Q82794 } # ist eine geographische Region
+  OPTIONAL { ?item wdt:P571 ?inceptionDate }
+  OPTIONAL { ?item wdt:P576 ?dissolutionDate }
   FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q192611 } # ohne Wahlkreise
   FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q20296613 } # Ohne Natur- und Landschaftsschutzgebiete
   FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q1643757 } # Ohne Landschaftsverbände
@@ -19,4 +21,4 @@ SELECT DISTINCT ?item ?itemLabel ?partOf ?gnd
   OPTIONAL {?item wdt:P227 ?gnd .}
   #OPTIONAL {?item wdt:P150 ?hasPart .}
 }
-GROUP BY ?item ?itemLabel ?partOf ?gnd
+GROUP BY ?item ?itemLabel ?partOf ?gnd ?inceptionDate ?dissolutionDate

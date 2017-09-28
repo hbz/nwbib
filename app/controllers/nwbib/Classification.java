@@ -216,6 +216,14 @@ public class Classification {
 			String broaderId = item.get("partOf").get("value").textValue();
 			String gnd =
 					item.has("gnd") ? item.get("gnd").get("value").textValue() : "";
+			String inception = item.has("inceptionDate")
+					? item.get("inceptionDate").get("value").textValue().split("-")[0]
+					: "";
+			String dissolution = item.has("dissolutionDate")
+					? item.get("dissolutionDate").get("value").textValue().split("-")[0]
+					: "";
+			label = !inception.isEmpty() || !dissolution.isEmpty()
+					? label + String.format(" (%s-%s)", inception, dissolution) : label;
 			String nrw = "http://www.wikidata.org/entity/Q1198";
 			String topLevelLabelPrefix = "Regierungsbezirk";
 			if (id.equals(nrw)) {
