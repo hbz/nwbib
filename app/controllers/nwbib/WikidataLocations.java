@@ -110,26 +110,30 @@ public class WikidataLocations {
 			int cacheDuration = Integer.MAX_VALUE;
 			return Cache.getOrElse("spatialQuery." + id, () -> {
 				String baseUrl = "http://stage.lobid.org/resources/search";
-				// TODO remove nested variant when index is fixed
-				String qParamValue = String
-						.format("spatial.id:\"%s\" OR spatial.spatial.id:\"%s\"", id, id);
+				String qParamValue = String.format("spatial.id:\"%s\"", id);
 				String fullUrl = baseUrl + "?q=" + qParamValue;
 				Thread.sleep(35); // slight delay to avoid too much load on server
-				JsonNode json = WS.url(baseUrl).setQueryParameter("q", qParamValue)
-						.setQueryParameter("format", "json").execute().get(60 * 1000)
-						.asJson();
-				requestCounter++;
-				long hits = json.get("totalItems").longValue();
-				String coverage = collectCoverageValues(json.findValues("coverage"));
-				if (requestCounter == 1 || requestCounter % 500 == 0) {
-					Logger.debug("Request {}", requestCounter);
+				WSResponse response =
+						WS.url(baseUrl).setQueryParameter("q", qParamValue)
+								.setQueryParameter("format", "json").execute().get(60 * 1000);
+				if (response.getStatus() == Http.Status.OK) {
+					JsonNode json = response.asJson();
+					requestCounter++;
+					long hits = json.get("totalItems").longValue();
+					String coverage = collectCoverageValues(json.findValues("coverage"));
+					if (requestCounter == 1 || requestCounter % 500 == 0) {
+						Logger.debug("Request {}", requestCounter);
+					}
+					Logger.trace("{}: {} -> {} hits, coverage: {}", requestCounter, id,
+							hits, coverage);
+					String html = String.format(
+							"<a title='Nach Titeln suchen' href='%s'><span class='glyphicon glyphicon-search'></span></a> (%s | %s)",
+							fullUrl, hits, coverage);
+					return hits == 0 ? "" : html;
 				}
-				Logger.trace("{}: {} -> {} hits, coverage: {}", requestCounter, id,
-						hits, coverage);
-				String html = String.format(
-						"<a title='Nach Titeln suchen' href='%s'><span class='glyphicon glyphicon-search'></span></a> (%s | %s)",
-						fullUrl, hits, coverage);
-				return hits == 0 ? "" : html;
+				Logger.error("Response status: {}: {}", response.getStatusText(),
+						response.getBody());
+				return "";
 			}, cacheDuration);
 		} catch (Exception e) {
 			Logger.error("Could not query for " + id, e);
