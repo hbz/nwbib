@@ -23,7 +23,7 @@
                 @if(t=="Wikidata"){
                     @Html(controllers.nwbib.WikidataLocations.searchLink(value))
                     @for(gnd <- (json\"gnd").asOpt[String]; if !gnd.isEmpty){
-                        <a title='In der GND anzeigen' href='http://d-nb.info/gnd/@gnd'><small><span class="label label-info">gnd</span></small></a>
+                        <a title='Verknüpften GND-Eintrag anzeigen' href='http://test.lobid.org/authorities/@gnd'><small><span class="label label-info">gnd</span></small></a>
                     }
                 }
                 @if(subs != null && subs.get(value) != null){
