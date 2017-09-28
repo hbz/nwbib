@@ -112,7 +112,7 @@ public class WikidataLocations {
 				String baseUrl = "http://stage.lobid.org/resources/search";
 				String qParamValue = String.format("spatial.id:\"%s\"", id);
 				String fullUrl = baseUrl + "?q=" + qParamValue;
-				Thread.sleep(35); // slight delay to avoid too much load on server
+				Thread.sleep(50); // slight delay to avoid too much load on server
 				WSResponse response =
 						WS.url(baseUrl).setQueryParameter("q", qParamValue)
 								.setQueryParameter("format", "json").execute().get(60 * 1000);
@@ -139,7 +139,6 @@ public class WikidataLocations {
 			Logger.error("Could not query for " + id, e);
 			return "";
 		}
-
 	}
 
 	private static String collectCoverageValues(List<JsonNode> coverageNodes) {
