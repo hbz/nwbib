@@ -127,8 +127,8 @@ public class WikidataLocations {
 					Logger.trace("{}: {} -> {} hits, coverage: {}", requestCounter, id,
 							hits, coverage);
 					String html = String.format(
-							"<a title='Nach Titeln suchen' href='%s'><span class='glyphicon glyphicon-search'></span></a> (%s | %s)",
-							fullUrl, hits, coverage);
+							"<a title='Nach Titeln suchen | %s' href='%s'><span class='glyphicon glyphicon-search'></span></a> %s",
+							coverage, fullUrl, hits);
 					return hits == 0 ? "" : html;
 				}
 				Logger.error("Response status: {}: {}", response.getStatusText(),
