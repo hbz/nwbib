@@ -109,7 +109,7 @@ public class WikidataLocations {
 		try {
 			int cacheDuration = Integer.MAX_VALUE;
 			return Cache.getOrElse("spatialQuery." + id, () -> {
-				String baseUrl = "http://stage.lobid.org/resources/search";
+				String baseUrl = "http://lobid.org/resources/search";
 				String qParamValue = String.format("spatial.id:\"%s\"", id);
 				String fullUrl = baseUrl + "?q=" + qParamValue;
 				Thread.sleep(50); // slight delay to avoid too much load on server
