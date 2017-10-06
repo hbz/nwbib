@@ -34,7 +34,7 @@
 }
 
 .treeFile:before {
-	content: "\e041";
+	content: "\e092";
 	font-family: "Glyphicons Halflings";
-	color: transparent !important;
+	color: /*#2F994C*/ transparent !important;
 }

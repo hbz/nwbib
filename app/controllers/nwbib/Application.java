@@ -359,10 +359,21 @@ public class Application extends Controller {
 	 * @return Classification data for the given type
 	 */
 	public static Result classification(final String t) {
+		if (t.equals("WikidataImport")) {
+			File data = WikidataLocations.wikidataFile();
+			boolean deleteSuccess = data.delete();
+			Logger.debug("Deleting local data: {}, success: {}", data, deleteSuccess);
+			return redirect(routes.Application.classification("Wikidata"));
+		}
 		Result cachedResult = (Result) Cache.get("classification." + t);
 		if (cachedResult != null)
 			return cachedResult;
 		Result result = null;
+		String placeholder = t + " filtern";
+		if (t.equals("Wikidata")) {
+			return classificationResultWikidata(WikidataLocations.load(), t,
+					placeholder);
+		}
 		if (t.isEmpty()) {
 			result = ok(classification.render());
 		} else {
@@ -373,11 +384,21 @@ public class Application extends Controller {
 				return internalServerError(
 						browse_classification.render(null, null, t, ""));
 			}
-			String placeholder = t + " filtern";
 			result = classificationResult(response, t, placeholder);
 		}
 		Cache.set("classification." + t, result, ONE_DAY);
 		return result;
+	}
+
+	// Prototype, see https://github.com/hbz/nwbib/issues/392
+	private static Result classificationResultWikidata(JsonNode json, String t,
+			String placeholder) {
+		List<JsonNode> topClasses = new ArrayList<>();
+		Map<String, List<JsonNode>> subClasses = new HashMap<>();
+		Classification.buildHierarchyWikidata(json, topClasses, subClasses);
+		String topClassesJson = Json.toJson(topClasses).toString();
+		return ok(browse_classification.render(topClassesJson, subClasses, t,
+				placeholder));
 	}
 
 	private static Result classificationResult(SearchResponse response, String t,

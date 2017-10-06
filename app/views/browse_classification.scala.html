@@ -2,6 +2,19 @@
 
 @(tops: String, subs: Map[String,List[com.fasterxml.jackson.databind.JsonNode]], t: String, placeholder: String)
 
+@import play.api.libs.json.Json
+@import play.api.libs.json.JsValue
+@import com.fasterxml.jackson.databind.JsonNode
+
 @main("NWBib - " + t) {
+    @if(t=="Wikidata"){
+        <div class="alert alert-warning text-center" role="alert">Dies ist eine experimentelle Visualisierung von Orten und Verwaltungseinheiten in NRW aus Wikidata</div>
+    }
     @tags.browse_list(tops, subs, t, placeholder)
+    @if(t=="Wikidata"){
+        <p style="margin-top:10px">@(subs.values.flatMap((vals: List[JsonNode]) => vals).size + Json.parse(tops).asOpt[Seq[JsValue]].getOrElse(Seq()).size - 1) Orte | 
+            <a href='@nwbib.routes.Application.classification("WikidataImport")'>aus Wikidata aktualisieren
+            <span class="glyphicon glyphicon-repeat"></span></a>
+        </p>
+    }
 }

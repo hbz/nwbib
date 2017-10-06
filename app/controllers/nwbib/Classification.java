@@ -206,6 +206,46 @@ public class Classification {
 		return json.get("label").asText();
 	}
 
+	// Prototype, see https://github.com/hbz/nwbib/issues/392
+	@SuppressWarnings("javadoc")
+	public static void buildHierarchyWikidata(JsonNode json,
+			List<JsonNode> topClasses, Map<String, List<JsonNode>> subClasses) {
+		json.elements().forEachRemaining(item -> {
+			String id = item.get("item").get("value").textValue();
+			String label = item.get("itemLabel").get("value").textValue();
+			String broaderId = item.get("partOf").get("value").textValue();
+			String gnd =
+					item.has("gnd") ? item.get("gnd").get("value").textValue() : "";
+			String dissolution = item.has("dissolutionDate")
+					? item.get("dissolutionDate").get("value").textValue().split("-")[0]
+					: "";
+			label = !dissolution.isEmpty()
+					? label + String.format(" (bis %s)", dissolution) : label;
+			String nrw = "http://www.wikidata.org/entity/Q1198";
+			String topLevelLabelPrefix = "Regierungsbezirk";
+			if (id.equals(nrw)) {
+				topClasses.add(
+						Json.toJson(ImmutableMap.of("value", id, "label", "Sonstige")));
+			} else if (broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix)
+					&& !label.startsWith(topLevelLabelPrefix + " Aachen")) {
+				topClasses.add(Json
+						.toJson(ImmutableMap.of("value", id, "label", label, "gnd", gnd)));
+			}
+			if (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
+					|| (broaderId.equals(nrw)
+							&& label.startsWith(topLevelLabelPrefix + " Aachen"))) {
+				if (!subClasses.containsKey(broaderId))
+					subClasses.put(broaderId, new ArrayList<JsonNode>());
+				List<JsonNode> sub = subClasses.get(broaderId);
+				sub.add(Json
+						.toJson(ImmutableMap.of("value", id, "label", label, "gnd", gnd)));
+				Collections.sort(sub, comparator);
+			}
+		});
+		Collections.sort(topClasses, comparator);
+
+	}
+
 	static void buildHierarchy(SearchResponse response, List<JsonNode> topClasses,
 			Map<String, List<JsonNode>> subClasses) {
 		for (SearchHit hit : response.getHits()) {

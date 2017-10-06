@@ -13,9 +13,19 @@
         @for(json <- classes.getOrElse(Seq())){
             @defining((json\"value").as[String]) { value =>
             <li>
-                <a href="@if(t=="Zeitschriften"){@value}else{@if(t=="Raumsystematik"){@nwbib.routes.Application.search(nwbibspatial=value)}else{@nwbib.routes.Application.search(nwbibsubject=value)}}">
-                    @((json\"label").as[String])
-                </a>
+                <a href="@{t match {
+                    case "Zeitschriften" => value
+                    case "Wikidata" => value
+                    case "Raumsystematik" => nwbib.routes.Application.search(nwbibspatial=value)
+                    case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
+                    case _ => value
+                 }}">@((json\"label").as[String])</a>
+                @if(t=="Wikidata"){
+                    @Html(controllers.nwbib.WikidataLocations.searchLink(value))
+                    @for(gnd <- (json\"gnd").asOpt[String]; if !gnd.isEmpty){
+                        <a title='Verknüpften GND-Eintrag anzeigen' href='http://test.lobid.org/authorities/@gnd'><small><span class="label label-info">gnd</span></small></a>
+                    }
+                }
                 @if(subs != null && subs.get(value) != null){
                     @ul(Some(subs.get(value).map((node: JsonNode) => Json.parse(node.toString)).toSeq),"")
                 }
