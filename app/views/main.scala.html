@@ -43,19 +43,11 @@
                       <li @if(title=="NWBib - Themensuche"){class="active"}>
                         <a href="@nwbib.routes.Application.topics()">Themensuche</a>
                       </li>
-                      <li @if(title.contains("Raumsystematik")){class="active"} class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Regionen<b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                          <li><a href="@nwbib.routes.Application.classification("Raumsystematik")"><span class="octicon octicon-milestone"></span> Raumsystematik</a></li>
-                          <li><a href="@nwbib.routes.Application.register("Raumsystematik")"><span class="glyphicon glyphicon-arrow-down"></span> A-Z Register</a></li>
-                        </ul>
+                      <li @if(title.contains("Raumsystematik")){class="active"}>
+                        <a href="@nwbib.routes.Application.classification("Raumsystematik")">Regionen</a>
                       </li>
-                      <li @if(title.contains("Sachsystematik")){class="active"} class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Sachgebiete<b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                          <li><a href="@nwbib.routes.Application.classification("Sachsystematik")"><span class="octicon octicon-list-unordered"></span> Sachsystematik</a></li>
-                          <li><a href="@nwbib.routes.Application.register("Sachsystematik")"><span class="glyphicon glyphicon-arrow-down"></span> A-Z Register</a></li>
-                        </ul>
+                      <li @if(title.contains("Sachsystematik")){class="active"}>
+                        <a href="@nwbib.routes.Application.classification("Sachsystematik")">Sachgebiete</a>
                       </li>
                       <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Ergänzende Suche<b class="caret"></b></a>
@@ -67,6 +59,8 @@
                           <li class="dropdown-header">Sonstige</li>
                           <li><a href="http://www.landesbibliothek-nrw.de/">Die NRW-Landesbibliotheken</a></li>
                           <li><a href="http://www.ubka.uni-karlsruhe.de/landesbibliographie/">Virtuelle Deutsche Landesbibliographie (VDL)</a></li>
+                          @* Enable after OK from H.F., see https://github.com/hbz/nwbib/issues/394#issuecomment-335094505 *@
+                          @* <li><a href="https://biographie-nrw.uni-muenster.de/">Biographisches Portal NRW</a></li> *@
                         </ul>
                       </li>
                     </ul>
