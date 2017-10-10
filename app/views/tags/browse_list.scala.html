@@ -12,14 +12,14 @@
         <script>$('#root').hide()</script>
         @for(json <- classes.getOrElse(Seq())){
             @defining((json\"value").as[String]) { value =>
-            <li>
+            <li>@if(id=="root"){ <b>@((json\"label").as[String].split(" ").tail.mkString(" "))</b>} else {
                 <a href="@{t match {
                     case "Zeitschriften" => value
                     case "Wikidata" => value
                     case "Raumsystematik" => nwbib.routes.Application.search(nwbibspatial=value)
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
                     case _ => value
-                 }}">@((json\"label").as[String])</a>
+                 }}">@((json\"label").as[String])</a>}
                 @if(t=="Wikidata"){
                     @Html(controllers.nwbib.WikidataLocations.searchLink(value))
                     @for(gnd <- (json\"gnd").asOpt[String]; if !gnd.isEmpty){
