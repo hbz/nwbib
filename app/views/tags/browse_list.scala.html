@@ -6,20 +6,22 @@
 @import play.api.libs.json.JsValue
 @import com.fasterxml.jackson.databind.JsonNode
 
+@labelPlain(json: JsValue) = @{((json\"label").as[String].split(" ").tail.mkString(" "))}
+
 @ul(classes: Option[Seq[JsValue]], id: String) = {
     @if(!classes.isEmpty){
         <ul id="@id">
         <script>$('#root').hide()</script>
         @for(json <- classes.getOrElse(Seq())){
             @defining((json\"value").as[String]) { value =>
-            <li>
+            <li>@if(id=="root" && !placeholder.contains("Register")) { <b>@labelPlain(json)</b> } else {
                 <a href="@{t match {
                     case "Zeitschriften" => value
                     case "Wikidata" => value
                     case "Raumsystematik" => nwbib.routes.Application.search(nwbibspatial=value)
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
                     case _ => value
-                 }}">@((json\"label").as[String])</a>
+                 }}">@if(!placeholder.contains("Register") && t=="Raumsystematik"){@labelPlain(json)} else {@((json\"label").as[String])}</a>}
                 @if(t=="Wikidata"){
                     @Html(controllers.nwbib.WikidataLocations.searchLink(value))
                     @for(gnd <- (json\"gnd").asOpt[String]; if !gnd.isEmpty){
