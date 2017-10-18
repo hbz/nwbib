@@ -556,9 +556,9 @@ public class Lobid {
 	}
 
 	static String toApi1xOrg(String url) {
-		String betaOrgsPrefix = "http://beta.lobid.org/organisations";
-		return url.startsWith(betaOrgsPrefix)
-				? url.replace(betaOrgsPrefix, "http://lobid.org/organisation") : url;
+		String orgs2Prefix = "http://lobid.org/organisations";
+		return url.startsWith(orgs2Prefix)
+				? url.replace(orgs2Prefix, "http://lobid.org/organisation") : url;
 	}
 
 	static boolean isOrg(String term) {
