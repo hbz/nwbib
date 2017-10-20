@@ -28,7 +28,7 @@ import play.cache.Cache;
 import play.libs.F.Promise;
 import play.libs.Json;
 import play.libs.ws.WS;
-import play.libs.ws.WSRequestHolder;
+import play.libs.ws.WSRequest;
 import play.libs.ws.WSResponse;
 import play.mvc.Http;
 import views.TableRow;
@@ -99,15 +99,14 @@ public class Lobid {
 				.asLong();
 	}
 
-	static WSRequestHolder request(final String q, final String person,
+	static WSRequest request(final String q, final String person,
 			final String name, final String subject, final String id,
 			final String publisher, final String issued, final String medium,
 			final String nwbibspatial, final String nwbibsubject, final int from,
 			final int size, String owner, String t, String sort, boolean allData,
 			String set, String location, String word, String corporation,
 			String raw) {
-		WSRequestHolder requestHolder = WS
-				.url(Application.CONFIG.getString("nwbib.api"))
+		WSRequest requestHolder = WS.url(Application.CONFIG.getString("nwbib.api"))
 				.setHeader("Accept", "application/json")
 				.setQueryParameter("format", "full")
 				.setQueryParameter("from", from + "")
@@ -159,8 +158,8 @@ public class Lobid {
 		return requestHolder;
 	}
 
-	static WSRequestHolder topicRequest(final String q, int from, int size) {
-		WSRequestHolder requestHolder = // @formatter:off
+	static WSRequest topicRequest(final String q, int from, int size) {
+		WSRequest requestHolder = // @formatter:off
 				WS.url(Application.CONFIG.getString("nwbib.api"))
 						.setHeader("Accept", "application/json")
 						.setQueryParameter("format", "short.subjectChain")
@@ -187,8 +186,8 @@ public class Lobid {
 				return cachedResult;
 			});
 		}
-		WSRequestHolder requestHolder = request("", "", "", "", "", "", "", "", "",
-				"", 0, 0, "", "", "", false, set, "", "", "", "");
+		WSRequest requestHolder = request("", "", "", "", "", "", "", "", "", "", 0,
+				0, "", "", "", false, set, "", "", "", "");
 		return requestHolder.get().map((WSResponse response) -> {
 			Long total = getTotalResults(response.asJson());
 			Cache.set(cacheKey, total, Application.ONE_HOUR);
@@ -261,7 +260,7 @@ public class Lobid {
 		try {
 			URI.create(uri);
 			String api = Application.CONFIG.getString("nwbib.api");
-			WSRequestHolder requestHolder = WS
+			WSRequest requestHolder = WS
 					.url(toApi1xOrg(Lobid.DATA_2
 							? uri.replaceAll("https?://lobid\\.org/resources?", api) : uri))
 					.setHeader("Accept", "application/json")
@@ -290,11 +289,10 @@ public class Lobid {
 		if (cachedResult != null) {
 			return cachedResult;
 		}
-		WSRequestHolder requestHolder =
-				WS.url(Application.CONFIG.getString("nwbib.api"))
-						.setHeader("Accept", "application/json")
-						.setQueryParameter("subject", uri)
-						.setQueryParameter("format", "full").setQueryParameter("size", "1");
+		WSRequest requestHolder = WS.url(Application.CONFIG.getString("nwbib.api"))
+				.setHeader("Accept", "application/json")
+				.setQueryParameter("subject", uri).setQueryParameter("format", "full")
+				.setQueryParameter("size", "1");
 		return requestHolder.get().map((WSResponse response) -> {
 			JsonNode value = response.asJson().get(1);
 			String label = TableRow.labelForId(uri, value,
@@ -354,7 +352,7 @@ public class Lobid {
 			String medium, String nwbibspatial, String nwbibsubject, String owner,
 			String field, String t, String set, String location, String word,
 			String corporation, String raw) {
-		WSRequestHolder request =
+		WSRequest request =
 				WS.url(Application.CONFIG.getString("nwbib.api") + "/facets")
 						.setHeader("Accept", "application/json")
 						.setQueryParameter("author", person)//

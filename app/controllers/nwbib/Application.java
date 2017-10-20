@@ -45,7 +45,7 @@ import play.data.Form;
 import play.libs.F.Promise;
 import play.libs.Json;
 import play.libs.ws.WS;
-import play.libs.ws.WSRequestHolder;
+import play.libs.ws.WSRequest;
 import play.libs.ws.WSResponse;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -168,7 +168,7 @@ public class Application extends Controller {
 		Promise<Result> cachedResult = (Promise<Result>) Cache.get(cacheId);
 		if (cachedResult != null)
 			return cachedResult;
-		WSRequestHolder request = // @formatter:off
+		WSRequest request = // @formatter:off
 				WS.url(Application.CONFIG.getString("nwbib.api") + "/facets")
 						.setHeader("Accept", "application/json")
 						.setQueryParameter("subject", q)
@@ -453,10 +453,9 @@ public class Application extends Controller {
 			final int size, String owner, String t, String sort, boolean showDetails,
 			String set, String location, String word, String corporation,
 			String raw) {
-		final WSRequestHolder requestHolder =
-				Lobid.request(q, person, name, subject, id, publisher, issued, medium,
-						nwbibspatial, nwbibsubject, from, size, owner, t, sort, showDetails,
-						set, location, word, corporation, raw);
+		final WSRequest requestHolder = Lobid.request(q, person, name, subject, id,
+				publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
+				owner, t, sort, showDetails, set, location, word, corporation, raw);
 		return requestHolder.get().map((WSResponse response) -> {
 			Long hits = 0L;
 			String s = "{}";
