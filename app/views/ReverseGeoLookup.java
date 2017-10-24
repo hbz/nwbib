@@ -6,6 +6,7 @@ import play.Logger;
 import play.cache.Cache;
 import play.libs.F.Promise;
 import play.libs.ws.WS;
+import play.libs.ws.WSRequest;
 import play.libs.ws.WSRequestHolder;
 
 /**
@@ -46,9 +47,9 @@ public class ReverseGeoLookup {
 			return (String) cached;
 		}
 		try {
-			WSRequestHolder idRequest = WS.url(String.format(idLookupUrl, location));
+			WSRequest idRequest = WS.url(String.format(idLookupUrl, location));
 			Promise<String> promise = idRequest.get().flatMap(idResponse -> {
-				WSRequestHolder labelRequest = WS.url(String.format(labelLookupURl,
+				WSRequest labelRequest = WS.url(String.format(labelLookupURl,
 						idResponse.asJson().get("items").elements().next().asInt()));
 				return labelRequest.get().map(labelResponse -> labelResponse.asJson()
 						.findValue("value").asText());

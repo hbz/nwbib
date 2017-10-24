@@ -22,6 +22,7 @@ import play.cache.Cache;
 import play.libs.F.Promise;
 import play.libs.Json;
 import play.libs.ws.WS;
+import play.libs.ws.WSRequest;
 import play.libs.ws.WSRequestHolder;
 import play.libs.ws.WSResponse;
 import play.mvc.Http;
@@ -89,7 +90,7 @@ public class WikidataLocations {
 	}
 
 	private static Promise<WSResponse> cachedRequest(String key,
-			WSRequestHolder request) {
+			WSRequest request) {
 		@SuppressWarnings("unchecked")
 		Promise<WSResponse> promise = (Promise<WSResponse>) Cache.get(key);
 		if (promise == null) {

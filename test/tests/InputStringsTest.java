@@ -25,8 +25,8 @@ import com.google.common.collect.ImmutableMap;
 import play.Play;
 import play.libs.Json;
 import play.mvc.Http;
+import play.mvc.Http.RequestBuilder;
 import play.mvc.Result;
-import play.test.FakeRequest;
 import play.test.Helpers;
 
 /**
@@ -81,11 +81,12 @@ public class InputStringsTest {
 	@Test
 	public void test() {
 		running(testServer(3333), () -> {
-			Result result = Helpers.callAction(
-					controllers.nwbib.routes.ref.Application.search(input, "", "", "", "",
-							"", "", "", "", "", 0, 10, "", "", "", false, "", "", "", "", ""),
-					new FakeRequest(Helpers.GET, "/")
-							.withFormUrlEncodedBody(ImmutableMap.of()));
+			String uri = controllers.nwbib.routes.Application
+					.search(input, "", "", "", "", "", "", "", "", "", 0, 10, "", "", "",
+							false, "", "", "", "", "")
+					.toString();
+			Result result = Helpers.route(new RequestBuilder().uri(uri)
+					.method(Helpers.GET).path("/").bodyForm(ImmutableMap.of()));
 			// we don't expect any server errors (see
 			// https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_Server_Error)
 			assertThat((Helpers.status(result) + "")).matches("[^5]..");
