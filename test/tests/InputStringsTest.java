@@ -89,7 +89,7 @@ public class InputStringsTest {
 					.method(Helpers.GET).path("/").bodyForm(ImmutableMap.of()));
 			// we don't expect any server errors (see
 			// https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_Server_Error)
-			assertThat((Helpers.status(result) + "")).matches("[^5]..");
+			assertThat((result.status() + "")).matches("[^5]..");
 		});
 	}
 

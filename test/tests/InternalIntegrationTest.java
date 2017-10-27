@@ -47,28 +47,13 @@ public class InternalIntegrationTest {
 			Promise<JsonNode> jsonPromise = Lobid.getFacets("köln", "", "", "", "",
 					"", "", "", "", "", "", field, "", "", "", "", "", "");
 			JsonNode facets = jsonPromise.get(Lobid.API_TIMEOUT);
-			assertThat(facets.findValues("term").stream().map(e -> e.asText())
-					.collect(Collectors.toList())).contains(
-							"http://purl.org/dc/terms/BibliographicResource",
-							"http://purl.org/ontology/bibo/Article",
-							"http://purl.org/ontology/bibo/Book",
-							"http://purl.org/ontology/bibo/Journal",
-							"http://purl.org/ontology/bibo/MultiVolumeBook",
-							"http://purl.org/ontology/bibo/Thesis",
-							"http://purl.org/lobid/lv#Miscellaneous",
-							"http://purl.org/ontology/bibo/Proceedings",
-							"http://purl.org/lobid/lv#EditedVolume",
-							"http://purl.org/lobid/lv#Biography",
-							"http://purl.org/lobid/lv#Festschrift",
-							"http://purl.org/ontology/bibo/Newspaper",
-							"http://purl.org/lobid/lv#Bibliography",
-							"http://purl.org/ontology/bibo/Series",
-							"http://purl.org/lobid/lv#OfficialPublication",
-							"http://purl.org/ontology/bibo/ReferenceSource",
-							"http://purl.org/ontology/mo/PublishedScore",
-							"http://purl.org/lobid/lv#Legislation",
-							"http://purl.org/ontology/bibo/Image",
-							"http://purl.org/library/Game");
+			assertThat(facets.findValue("aggregation").findValues("key").stream()
+					.map(e -> e.asText()).collect(Collectors.toList())).contains(
+							"BibliographicResource", "Article", "Book", "MultiVolumeBook",
+							"Thesis", "Miscellaneous", "Proceedings", "EditedVolume",
+							"Biography", "Festschrift", "Newspaper", "Bibliography", "Series",
+							"OfficialPublication", "ReferenceSource", "PublishedScore",
+							"Legislation", "Game");
 			assertThat(facets.findValues("count").stream().map(e -> e.intValue())
 					.collect(Collectors.toList())).excludes(0);
 		});
@@ -82,7 +67,7 @@ public class InternalIntegrationTest {
 		running(testServer(3333), () -> {
 			Content html = views.html.search.render("[{}]", query, "", "", "", "", "",
 					"", "", "", "", from, size, 0L, "", "", "", "", "", "", "", "");
-			assertThat(Helpers.contentType(html)).isEqualTo("text/html");
+			assertThat(html.contentType()).isEqualTo("text/html");
 			String text = Helpers.contentAsString(html);
 			assertThat(text).contains("NWBib").contains("buch")
 					.contains("Sachsystematik").contains("Raumsystematik");
@@ -93,20 +78,20 @@ public class InternalIntegrationTest {
 	public void sizeRequest() {
 		running(testServer(3333), () -> {
 			Long hits = Lobid
-					.getTotalHits("@graph.http://purl.org/lobid/lv#multiVolumeWork.@id",
-							"http://lobid.org/resource/HT018486420", "")
+					.getTotalHits("isPartOf.hasSuperordinate.id",
+							"http://lobid.org/resources/HT018486420#!", "")
 					.get(Lobid.API_TIMEOUT);
-			assertThat(hits).isGreaterThan(0);
+			assertThat(hits).as("1").isGreaterThan(0);
 			hits = Lobid
-					.getTotalHits("@graph.http://purl.org/lobid/lv#series.@id",
-							"http://lobid.org/resource/HT002091108", "")
+					.getTotalHits("isPartOf.hasSuperordinate.id",
+							"http://lobid.org/resources/HT002091108#!", "")
 					.get(Lobid.API_TIMEOUT);
-			assertThat(hits).isGreaterThan(0);
+			assertThat(hits).as("2").isGreaterThan(0);
 			hits = Lobid
-					.getTotalHits("@graph.http://purl.org/lobid/lv#containedIn.@id",
-							"http://lobid.org/resource/HT001387709", "")
+					.getTotalHits("containedIn.id",
+							"http://lobid.org/resources/HT001387709#!", "")
 					.get(Lobid.API_TIMEOUT);
-			assertThat(hits).isGreaterThan(0);
+			assertThat(hits).as("3").isGreaterThan(0);
 		});
 	}
 

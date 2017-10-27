@@ -83,7 +83,7 @@ var markers = new L.MarkerClusterGroup({
     }
 });
 
-var facetFieldName = '@urlEncode("@graph.http://purl.org/lobid/lv#subjectLocation.@value")';
+var facetFieldName = '@urlEncode("spatial.geo")';
 var queryParams = '&q=@urlEncode(q)&person=@urlEncode(person)&name=@urlEncode(name)'+
 '&subject=@urlEncode(subject)&publisher=@urlEncode(publisher)&issued=@urlEncode(issued)'+
 '&medium=@urlEncode(medium)&nwbibspatial=@urlEncode(nwbibspatial)&nwbibsubject=@urlEncode(nwbibsubject)'+

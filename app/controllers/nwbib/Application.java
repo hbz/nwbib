@@ -72,36 +72,29 @@ public class Application extends Controller {
 	private static final String STARRED = "starred";
 
 	/** The internal ES field for the type facet. */
-	public static final String TYPE_FIELD = "@graph.@type";
+	public static final String TYPE_FIELD = "type";
 	/** The type field in Lobid data 2.0. */
 	public static final String TYPE_FIELD_LOBID2 = "type";
 	/** The internal ES field for the medium facet. */
-	public static final String MEDIUM_FIELD =
-			"@graph.http://purl.org/dc/terms/medium.@id";
+	public static final String MEDIUM_FIELD = "medium.id";
 	/** The internal ES field for the item/exemplar facet. */
-	public static final String ITEM_FIELD =
-			"@graph.http://purl.org/vocab/frbr/core#exemplar.@id";
+	public static final String ITEM_FIELD = "owner";
 
 	/** The internal ES field for the NWBib subject facet. */
-	public static final String NWBIB_SUBJECT_FIELD =
-			"@graph.http://purl.org/lobid/lv#nwbibsubject.@id";
+	public static final String NWBIB_SUBJECT_FIELD = "subject.id";
 	/** The internal ES field for the NWBib spatial facet. */
 	public static final String NWBIB_SPATIAL_FIELD =
 			"@graph.http://purl.org/lobid/lv#nwbibspatial.@id";
 	/** The internal ES field for the coverage facet. */
-	public static final String COVERAGE_FIELD =
-			"@graph.http://purl.org/dc/elements/1.1/coverage.@value.raw";
+	public static final String COVERAGE_FIELD = "spatial.label.raw";
 	/** The internal ES field for subject locations. */
-	public static final String SUBJECT_LOCATION_FIELD =
-			"@graph.http://purl.org/lobid/lv#subjectLocation.@value";
+	public static final String SUBJECT_LOCATION_FIELD = "spatial.geo";
 
 	/** The internal ES field for subjects. */
-	public static final String SUBJECT_FIELD =
-			"@graph.http://purl.org/dc/terms/subject.@id";
+	public static final String SUBJECT_FIELD = "subject.componentList.id";
 
 	/** The internal ES field for issued years. */
-	public static final String ISSUED_FIELD =
-			"@graph.http://purl.org/dc/terms/issued.@value";
+	public static final String ISSUED_FIELD = "publication.startDate";
 
 	private static final File FILE = new File("conf/nwbib.conf");
 	/** Access to the nwbib.conf config file. */
@@ -178,7 +171,7 @@ public class Application extends Controller {
 						.setQueryParameter("size", "9999"); // @formatter:on
 		Promise<Result> result = request.get().map((WSResponse response) -> {
 			if (response.getStatus() == Http.Status.OK) {
-				List<JsonNode> terms = response.asJson().findValues("term");
+				List<JsonNode> terms = response.asJson().findValues("key");
 				return ok(views.html.topics.render(q, cleanSortUnique(terms)));
 			}
 			Logger.error(new String(response.asByteArray()));
@@ -274,8 +267,8 @@ public class Application extends Controller {
 		} else {
 			Logger.warn("No pagination session data for {}", id);
 		}
-		return search("", "", "", "", id, "", "", "", "", "", 0, 1, "", "", "",
-				true, "", "", "", "", "");
+		return search("hbzId:" + id, "", "", "", "", "", "", "", "", "", 0, 1, "",
+				"", "", true, "", "", "", "", "");
 	}
 
 	/**
@@ -441,7 +434,7 @@ public class Application extends Controller {
 	private static void cacheOnRedeem(final String cacheId,
 			final Promise<Result> resultPromise, final int duration) {
 		resultPromise.onRedeem((Result result) -> {
-			if (play.test.Helpers.status(result) == Http.Status.OK)
+			if (result.status() == Http.Status.OK)
 				Cache.set(cacheId, resultPromise, duration);
 		});
 	}
@@ -476,9 +469,9 @@ public class Application extends Controller {
 			}
 			if (showDetails) {
 				String json = "";
-				JsonNode nodes = Json.parse(s);
-				if (nodes.isArray() && nodes.size() == 2) { // first: metadata
-					json = nodes.get(1).toString();
+				JsonNode nodes = Json.parse(s).get("member");
+				if (nodes.isArray() && nodes.size() == 1) {
+					json = nodes.get(0).toString();
 				} else {
 					Logger.warn("No suitable data to show details for: {}", nodes);
 				}
@@ -538,8 +531,8 @@ public class Application extends Controller {
 		String labelTemplate = "<span class='%s'/>&nbsp;%s (%s)";
 
 		Function<JsonNode, Pair<JsonNode, String>> toLabel = json -> {
-			String term = json.get("term").asText();
-			int count = json.get("count").asInt();
+			String term = json.get("key").asText();
+			int count = json.get("doc_count").asInt();
 			String icon = Lobid.facetIcon(Arrays.asList(term), field);
 			String label = Lobid.facetLabel(Arrays.asList(term), field, "");
 			String fullLabel = String.format(labelTemplate, icon, label, count);
@@ -549,23 +542,23 @@ public class Application extends Controller {
 		Predicate<Pair<JsonNode, String>> labelled = pair -> {
 			JsonNode json = pair.getLeft();
 			String label = pair.getRight();
-			int count = json.get("count").asInt();
+			int count = json.get("doc_count").asInt();
 			return (!label.contains("http") || label.contains("nwbib")) && label
 					.length() > String.format(labelTemplate, "", "", count).length();
 		};
 
 		Collator collator = Collator.getInstance(Locale.GERMAN);
 		Comparator<Pair<JsonNode, String>> sorter = (p1, p2) -> {
-			String t1 = p1.getLeft().get("term").asText();
-			String t2 = p2.getLeft().get("term").asText();
+			String t1 = p1.getLeft().get("key").asText();
+			String t2 = p2.getLeft().get("key").asText();
 			boolean t1Current = current(subject, medium, nwbibspatial, nwbibsubject,
 					owner, t, field, t1, raw);
 			boolean t2Current = current(subject, medium, nwbibspatial, nwbibsubject,
 					owner, t, field, t2, raw);
 			if (t1Current == t2Current) {
 				if (!field.equals(ISSUED_FIELD)) {
-					Integer c1 = p1.getLeft().get("count").asInt();
-					Integer c2 = p2.getLeft().get("count").asInt();
+					Integer c1 = p1.getLeft().get("doc_count").asInt();
+					Integer c2 = p2.getLeft().get("doc_count").asInt();
 					return c2.compareTo(c1);
 				}
 				String l1 = p1.getRight().substring(p1.getRight().lastIndexOf('>') + 1);
@@ -578,29 +571,38 @@ public class Application extends Controller {
 		Function<Pair<JsonNode, String>, String> toHtml = pair -> {
 			JsonNode json = pair.getLeft();
 			String fullLabel = pair.getRight();
-			String term = json.get("term").asText();
+			String term = json.get("key").asText();
 			if (field.equals(SUBJECT_LOCATION_FIELD)) {
 				GeoPoint point = new GeoPoint(term);
 				term = String.format("%s,%s", point.getLat(), point.getLon());
 			}
 			String mediumQuery = !field.equals(MEDIUM_FIELD) //
-					? medium : queryParam(medium, term);
+					? medium
+					: queryParam(medium, term);
 			String typeQuery = !field.equals(TYPE_FIELD) //
-					? t : queryParam(t, term);
+					? t
+					: queryParam(t, term);
 			String ownerQuery = !field.equals(ITEM_FIELD) //
-					? owner : withoutAndOperator(queryParam(owner, term));
+					? owner
+					: withoutAndOperator(queryParam(owner, term));
 			String nwbibsubjectQuery = !field.equals(NWBIB_SUBJECT_FIELD) //
-					? nwbibsubject : queryParam(nwbibsubject, term);
+					? nwbibsubject
+					: queryParam(nwbibsubject, term);
 			String nwbibspatialQuery = !field.equals(NWBIB_SPATIAL_FIELD) //
-					? nwbibspatial : queryParam(nwbibspatial, term);
+					? nwbibspatial
+					: queryParam(nwbibspatial, term);
 			String rawQuery = !field.equals(COVERAGE_FIELD) //
-					? raw : rawQueryParam(raw, term);
+					? raw
+					: rawQueryParam(raw, term);
 			String locationQuery = !field.equals(SUBJECT_LOCATION_FIELD) //
-					? location : term;
+					? location
+					: term;
 			String subjectQuery = !field.equals(SUBJECT_FIELD) //
-					? subject : queryParam(subject, term);
+					? subject
+					: queryParam(subject, term);
 			String issuedQuery = !field.equals(ISSUED_FIELD) //
-					? issued : queryParam(issued, term);
+					? issued
+					: queryParam(issued, term);
 
 			boolean current = current(subject, medium, nwbibspatial, nwbibsubject,
 					owner, t, field, term, raw);
@@ -611,11 +613,10 @@ public class Application extends Controller {
 					sort(sort, nwbibspatialQuery, nwbibsubjectQuery, subjectQuery), false,
 					set, locationQuery, word, corporation, rawQuery).url();
 
-			String result = String.format(
-					"<li " + (current ? "class=\"active\"" : "")
-							+ "><a class=\"%s-facet-link\" href='%s'>"
-							+ "<input onclick=\"location.href='%s'\" class=\"facet-checkbox\" "
-							+ "type=\"checkbox\" %s>&nbsp;%s</input>" + "</a></li>",
+			String result = String.format("<li " + (current ? "class=\"active\"" : "")
+					+ "><a class=\"%s-facet-link\" href='%s'>"
+					+ "<input onclick=\"location.href='%s'\" class=\"facet-checkbox\" "
+					+ "type=\"checkbox\" %s>&nbsp;%s</input>" + "</a></li>",
 					Math.abs(field.hashCode()), routeUrl, routeUrl,
 					current ? "checked" : "", fullLabel);
 
@@ -625,9 +626,10 @@ public class Application extends Controller {
 		Promise<Result> promise = Lobid.getFacets(q, person, name, subject, id,
 				publisher, issued, medium, nwbibspatial, nwbibsubject, owner, field, t,
 				set, location, word, corporation, raw).map(json -> {
-					Stream<JsonNode> stream =
-							StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-									json.findValue("entries").elements(), 0), false);
+					Stream<JsonNode> stream = StreamSupport.stream(
+							Spliterators.spliteratorUnknownSize(
+									json.findValue("aggregation").get(field).elements(), 0),
+							false);
 					if (field.equals(ITEM_FIELD)) {
 						stream = preprocess(stream);
 					}
@@ -655,7 +657,8 @@ public class Application extends Controller {
 	private static String sort(String sort, String nwbibspatialQuery,
 			String nwbibsubjectQuery, String subjectQuery) {
 		return (nwbibspatialQuery + nwbibsubjectQuery + subjectQuery).contains(",")
-				? "" /* relevance */ : sort;
+				? ""
+				/* relevance */ : sort;
 	}
 
 	private static boolean current(String subject, String medium,
@@ -723,22 +726,20 @@ public class Application extends Controller {
 
 	private static Stream<JsonNode> preprocess(Stream<JsonNode> stream) {
 		String captureItemUriWithoutSignature =
-				"(http://lobid\\.org/item/[^:]*?:[^:]*?:)[^\"]*";
+				"(http://lobid\\.org/items/[^:]*?:[^:]*?:)[^\"]*";
 		List<String> itemUrisWithoutSignatures = stream
-				.map(json -> json.get("term").asText()
+				.map(json -> json.get("key").asText()
 						.replaceAll(captureItemUriWithoutSignature, "$1"))
 				.distinct().collect(Collectors.toList());
 		return count(itemUrisWithoutSignatures).entrySet().stream()
 				.map(entry -> Json.toJson(ImmutableMap.of(//
-						"term",
-						Lobid.toApi1xOrg(Application.CONFIG.getString("orgs.api")) + "/"
-								+ entry.getKey(), //
-						"count", entry.getValue())));
+						"key", entry.getKey(), //
+						"doc_count", entry.getValue())));
 	}
 
 	private static Map<String, Integer> count(List<String> itemUris) {
 		String captureIsilOrgIdentifier =
-				"http://lobid\\.org/item/[^:]*?:([^:]*?):[^\"]*";
+				"http://lobid\\.org/items/[^:]*?:([^:]*?):[^\"]*";
 		Map<String, Integer> map = new HashMap<>();
 		for (String term : itemUris) {
 			String isil = term.replaceAll(captureIsilOrgIdentifier, "$1");
@@ -810,8 +811,9 @@ public class Application extends Controller {
 			return Promise.pure(redirect(routes.Application.showStars(format,
 					starred.stream().collect(Collectors.joining(",")))));
 		}
-		final List<String> starredIds = starred.isEmpty() && ids.trim().isEmpty()
-				? starred : Arrays.asList(ids.split(","));
+		final List<String> starredIds =
+				starred.isEmpty() && ids.trim().isEmpty() ? starred
+						: Arrays.asList(ids.split(","));
 		String cacheKey = "starsForIds." + starredIds;
 		Object cachedJson = Cache.get(cacheKey);
 		if (cachedJson != null && cachedJson instanceof List) {

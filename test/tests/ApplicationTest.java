@@ -81,7 +81,7 @@ public class ApplicationTest {
 		List<String> nwbibspatials = Classification
 				.toJsonLd(new URL(CONFIG.getString("index.data.nwbibspatial")));
 		nwbibspatials.forEach(System.out::println);
-		assertThat(nwbibspatials.size()).isEqualTo(50);
+		assertThat(nwbibspatials.size()).isEqualTo(49);
 		assertThat(nwbibspatials.toString()).contains("Nordrhein-Westfalen")
 				.contains("Rheinland").contains("Grafschaft, Herzogtum Jülich");
 	}

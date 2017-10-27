@@ -84,7 +84,7 @@ public class ExternalIntegrationTest {
 		running(testServer(3333), () -> {
 			Content html = views.html.search.render("[{}]", query, "", "", "", "", "",
 					"", "", "", "", from, size, 0L, "", "", "", "", "", "", "", "");
-			assertThat(Helpers.contentType(html)).isEqualTo("text/html");
+			assertThat(html.contentType()).isEqualTo("text/html");
 			String text = Helpers.contentAsString(html);
 			assertThat(text).contains("NWBib").contains("buch")
 					.contains("Sachsystematik").contains("Raumsystematik");
