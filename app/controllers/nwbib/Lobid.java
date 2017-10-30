@@ -4,7 +4,6 @@ package controllers.nwbib;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterators;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -45,34 +45,15 @@ public class Lobid {
 	/** Timeout for API calls in milliseconds. */
 	public static final int API_TIMEOUT = 50000;
 
-	/** Feature toggle for using the new Lobid 2.0 data. */
-	public static boolean DATA_2 =
-			Application.CONFIG.getBoolean("feature.lobid2.enabled");
-
 	/**
 	 * @param id The resource ID
 	 * @return The resource JSON content
 	 */
 	public static JsonNode getResource(String id) {
-		DATA_2 = Application.CONFIG.getBoolean("feature.lobid2.enabled");
-		if (DATA_2) {
-			String url = String.format(
-					Application.CONFIG.getString("feature.lobid2.indexUrlFormat"), id);
-			JsonNode response = cachedJsonCall(url);
-			if (response.size() == 0) {
-				// Fall back to data 1.x if nothing found:
-				String fallbackUrl = String.format("%s/%s?format=full",
-						Application.CONFIG.getString("nwbib.api"), id);
-				Logger.warn(
-						"No response from Lobid API 2.0 URL '{}', falling back to API 1.x URL '{}'",
-						url, fallbackUrl);
-				DATA_2 = false; // required for processing individual fields
-				return cachedJsonCall(fallbackUrl);
-			}
-			return response;
-		}
-		throw new IllegalStateException(
-				"Only implemented for Lobid.DATA_2 feature");
+		String url =
+				String.format(Application.CONFIG.getString("indexUrlFormat"), id);
+		JsonNode response = cachedJsonCall(url);
+		return response;
 	}
 
 	/**
@@ -86,10 +67,9 @@ public class Lobid {
 			return json;
 		}
 		Logger.debug("Not cached, GET: {}", url);
-		Promise<JsonNode> promise = WS.url(url).get()
-				.map(response -> response.getStatus() == Http.Status.OK
-						? response.asJson()
-						: Json.newObject());
+		Promise<JsonNode> promise =
+				WS.url(url).get().map(response -> response.getStatus() == Http.Status.OK
+						? response.asJson() : Json.newObject());
 		promise.onRedeem(jsonResponse -> {
 			Cache.set(cacheKey, jsonResponse, Application.ONE_DAY);
 		});
@@ -116,7 +96,9 @@ public class Lobid {
 
 		if (!raw.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("q",
-					prepare(preprocess(q) + " AND " + raw, allData, set));
+					prepare(
+							preprocess(q) + (preprocess(q).isEmpty() ? "" : " AND ") + raw,
+							allData, set));
 		if (!q.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("q",
 					prepare(preprocess(q), allData, set));
@@ -231,9 +213,9 @@ public class Lobid {
 				return cachedResult;
 			});
 		}
+		String qVal = prepare(f + ":\"" + v + "\"", set);
 		return WS.url(Application.CONFIG.getString("nwbib.api"))
-				.setQueryParameter("format", "json")
-				.setQueryParameter("q", prepare(f + ":" + v, set)).get()
+				.setQueryParameter("format", "json").setQueryParameter("q", qVal).get()
 				.map((WSResponse response) -> {
 					Long total = getTotalResults(response.asJson());
 					Cache.set(cacheKey, total, Application.ONE_HOUR);
@@ -250,46 +232,64 @@ public class Lobid {
 	}
 
 	/**
-	 * @param uri A Lobid-Organisation URI
-	 * @return A human readable label for the given URI
+	 * @param id A Lobid-Organisations URI or ISIL
+	 * @return A human readable label for the given id
 	 */
-	public static String organisationLabel(String uri) {
-		String cacheKey = "org.label." + uri;
-		return lobidLabel(uri, cacheKey);
+	public static String organisationLabel(String id) {
+		// e.g. take DE-6 from http://lobid.org/organisations/DE-6#!
+		String simpleId =
+				id.replaceAll("https?://lobid.org/organisations?/(.+?)(#!)?$", "$1");
+		if (simpleId.startsWith("ZDB-")) {
+			return "Paket elektronischer Ressourcen: " + simpleId;
+		}
+		JsonNode org = cachedJsonCall(id.startsWith("http") ? id
+				: Application.CONFIG.getString("orgs.api") + id);
+		if (org.size() == 0) {
+			if (simpleId.split("-").length == 3) {
+				String superSigel = id.substring(0, id.lastIndexOf('-'));
+				Logger.info("No data for: {}, trying {}", id, superSigel);
+				return organisationLabel(superSigel) + ": " + simpleId;
+			}
+			Logger.warn("No data for: " + id);
+			return simpleId;
+		}
+		JsonNode json = Optional.ofNullable(org.findValue("alternateName"))
+				.orElse(Json.toJson(Arrays.asList(org.findValue("name"))));
+		String label = HtmlEscapers.htmlEscaper()
+				.escape(json == null ? "" : last(json.elements()).asText());
+		Logger.trace("Get org label, {} -> {} -> {}", id, simpleId, label);
+		return label.isEmpty() ? simpleId : label;
+	}
+
+	private static JsonNode last(Iterator<JsonNode> iterator) {
+		JsonNode result = null;
+		while (iterator.hasNext()) {
+			result = iterator.next();
+		}
+		return result;
 	}
 
 	/**
-	 * @param uri A Lobid-Resources URI
-	 * @return A human readable label for the given URI
+	 * @param id A Lobid-Resources URI or hbz title ID
+	 * @return A human readable label for the given id
 	 */
-	public static String resourceLabel(String uri) {
-		String cacheKey = "res.label." + uri;
-		return lobidLabel(uri, cacheKey);
-	}
-
-	private static String lobidLabel(String uri, String cacheKey) {
-		final String cachedResult = (String) Cache.get(cacheKey);
-		if (cachedResult != null) {
-			return cachedResult;
-		}
+	public static String resourceLabel(String id) {
+		Callable<String> getLabel = () -> {
+			// e.g. take TT000086525 from http://lobid.org/resources/TT000086525#!
+			String simpleId =
+					id.replaceAll("https?://lobid.org/resources?/(.+?)[^A-Z0-9]*$", "$1");
+			JsonNode json = getResource(simpleId).findValue("title");
+			String label =
+					json == null ? "" : HtmlEscapers.htmlEscaper().escape(json.asText());
+			Logger.debug("Get res label, {} -> {} -> {}", id, simpleId, label);
+			return label.isEmpty() ? simpleId : label;
+		};
 		try {
-			URI.create(uri);
-			WSRequest requestHolder =
-					WS.url(uri).setHeader("Accept", "application/json");
-			return requestHolder.get().map((WSResponse response) -> {
-				JsonNode json = response.asJson();
-				String label = json.has("alternateName")
-						? json.get("alternateName").elements().next().textValue()
-						: Optional.ofNullable(json.findValue("name"))
-								.orElse(json.findValue("title")).textValue();
-				label = HtmlEscapers.htmlEscaper().escape(label);
-				Cache.set(cacheKey, label, Application.ONE_DAY);
-				return label;
-			}).get(Lobid.API_TIMEOUT);
-		} catch (Exception x) {
-			Logger.error("Could not get Lobid label for " + uri, x);
-			return uri;
+			return Cache.getOrElse("res.label." + id, getLabel, Application.ONE_DAY);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		return "";
 	}
 
 	private static String gndLabel(String uri) {
@@ -437,9 +437,8 @@ public class Lobid {
 				.replaceAll("^\\+?<", "").replace("^\\+?>", "");
 	}
 
-	private static final Map<String, String> keys = ImmutableMap.of(
-			// Application.TYPE_FIELD, "type.labels.lobid1", //
-			Application.TYPE_FIELD_LOBID2, "type.labels.lobid2", //
+	private static final Map<String, String> keys = ImmutableMap.of(//
+			Application.TYPE_FIELD, "type.labels", //
 			Application.MEDIUM_FIELD, "medium.labels");
 
 	/**
@@ -557,8 +556,7 @@ public class Lobid {
 			Integer specificity = (Integer) vals.get(2);
 			return ((String) vals.get(0)).isEmpty()
 					|| ((String) vals.get(1)).isEmpty() //
-							? Pair.of("", specificity)
-							: Pair.of(t, specificity);
+							? Pair.of("", specificity) : Pair.of(t, specificity);
 		}).filter(t -> {
 			return !t.getLeft().isEmpty();
 		}).collect(Collectors.toList());
@@ -595,7 +593,7 @@ public class Lobid {
 	 * @return A mapping of ISILs to item URIs
 	 */
 	public static Map<String, List<String>> items(String doc) {
-		JsonNode items = Json.parse(doc).findValue("exemplar");
+		JsonNode items = Json.parse(doc).findValue("hasItem");
 		Map<String, List<String>> result = new HashMap<>();
 		if (items != null && (items.isArray() || items.isTextual()))
 			mapIsilsToUris(items, result);
@@ -607,7 +605,7 @@ public class Lobid {
 		Iterator<JsonNode> elements =
 				items.isArray() ? items.elements() : Arrays.asList(items).iterator();
 		while (elements.hasNext()) {
-			String itemUri = elements.next().asText();
+			String itemUri = elements.next().get("id").asText();
 			try {
 				String isil = itemUri.split(":")[2];
 				List<String> uris = result.getOrDefault(isil, new ArrayList<>());
@@ -628,7 +626,7 @@ public class Lobid {
 				Play.application().resourceAsStream("isil2opac_hbzid.json")) {
 			JsonNode json = Json.parse(stream);
 			String[] hbzId_isil_sig =
-					itemUri.substring(itemUri.indexOf("item/") + 5).split(":");
+					itemUri.substring(itemUri.indexOf("items/") + 6).split(":");
 			String hbzId = hbzId_isil_sig[0];
 			String isil = hbzId_isil_sig[1];
 			Logger.debug("From item URI {}, got ISIL {} and HBZ-ID {}", itemUri, isil,

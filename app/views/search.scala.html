@@ -48,7 +48,7 @@
 }
 
 @labelRaw = @{
-	if(raw.contains("multiVolumeWork")) {select(("Band","Bände"))} else if (raw.contains("series")) {select(("Serienband","Serienbände"))} else if (raw.contains("containedIn")) {select(("Beitrag","Beiträge"))} else {""}
+	if(raw.contains("hasSuperordinate")) {select(("Band","Bände"))} else if (raw.contains("containedIn")) {select(("Beitrag","Beiträge"))} else {""}
 }
 
 @nwbibBreadcrumb() = {
@@ -100,8 +100,8 @@
                     <div class="col-md-1"></div>
                     <div class="col-md-10">
                      @allHits @if(!raw.isEmpty && !raw.contains(Lobid.escapeUri(Application.COVERAGE_FIELD.replace(".raw","")))){
-                      @defining(Application.CONFIG.getString("nwbib.api") + "/" + raw.substring(raw.lastIndexOf("/")+1)) { lobidUrl =>
-                       @labelRaw in: <a href="@lobidUrl.replace("/resource/","/nwbib/")">@Html(Lobid.resourceLabel(lobidUrl))</a>}}else{Treffer}@nwbibBreadcrumb()
+                      @defining(String.format(Application.CONFIG.getString("indexUrlFormat"), raw.substring(raw.lastIndexOf("/")+1))) { lobidUrl =>
+                       @labelRaw in: <a href="@lobidUrl.replace("/resources/","/nwbib/")">@Html(Lobid.resourceLabel(lobidUrl))</a>}}else{Treffer}@nwbibBreadcrumb()
                        zeige @(from+1) bis @(Math.min(from+hits.size,from+size)):
                     </div>
                     <div class="col-md-1" style="text-align: right; padding-right: 4px;">

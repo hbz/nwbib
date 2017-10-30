@@ -27,14 +27,14 @@
 @if(docJson.isEmpty){
   @main("NWBib - Vollanzeige") {
     @if(flash.get("error")!=null){
-    <div class="alert alert-danger">@flash.get("error")</div>
+    <div id="search-results" class="alert alert-danger">@flash.get("error")</div>
     } else {
-    <div class="alert alert-info text-center">Ein Titel mit der ID @q konnte nicht gefunden werden.</div>
+    <div id="search-results" class="alert alert-info text-center">Ein Titel mit der ID @q konnte nicht gefunden werden.</div>
     }
   }
 } else {
   @defining(Json.parse(docJson)) { doc =>
-    @main(if( (doc\\"title").isEmpty) "NWBib - Vollanzeige" else (doc\\"title")(0).as[String]) {
+    @main(if( (doc\\"title").isEmpty) "NWBib - Vollanzeige" else (doc\\"title")(0).asOpt[String].getOrElse(q)) {
       @if(Cache.get(session("uuid") + "-" + (doc\\"hbzId")(0).as[String]) != null) {
         @defining(Cache.get(session("uuid") + "-lastSearch")) { lastSearch =>
           @if(lastSearch != null) {
@@ -58,16 +58,16 @@
           }
         }
       }
-      <div class="row">
+      <div class="row" id="search-results">
       @defining(Lobid.items(doc.toString)) { items =>
-        @defining(!(doc\\"isPartOf").isEmpty && doc.toString.contains("http://purl.org/ontology/bibo/Article")){superordination =>
+        @defining(!(doc\\"isPartOf").isEmpty && (doc\"type").toString.contains("Article")){superordination =>
           <div class="col-md-@if(items.isEmpty && !doc.toString.contains("fulltextOnline") && !superordination){12} else {8}">
             <dl>
-            @defining((doc\\"hbzId")(0).asOpt[String].getOrElse("--")){ id =>
+            @defining((doc\\"hbzId")(0).asOpt[String].getOrElse(q)){ id =>
               <dt>@tags.star_button(id) Titeldetails:
-              <a href="@Application.CONFIG.getString("hbz01.api")/@id">&nbsp;</a>
+              <a href="@(String.format(Application.CONFIG.getString("indexUrlFormat"), id))">&nbsp;</a>
               </dt>
-              <dd>@tags.result_doc(if(Lobid.DATA_2) { Json.parse(Lobid.getResource(id).toString) } else { doc })</dd>
+              <dd>@tags.result_doc(doc)</dd>
             }
             </dl>
           </div>
@@ -94,7 +94,7 @@
                 <th style="width: 30%"></th>
                 <th style="width: 70%"></th>
               </tr>
-              @result_field("Zum Bestand siehe:", "isPartOf", doc, TableRow.LINKS)
+              @result_field("Zum Bestand siehe:", "hasSuperordinate", doc, TableRow.LINKS)
             </table>
             </dd>
             }

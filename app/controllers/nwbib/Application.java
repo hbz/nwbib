@@ -73,8 +73,6 @@ public class Application extends Controller {
 
 	/** The internal ES field for the type facet. */
 	public static final String TYPE_FIELD = "type";
-	/** The type field in Lobid data 2.0. */
-	public static final String TYPE_FIELD_LOBID2 = "type";
 	/** The internal ES field for the medium facet. */
 	public static final String MEDIUM_FIELD = "medium.id";
 	/** The internal ES field for the item/exemplar facet. */
@@ -577,32 +575,23 @@ public class Application extends Controller {
 				term = String.format("%s,%s", point.getLat(), point.getLon());
 			}
 			String mediumQuery = !field.equals(MEDIUM_FIELD) //
-					? medium
-					: queryParam(medium, term);
+					? medium : queryParam(medium, term);
 			String typeQuery = !field.equals(TYPE_FIELD) //
-					? t
-					: queryParam(t, term);
+					? t : queryParam(t, term);
 			String ownerQuery = !field.equals(ITEM_FIELD) //
-					? owner
-					: withoutAndOperator(queryParam(owner, term));
+					? owner : withoutAndOperator(queryParam(owner, term));
 			String nwbibsubjectQuery = !field.equals(NWBIB_SUBJECT_FIELD) //
-					? nwbibsubject
-					: queryParam(nwbibsubject, term);
+					? nwbibsubject : queryParam(nwbibsubject, term);
 			String nwbibspatialQuery = !field.equals(NWBIB_SPATIAL_FIELD) //
-					? nwbibspatial
-					: queryParam(nwbibspatial, term);
+					? nwbibspatial : queryParam(nwbibspatial, term);
 			String rawQuery = !field.equals(COVERAGE_FIELD) //
-					? raw
-					: rawQueryParam(raw, term);
+					? raw : rawQueryParam(raw, term);
 			String locationQuery = !field.equals(SUBJECT_LOCATION_FIELD) //
-					? location
-					: term;
+					? location : term;
 			String subjectQuery = !field.equals(SUBJECT_FIELD) //
-					? subject
-					: queryParam(subject, term);
+					? subject : queryParam(subject, term);
 			String issuedQuery = !field.equals(ISSUED_FIELD) //
-					? issued
-					: queryParam(issued, term);
+					? issued : queryParam(issued, term);
 
 			boolean current = current(subject, medium, nwbibspatial, nwbibsubject,
 					owner, t, field, term, raw);
@@ -613,10 +602,11 @@ public class Application extends Controller {
 					sort(sort, nwbibspatialQuery, nwbibsubjectQuery, subjectQuery), false,
 					set, locationQuery, word, corporation, rawQuery).url();
 
-			String result = String.format("<li " + (current ? "class=\"active\"" : "")
-					+ "><a class=\"%s-facet-link\" href='%s'>"
-					+ "<input onclick=\"location.href='%s'\" class=\"facet-checkbox\" "
-					+ "type=\"checkbox\" %s>&nbsp;%s</input>" + "</a></li>",
+			String result = String.format(
+					"<li " + (current ? "class=\"active\"" : "")
+							+ "><a class=\"%s-facet-link\" href='%s'>"
+							+ "<input onclick=\"location.href='%s'\" class=\"facet-checkbox\" "
+							+ "type=\"checkbox\" %s>&nbsp;%s</input>" + "</a></li>",
 					Math.abs(field.hashCode()), routeUrl, routeUrl,
 					current ? "checked" : "", fullLabel);
 
@@ -657,8 +647,7 @@ public class Application extends Controller {
 	private static String sort(String sort, String nwbibspatialQuery,
 			String nwbibsubjectQuery, String subjectQuery) {
 		return (nwbibspatialQuery + nwbibsubjectQuery + subjectQuery).contains(",")
-				? ""
-				/* relevance */ : sort;
+				? ""/* relevance */ : sort;
 	}
 
 	private static boolean current(String subject, String medium,
@@ -811,9 +800,8 @@ public class Application extends Controller {
 			return Promise.pure(redirect(routes.Application.showStars(format,
 					starred.stream().collect(Collectors.joining(",")))));
 		}
-		final List<String> starredIds =
-				starred.isEmpty() && ids.trim().isEmpty() ? starred
-						: Arrays.asList(ids.split(","));
+		final List<String> starredIds = starred.isEmpty() && ids.trim().isEmpty()
+				? starred : Arrays.asList(ids.split(","));
 		String cacheKey = "starsForIds." + starredIds;
 		Object cachedJson = Cache.get(cacheKey);
 		if (cachedJson != null && cachedJson instanceof List) {
