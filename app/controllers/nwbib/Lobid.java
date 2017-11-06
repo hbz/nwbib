@@ -368,7 +368,6 @@ public class Lobid {
 				.setHeader("Accept", "application/json").setQueryParameter("name", name)
 				.setQueryParameter("publisher", publisher)//
 				.setQueryParameter("id", id)//
-				.setQueryParameter("q", prepare(q, set))//
 				.setQueryParameter("aggregations", field)//
 				.setQueryParameter("from", "0")//
 				.setQueryParameter("size",
@@ -397,6 +396,9 @@ public class Lobid {
 		if (!raw.isEmpty()
 				&& !raw.contains(Lobid.escapeUri(Application.COVERAGE_FIELD)))
 			request = request.setQueryParameter("q", raw);
+		else if (request.getQueryParameters().get("q") == null) {
+			request.setQueryParameter("q", prepare(q, set));
+		}
 		if (!field.equals(Application.ITEM_FIELD))
 			request = request.setQueryParameter("owner", owner);
 		if (!field.startsWith("http"))
