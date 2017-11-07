@@ -225,7 +225,7 @@ public class Application extends Controller {
 		String uuid = session("uuid");
 		if (uuid == null)
 			session("uuid", UUID.randomUUID().toString());
-		if (id.isEmpty()) {
+		if (!q.contains("hbzId:")) {
 			session("lastSearchUrl", request().uri());
 			response().setHeader("Cache-Control",
 					"no-cache, no-store, must-revalidate");
@@ -454,7 +454,7 @@ public class Application extends Controller {
 				JsonNode json = response.asJson();
 				hits = Lobid.getTotalResults(json);
 				s = json.toString();
-				if (id.isEmpty()) {
+				if (!q.contains("hbzId:")) {
 					List<JsonNode> ids = json.findValues("hbzId");
 					uncache(
 							ids.stream().map(j -> j.asText()).collect(Collectors.toList()));
