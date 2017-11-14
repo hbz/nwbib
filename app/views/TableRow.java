@@ -234,7 +234,7 @@ public enum TableRow {
 				|| property.equals("isPartOf") || property.equals("hasSuperordinate"))
 				&& value.contains("lobid.org")) {
 			return new String[] {
-					value.replaceAll("lobid.org/resources?/", "lobid.org/nwbib/"),
+					value.replaceAll("lobid.org/resources?/", "nwbib.de/"),
 					Lobid.resourceLabel(value) };
 		}
 		String label =
