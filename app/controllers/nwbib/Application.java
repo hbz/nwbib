@@ -33,7 +33,6 @@ import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.io.Streams;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.ImmutableMap;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -620,9 +619,6 @@ public class Application extends Controller {
 							Spliterators.spliteratorUnknownSize(
 									json.findValue("aggregation").get(field).elements(), 0),
 							false);
-					if (field.equals(ITEM_FIELD)) {
-						stream = preprocess(stream);
-					}
 					String labelKey = String.format(
 							"facets-labels.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s",
 							field, raw, q, person, name, id, publisher, set, word,
@@ -711,31 +707,6 @@ public class Application extends Controller {
 		terms =
 				terms.length() >= 2 ? terms.substring(1, terms.length() - 1) : terms;
 		return Arrays.asList(terms.split("\\+")).contains(term);
-	}
-
-	private static Stream<JsonNode> preprocess(Stream<JsonNode> stream) {
-		String captureItemUriWithoutSignature =
-				"(http://lobid\\.org/items/[^:]*?:[^:]*?:)[^\"]*";
-		List<String> itemUrisWithoutSignatures = stream
-				.map(json -> json.get("key").asText()
-						.replaceAll(captureItemUriWithoutSignature, "$1"))
-				.distinct().collect(Collectors.toList());
-		return count(itemUrisWithoutSignatures).entrySet().stream()
-				.map(entry -> Json.toJson(ImmutableMap.of(//
-						"key", entry.getKey(), //
-						"doc_count", entry.getValue())));
-	}
-
-	private static Map<String, Integer> count(List<String> itemUris) {
-		String captureIsilOrgIdentifier =
-				"http://lobid\\.org/items/[^:]*?:([^:]*?):[^\"]*";
-		Map<String, Integer> map = new HashMap<>();
-		for (String term : itemUris) {
-			String isil = term.replaceAll(captureIsilOrgIdentifier, "$1");
-			if (!isil.trim().isEmpty())
-				map.put(isil, map.get(isil) == null ? 1 : map.get(isil) + 1);
-		}
-		return map;
 	}
 
 	/**
