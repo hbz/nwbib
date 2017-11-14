@@ -34,7 +34,7 @@
   }
 } else {
   @defining(Json.parse(docJson)) { doc =>
-    @main(if( (doc\\"title").isEmpty) "NWBib - Vollanzeige" else (doc\\"title")(0).asOpt[String].getOrElse(q)) {
+    @main(if( (doc\\"title").isEmpty) "NWBib - Vollanzeige" else (doc\\"title")(0).asOpt[String].getOrElse(q), docJson = Some(docJson)) {
       @if(Cache.get(session("uuid") + "-" + (doc\\"hbzId")(0).as[String]) != null) {
         @defining(Cache.get(session("uuid") + "-lastSearch")) { lastSearch =>
           @if(lastSearch != null) {
