@@ -14,7 +14,7 @@
         <script>$('#root').hide()</script>
         @for(json <- classes.getOrElse(Seq())){
             @defining((json\"value").as[String]) { value =>
-            <li>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata") { <b>@labelPlain(json)</b> } else {
+            <li>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@labelPlain(json)</b> } else {
                 <a href="@{t match {
                     case "Zeitschriften" => value
                     case "Wikidata" => value
