@@ -1,23 +1,32 @@
-# Get administrative areas (with some exemptions) in North Rhine-Westphalia with German labels
+# Get administrative areas in North Rhine-Westphalia with German labels
 
-SELECT DISTINCT ?item ?itemLabel ?partOf ?gnd ?dissolutionDate
-                #(GROUP_CONCAT(DISTINCT ?hasPart ; separator = "; ") AS ?hasParts)
-                WHERE {
+SELECT DISTINCT
+?item
+?itemLabel
+?partOf
+?gnd
+?dissolutionDate
+(group_concat(distinct ?hasPart; separator = ", ") as ?parts)
+WHERE {
   hint:Query hint:optimizer "None".
-  { ?item wdt:P131* wd:Q1198; # liegt in (einer Untereinheit von) Nordrhein-Westfalen
-        wdt:P31/wdt:P279* wd:Q387917. } # ist Instanz (einer Unterklasse) von "Verwaltungseinheit in Deutschland"
-  UNION
-  {  ?item wdt:P131* wd:Q1198 ; # liegt in (einer Untereinheit von) Nordrhein-Westfalen
-       wdt:P31 wd:Q82794 } # ist eine geographische Region
+  { ?item wdt:P131* wd:Q1198 .
+       { ?item wdt:P31 wd:Q22721 . } # Regierungsbezirk
+   UNION
+       { ?item wdt:P31 wd:Q106658 . } # Landkreis
+   UNION
+       { ?item wdt:P31 wd:Q262166 . } # Gemeinde
+   UNION
+       { ?item wdt:P31 wd:Q22865 . } # kreisfreie Stadt
+   UNION
+       { ?item wdt:P31 wd:Q253019 . } # Ortsteil
+   UNION
+       { ?item wdt:P31/wdt:P279*  wd:Q4286337 } # Stadtbezirk, für Geocache auskommentieren
+  }
+  SERVICE wikibase:label {  bd:serviceParam wikibase:language "de" }
+  OPTIONAL { ?item wdt:P227 ?gnd }
   OPTIONAL { ?item wdt:P576 ?dissolutionDate }
-  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q192611 } # ohne Wahlkreise
-  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q20296613 } # Ohne Natur- und Landschaftsschutzgebiete
-  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q1643757 } # Ohne Landschaftsverbände
-  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q2520712 } # Ohne Verwaltungskooperationen 
-  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q478847 } # Ohne Ämter
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "de,en" }
-  OPTIONAL {?item wdt:P131 ?partOf .}
-  OPTIONAL {?item wdt:P227 ?gnd .}
-  #OPTIONAL {?item wdt:P150 ?hasPart .}
+  OPTIONAL { ?item wdt:P150 ?hasPart . }
+  OPTIONAL { ?item wdt:P131 ?partOf }
 }
+
 GROUP BY ?item ?itemLabel ?partOf ?gnd ?dissolutionDate
