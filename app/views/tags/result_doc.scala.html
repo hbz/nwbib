@@ -145,9 +145,7 @@
 	}
 }
 
-@subject_source(label: String, source: String, searchParam: String) = {
-  @if((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()).toString.contains(source)) {
-    <tr><td>@label</td><td>
+@subject_source_links(source: String, searchParam: String) = {
     @for(
         subject <- (doc \ "subject").as[Seq[JsValue]];
         sourceId <- (subject \ "source" \ "id").asOpt[String];
@@ -155,7 +153,32 @@
         subjectId <- (subject \ "id").asOpt[String];
         subjectLabel <- (subject \ "label").asOpt[String]) {
       <a href='@nwbib.routes.Application.search()?@searchParam=@subjectId.replace("#", "%23")'>@subjectLabel</a><br/>
-    }</td></tr>
+    }
+}
+
+@raumsystematik(source: String) = {
+  @if((doc\"spatial").asOpt[Seq[JsValue]].isDefined) {
+    <tr>
+      <td>Raumsystematik</td>
+      <td><a href='@nwbib.routes.Application.search()?q=spatial.id:"@(((doc\"spatial")(0)\"id").asOpt[String].getOrElse("--"))"'>@(((doc\"spatial")(0)\"label").asOpt[String].getOrElse("--"))</a>
+      <br/>
+  }
+  @if((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()).toString.contains(source)) {
+    @if(!(doc\"spatial").asOpt[Seq[JsValue]].isDefined) { @* No opening <tr> and label <td> from above *@
+    <tr>
+      <td>Raumsystematik</td>
+      <td>}
+      @subject_source_links(source, "nwbibspatial")}
+      </td>
+    </tr>
+}
+
+@sachsystematik(source: String) = {
+  @if((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()).toString.contains(source)) {
+    <tr>
+      <td>Sachsystematik</td>
+      <td>@subject_source_links(source, "nwbibsubject")</td>
+    </tr>
   }
 }
 
@@ -186,10 +209,8 @@
    @subordinated("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
   }
 
-  @result_field("Raumsystematik", "coverage", doc, TableRow.VALUES, valueLabel = Option(Seq()), param="raw")
-
-  @subject_source("Raumsystematik", "http://purl.org/lobid/nwbib-spatial", "nwbibspatial")
-  @subject_source("Sachsystematik", "http://purl.org/lobid/nwbib", "nwbibsubject")
+  @raumsystematik("http://purl.org/lobid/nwbib-spatial")
+  @sachsystematik("http://purl.org/lobid/nwbib")
 
   @subjects((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()))
 
