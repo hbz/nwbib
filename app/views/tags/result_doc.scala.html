@@ -145,6 +145,20 @@
 	}
 }
 
+@subject_source(label: String, source: String, searchParam: String) = {
+  @if((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()).toString.contains(source)) {
+    <tr><td>@label</td><td>
+    @for(
+        subject <- (doc \ "subject").as[Seq[JsValue]];
+        sourceId <- (subject \ "source" \ "id").asOpt[String];
+        if sourceId == source;
+        subjectId <- (subject \ "id").asOpt[String];
+        subjectLabel <- (subject \ "label").asOpt[String]) {
+      <a href='@nwbib.routes.Application.search()?@searchParam=@subjectId.replace("#", "%23")'>@subjectLabel</a><br/>
+    }</td></tr>
+  }
+}
+
 @table(){
   @result_field("Titel", "title", doc, TableRow.VALUES)
   @result_field("Titelzusatz", "otherTitleInformation", doc, TableRow.VALUES)
@@ -173,8 +187,9 @@
   }
 
   @result_field("Raumsystematik", "coverage", doc, TableRow.VALUES, valueLabel = Option(Seq()), param="raw")
-  @result_field("Raumsystematik", "nwbibspatial", doc, TableRow.VALUES, valueLabel = Option(Seq()), param="nwbibspatial")
-  @result_field("Sachsystematik", "nwbibsubject", doc, TableRow.VALUES, valueLabel = Option(Seq()), param="nwbibsubject")
+
+  @subject_source("Raumsystematik", "http://purl.org/lobid/nwbib-spatial", "nwbibspatial")
+  @subject_source("Sachsystematik", "http://purl.org/lobid/nwbib", "nwbibsubject")
 
   @subjects((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()))
 
