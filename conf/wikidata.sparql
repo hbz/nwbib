@@ -1,4 +1,3 @@
-https://query.wikidata.org/sparql?query=
 # Get administrative areas in North Rhine-Westphalia with German labels
 SELECT DISTINCT
 ?item
@@ -20,7 +19,7 @@ WHERE {
    UNION
        { ?item wdt:P31 wd:Q253019 . } # Ortsteil
    UNION
-       { ?item wdt:P31 wd:Q1852178 . } # Stadteil von Düsseldorf
+       { ?item wdt:P31 wd:Q1852178 . } # Stadtteil von Düsseldorf
    UNION
        { ?item wdt:P31 wd:Q15632166 . } # Stadtteil von Köln
    UNION
