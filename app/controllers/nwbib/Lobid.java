@@ -368,7 +368,7 @@ public class Lobid {
 				.setHeader("Accept", "application/json").setQueryParameter("name", name)
 				.setQueryParameter("publisher", publisher)//
 				.setQueryParameter("id", id)//
-				.setQueryParameter("aggregations", field)//
+				.setQueryParameter("aggregations", field.split("<")[0])//
 				.setQueryParameter("from", "0")//
 				.setQueryParameter("size",
 						field.equals(Application.ITEM_FIELD) ? "9999"

@@ -78,10 +78,9 @@ public class Application extends Controller {
 	public static final String ITEM_FIELD = "owner";
 
 	/** The internal ES field for the NWBib subject facet. */
-	public static final String NWBIB_SUBJECT_FIELD = "subject.id";
+	public static final String NWBIB_SUBJECT_FIELD = "subject.id<nwbib#";
 	/** The internal ES field for the NWBib spatial facet. */
-	public static final String NWBIB_SPATIAL_FIELD =
-			"@graph.http://purl.org/lobid/lv#nwbibspatial.@id";
+	public static final String NWBIB_SPATIAL_FIELD = "subject.id<nwbib-spatial#";
 	/** The internal ES field for the coverage facet. */
 	public static final String COVERAGE_FIELD = "spatial.label.raw";
 	/** The internal ES field for subject locations. */
@@ -616,9 +615,15 @@ public class Application extends Controller {
 				publisher, issued, medium, nwbibspatial, nwbibsubject, owner, field, t,
 				set, location, word, corporation, raw).map(json -> {
 					Stream<JsonNode> stream = StreamSupport.stream(
-							Spliterators.spliteratorUnknownSize(
-									json.findValue("aggregation").get(field).elements(), 0),
+							Spliterators.spliteratorUnknownSize(json.findValue("aggregation")
+									.get(field.split("<")[0]).elements(), 0),
 							false);
+					if (field.equals(NWBIB_SUBJECT_FIELD)
+							|| field.equals(NWBIB_SPATIAL_FIELD)) {
+						String source = field.split("<")[1];
+						stream = stream
+								.filter(aggr -> aggr.get("key").textValue().contains(source));
+					}
 					String labelKey = String.format(
 							"facets-labels.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s",
 							field, raw, q, person, name, id, publisher, set, word,
