@@ -23,7 +23,6 @@ import play.libs.F.Promise;
 import play.libs.Json;
 import play.libs.ws.WS;
 import play.libs.ws.WSRequest;
-import play.libs.ws.WSRequestHolder;
 import play.libs.ws.WSResponse;
 import play.mvc.Http;
 
@@ -45,15 +44,21 @@ public class WikidataLocations {
 			File jsonFile = wikidataFile();
 			if (!jsonFile.exists()) {
 				// TODO Don't block, return Promise (but /classification no Promise yet)
-				Iterator<JsonNode> elements = request().get(Integer.MAX_VALUE).asJson()
-						.findValue("bindings").elements();
-				List<JsonNode> items = new ArrayList<>();
-				elements.forEachRemaining(items::add);
-				JsonNode all = Json.toJson(items);
-				try (FileWriter fw = new FileWriter(jsonFile)) {
-					fw.write(pretty(all));
+				WSResponse wsResponse = request().get(Integer.MAX_VALUE);
+				if (wsResponse.getStatus() == Http.Status.OK) {
+					Iterator<JsonNode> elements =
+							wsResponse.asJson().findValue("bindings").elements();
+					List<JsonNode> items = new ArrayList<>();
+					elements.forEachRemaining(items::add);
+					JsonNode all = Json.toJson(items);
+					try (FileWriter fw = new FileWriter(jsonFile)) {
+						fw.write(pretty(all));
+					}
+					return all;
 				}
-				return all;
+				Logger.error("Could not call Wikidata API: {}, body:\n{}",
+						wsResponse.getStatusText(), wsResponse.getBody());
+				return Json.newObject();
 			}
 			try (FileInputStream stream = new FileInputStream(jsonFile)) {
 				return Json.parse(stream);

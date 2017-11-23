@@ -1,5 +1,4 @@
 # Get administrative areas in North Rhine-Westphalia with German labels
-
 SELECT DISTINCT
 ?item
 ?itemLabel
@@ -19,6 +18,10 @@ WHERE {
        { ?item wdt:P31 wd:Q22865 . } # kreisfreie Stadt
    UNION
        { ?item wdt:P31 wd:Q253019 . } # Ortsteil
+   UNION
+       { ?item wdt:P31 wd:Q1852178 . } # Stadtteil von Düsseldorf
+   UNION
+       { ?item wdt:P31 wd:Q15632166 . } # Stadtteil von Köln
    UNION
        { ?item wdt:P31/wdt:P279*  wd:Q4286337 } # Stadtbezirk, für Geocache auskommentieren
   }
