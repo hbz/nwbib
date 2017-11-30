@@ -226,14 +226,13 @@ public class Classification {
 			if (id.equals(nrw)) {
 				topClasses.add(
 						Json.toJson(ImmutableMap.of("value", id, "label", "Sonstige")));
-			} else if (broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix)
-					&& !label.startsWith(topLevelLabelPrefix + " Aachen")) {
+			} else if (broaderId.equals(nrw)
+					&& label.startsWith(topLevelLabelPrefix)) {
 				topClasses.add(Json
 						.toJson(ImmutableMap.of("value", id, "label", label, "gnd", gnd)));
 			}
 			if (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
-					|| (broaderId.equals(nrw)
-							&& label.startsWith(topLevelLabelPrefix + " Aachen"))) {
+					|| (broaderId.equals(nrw))) {
 				if (!subClasses.containsKey(broaderId))
 					subClasses.put(broaderId, new ArrayList<JsonNode>());
 				List<JsonNode> sub = subClasses.get(broaderId);
