@@ -164,10 +164,11 @@ public class Lobid {
 		WSRequest request = // @formatter:off
 				WS.url(Application.CONFIG.getString("nwbib.api"))
 						.setHeader("Accept", "application/json")
-						.setQueryParameter("format", "short.subjectChain")
+						.setQueryParameter("format", "json")
 						.setQueryParameter("from", "" + from)
 						.setQueryParameter("size", "" + size)
-						.setQueryParameter("subject", prepare(q, ""));
+						.setQueryParameter("subject", q) // TODO use NWBib set
+						.setQueryParameter("aggregations", "topic");
 		//@formatter:on
 		Logger.info("Request URL {}, query params {} ", request.getUrl(),
 				request.getQueryParameters());
@@ -434,7 +435,7 @@ public class Lobid {
 				.replace(")", "\\)").replace("{", "\\{").replace("}", "\\}")
 				.replace("[", "\\[").replace("]", "\\]")
 				// `embedded` phrases, like foo"something"bar -> foo\"something\"bar
-				.replaceAll("([^\\s])\"([^\"]+)\"([^\\s])", "$1\\\\\"$2\\\\\"$3")
+				// .replaceAll("([^\\s])\"([^\"]+)\"([^\\s])", "$1\\\\\"$2\\\\\"$3")
 				// remove inescapable range query symbols, possibly prepended with `+`:
 				.replaceAll("^\\+?<", "").replace("^\\+?>", "");
 	}

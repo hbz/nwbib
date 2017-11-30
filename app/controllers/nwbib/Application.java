@@ -158,13 +158,13 @@ public class Application extends Controller {
 		if (cachedResult != null)
 			return cachedResult;
 		WSRequest request = // @formatter:off
-				WS.url(Application.CONFIG.getString("nwbib.api") + "/facets")
+				WS.url(Application.CONFIG.getString("nwbib.api"))
 						.setHeader("Accept", "application/json")
-						.setQueryParameter("subject", q)
-						.setQueryParameter("field", "@graph.http://purl.org/lobid/lv#subjectChain.@value.raw")
-						.setQueryParameter("set", Application.CONFIG.getString("nwbib.set"))
+						.setQueryParameter("subject", q) // TODO: no NWBib-Set-Restriction
+						.setQueryParameter("aggregations", "topic")
+//						.setQueryParameter("set", Application.CONFIG.getString("nwbib.set"))
 						.setQueryParameter("from", "0")
-						.setQueryParameter("size", "9999"); // @formatter:on
+						.setQueryParameter("size", "1"); // @formatter:on
 		Promise<Result> result = request.get().map((WSResponse response) -> {
 			if (response.getStatus() == Http.Status.OK) {
 				List<JsonNode> terms = response.asJson().findValues("key");
