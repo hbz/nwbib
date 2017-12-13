@@ -33,6 +33,7 @@ import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.io.Streams;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -210,6 +211,7 @@ public class Application extends Controller {
 	 * @param word A word, a concept from the hbz union catalog
 	 * @param corporation A corporation associated with the resource
 	 * @param raw A query string that's directly (unprocessed) passed to ES
+	 * @param format The response format, 'html' (default) or 'json'
 	 * @return The search results
 	 */
 	public static Promise<Result> search(final String q, final String person,
@@ -218,7 +220,7 @@ public class Application extends Controller {
 			final String nwbibspatial, final String nwbibsubject, final int from,
 			final int size, final String owner, String t, String sort,
 			boolean details, String location, String word, String corporation,
-			String raw) {
+			String raw, String format) {
 		String uuid = session("uuid");
 		if (uuid == null)
 			session("uuid", UUID.randomUUID().toString());
@@ -242,9 +244,10 @@ public class Application extends Controller {
 							publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
 							0L, owner, t, sort, location, word, corporation, raw)));
 		String query = form.data().get("q");
-		Promise<Result> result = okPromise(query != null ? query : q, person, name,
-				subject, id, publisher, issued, medium, nwbibspatial, nwbibsubject,
-				from, size, owner, t, sort, details, location, word, corporation, raw);
+		Promise<Result> result =
+				okPromise(query != null ? query : q, person, name, subject, id,
+						publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
+						owner, t, sort, details, location, word, corporation, raw, format);
 		cacheOnRedeem(cacheId, result, ONE_HOUR);
 		return result;
 	}
@@ -262,7 +265,7 @@ public class Application extends Controller {
 			Logger.warn("No pagination session data for {}", id);
 		}
 		return search("hbzId:" + id, "", "", "", "", "", "", "", "", "", 0, 1, "",
-				"", "", true, "", "", "", "");
+				"", "", true, "", "", "", "", "");
 	}
 
 	/**
@@ -404,10 +407,10 @@ public class Application extends Controller {
 			final String nwbibspatial, final String nwbibsubject, final int from,
 			final int size, final String owner, String t, String sort,
 			boolean details, String location, String word, String corporation,
-			String raw) {
+			String raw, String format) {
 		final Promise<Result> result = call(q, person, name, subject, id, publisher,
 				issued, medium, nwbibspatial, nwbibsubject, from, size, owner, t, sort,
-				details, location, word, corporation, raw);
+				details, location, word, corporation, raw, format);
 		return result.recover((Throwable throwable) -> {
 			Logger.error("Could not call Lobid", throwable);
 			flashError();
@@ -438,7 +441,8 @@ public class Application extends Controller {
 			final String publisher, final String issued, final String medium,
 			final String nwbibspatial, final String nwbibsubject, final int from,
 			final int size, String owner, String t, String sort, boolean showDetails,
-			String location, String word, String corporation, String raw) {
+			String location, String word, String corporation, String raw,
+			String format) {
 		final WSRequest requestHolder = Lobid.request(q, person, name, subject, id,
 				publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
 				owner, t, sort, location, word, corporation, raw);
@@ -470,9 +474,14 @@ public class Application extends Controller {
 				}
 				return ok(details.render(CONFIG, json, id));
 			}
-			return ok(search.render(s, q, person, name, subject, id, publisher,
-					issued, medium, nwbibspatial, nwbibsubject, from, size, hits, owner,
-					t, sort, location, word, corporation, raw));
+
+			return format.equals("html")
+					? ok(search.render(s, q, person, name, subject, id, publisher, issued,
+							medium, nwbibspatial, nwbibsubject, from, size, hits, owner, t,
+							sort, location, word, corporation, raw))
+					: ok(new ObjectMapper().writerWithDefaultPrettyPrinter()
+							.writeValueAsString(Json.parse(s)))
+									.as("application/json; charset=utf-8");
 		});
 	}
 
@@ -596,7 +605,7 @@ public class Application extends Controller {
 					id, publisher, issuedQuery, mediumQuery, nwbibspatialQuery,
 					nwbibsubjectQuery, from, size, ownerQuery, typeQuery,
 					sort(sort, nwbibspatialQuery, nwbibsubjectQuery, subjectQuery), false,
-					locationQuery, word, corporation, rawQuery).url();
+					locationQuery, word, corporation, rawQuery, "").url();
 
 			String result = String.format("<li " + (current ? "class=\"active\"" : "")
 					+ "><a class=\"%s-facet-link\" href='%s'>"
