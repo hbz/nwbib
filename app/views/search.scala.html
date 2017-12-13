@@ -1,6 +1,6 @@
 @* Copyright 2014 Fabian Steeg, hbz. Licensed under the GPLv2 *@
 
-@(result: String, q:String, person:String, name:String, subject:String, id:String, publisher:String, issued:String, medium: String, nwbibspatial: String, nwbibsubject: String, from: Int, size: Int, allHits: Long, owner: String, t: String, sortParam: String, set: String, location: String, word: String, corporation: String, raw: String)
+@(result: String, q:String, person:String, name:String, subject:String, id:String, publisher:String, issued:String, medium: String, nwbibspatial: String, nwbibsubject: String, from: Int, size: Int, allHits: Long, owner: String, t: String, sortParam: String, location: String, word: String, corporation: String, raw: String)
 
 @import helper._
 @import tags._
@@ -15,17 +15,17 @@
   <nav>
     <ul class="pagination">
       <li class="previous @if(from==0){disabled}">
-        <a href="@if(from==0){#} else {@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from-size,size,owner,t,sortParam,set=set,location=location,word=word,corporation=corporation,raw=raw)}">&larr;</a>
+        <a href="@if(from==0){#} else {@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from-size,size,owner,t,sortParam,location=location,word=word,corporation=corporation,raw=raw)}">&larr;</a>
       </li>
       @defining((((from+1)/size)+1,(if(allHits%size==0) allHits/size else allHits/size+1).toInt)) { case (currentPage,lastPage) =>
           @defining(Math.min(Math.max(1,currentPage-4)+9,lastPage)) { toPage =>
               @for(i <- Math.max(1,toPage-9) to toPage){
-                  <li @if(currentPage==i){class="active"}><a href="@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,(i*size)-size,size,owner,t,sortParam,set=set,location=location,word=word,corporation=corporation,raw=raw)">@i</a></li>
+                  <li @if(currentPage==i){class="active"}><a href="@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,(i*size)-size,size,owner,t,sortParam,location=location,word=word,corporation=corporation,raw=raw)">@i</a></li>
               }
           }
       }
       <li class="next @if(from+size >= allHits){disabled}">
-        <a href="@if(from+size >= allHits){#} else {@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from+size,size,owner,t,sortParam,set=set,location=location,word=word,corporation=corporation,raw=raw)}">&rarr;</a>
+        <a href="@if(from+size >= allHits){#} else {@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from+size,size,owner,t,sortParam,location=location,word=word,corporation=corporation,raw=raw)}">&rarr;</a>
       </li>
     </ul>
   </nav>
@@ -33,13 +33,13 @@
 
 @sort(param: String, label: String)={
 <li @if(sortParam==param){class="active"}>
-  <a href="@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from,size,owner,t,param,set=set,location=location,word=word,corporation=corporation,raw=raw)">@label</a>
+  <a href="@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from,size,owner,t,param,location=location,word=word,corporation=corporation,raw=raw)">@label</a>
 </li>
 }
 
 @pageLink(num: Int)={
 <li @if(size==num){class="active"}>
-  <a href="@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from,num,owner,t,sortParam,set=set,location=location,word=word,corporation=corporation,raw=raw)">@num</a>
+  <a href="@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from,num,owner,t,sortParam,location=location,word=word,corporation=corporation,raw=raw)">@num</a>
 </li>
 }
 
@@ -52,12 +52,12 @@
 }
 
 @nwbibBreadcrumb() = {
-	@if(!nwbibsubject.isEmpty && !nwbibsubject.contains(",") && Seq(nwbibspatial, person, name, subject, id, publisher, issued, medium, owner, t, set, location, word, corporation, raw).forall(_.isEmpty)){
+	@if(!nwbibsubject.isEmpty && !nwbibsubject.contains(",") && Seq(nwbibspatial, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
 			in <i><a href="@nwbib.routes.Application.register("Sachsystematik")">Sachgebiete</a> / 
 			<a href="@nwbib.routes.Application.classification("Sachsystematik")">Sachsystematik</a> / 
 			@Classification.shortId(nwbibsubject) @Lobid.facetLabel(Seq(nwbibsubject),"","")</i>, 
 	} else {
-		@if(!nwbibspatial.isEmpty && !nwbibspatial.contains(",") && Seq(nwbibsubject, person, name, subject, id, publisher, issued, medium, owner, t, set, location, word, corporation, raw).forall(_.isEmpty)){
+		@if(!nwbibspatial.isEmpty && !nwbibspatial.contains(",") && Seq(nwbibsubject, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
 			in <i><a href="@nwbib.routes.Application.register("Raumsystematik")">Regionen</a> / 
 			<a href="@nwbib.routes.Application.classification("Raumsystematik")">Raumsystematik</a> / 
 			@Classification.shortId(nwbibspatial) @Lobid.facetLabel(Seq(nwbibspatial),"","")</i>, 
@@ -142,7 +142,7 @@
             }
          }
         </div>
-        @if(allHits > 0) {@facets(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,owner,t,sortParam,set,location,word,corporation,raw,from,size)}
+        @if(allHits > 0) {@facets(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,owner,t,sortParam,location,word,corporation,raw,from,size)}
       </div>
     }
     @if(allHits > 0) {<p>@map_credits()</p>}

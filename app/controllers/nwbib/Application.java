@@ -162,7 +162,7 @@ public class Application extends Controller {
 						.setHeader("Accept", "application/json")
 						.setQueryParameter("subject", q) // TODO: no NWBib-Set-Restriction
 						.setQueryParameter("aggregations", "topic")
-//						.setQueryParameter("set", Application.CONFIG.getString("nwbib.set"))
+						.setQueryParameter("filter", Application.CONFIG.getString("nwbib.filter"))
 						.setQueryParameter("from", "0")
 						.setQueryParameter("size", "1"); // @formatter:on
 		Promise<Result> result = request.get().map((WSResponse response) -> {
@@ -206,7 +206,6 @@ public class Application extends Controller {
 	 * @param t Type filter for resource queries
 	 * @param sort Sorting order for results ("newest", "oldest", "" -> relevance)
 	 * @param details If true, render details
-	 * @param set The set, overrides the default NWBib set if not empty
 	 * @param location A polygon describing the subject area of the resources
 	 * @param word A word, a concept from the hbz union catalog
 	 * @param corporation A corporation associated with the resource
@@ -218,8 +217,8 @@ public class Application extends Controller {
 			final String publisher, final String issued, final String medium,
 			final String nwbibspatial, final String nwbibsubject, final int from,
 			final int size, final String owner, String t, String sort,
-			boolean details, String set, String location, String word,
-			String corporation, String raw) {
+			boolean details, String location, String word, String corporation,
+			String raw) {
 		String uuid = session("uuid");
 		if (uuid == null)
 			session("uuid", UUID.randomUUID().toString());
@@ -241,12 +240,11 @@ public class Application extends Controller {
 			return Promise.promise(
 					() -> badRequest(search.render(null, q, person, name, subject, id,
 							publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
-							0L, owner, t, sort, set, location, word, corporation, raw)));
+							0L, owner, t, sort, location, word, corporation, raw)));
 		String query = form.data().get("q");
-		Promise<Result> result =
-				okPromise(query != null ? query : q, person, name, subject, id,
-						publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
-						owner, t, sort, details, set, location, word, corporation, raw);
+		Promise<Result> result = okPromise(query != null ? query : q, person, name,
+				subject, id, publisher, issued, medium, nwbibspatial, nwbibsubject,
+				from, size, owner, t, sort, details, location, word, corporation, raw);
 		cacheOnRedeem(cacheId, result, ONE_HOUR);
 		return result;
 	}
@@ -264,7 +262,7 @@ public class Application extends Controller {
 			Logger.warn("No pagination session data for {}", id);
 		}
 		return search("hbzId:" + id, "", "", "", "", "", "", "", "", "", 0, 1, "",
-				"", "", true, "", "", "", "", "");
+				"", "", true, "", "", "", "");
 	}
 
 	/**
@@ -405,17 +403,17 @@ public class Application extends Controller {
 			final String publisher, final String issued, final String medium,
 			final String nwbibspatial, final String nwbibsubject, final int from,
 			final int size, final String owner, String t, String sort,
-			boolean details, String set, String location, String word,
-			String corporation, String raw) {
+			boolean details, String location, String word, String corporation,
+			String raw) {
 		final Promise<Result> result = call(q, person, name, subject, id, publisher,
 				issued, medium, nwbibspatial, nwbibsubject, from, size, owner, t, sort,
-				details, set, location, word, corporation, raw);
+				details, location, word, corporation, raw);
 		return result.recover((Throwable throwable) -> {
 			Logger.error("Could not call Lobid", throwable);
 			flashError();
 			return internalServerError(search.render("[]", q, person, name, subject,
 					id, publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
-					0L, owner, t, sort, set, location, word, corporation, raw));
+					0L, owner, t, sort, location, word, corporation, raw));
 		});
 	}
 
@@ -440,11 +438,10 @@ public class Application extends Controller {
 			final String publisher, final String issued, final String medium,
 			final String nwbibspatial, final String nwbibsubject, final int from,
 			final int size, String owner, String t, String sort, boolean showDetails,
-			String set, String location, String word, String corporation,
-			String raw) {
+			String location, String word, String corporation, String raw) {
 		final WSRequest requestHolder = Lobid.request(q, person, name, subject, id,
 				publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
-				owner, t, sort, showDetails, set, location, word, corporation, raw);
+				owner, t, sort, location, word, corporation, raw);
 		return requestHolder.get().map((WSResponse response) -> {
 			Long hits = 0L;
 			String s = "{}";
@@ -475,7 +472,7 @@ public class Application extends Controller {
 			}
 			return ok(search.render(s, q, person, name, subject, id, publisher,
 					issued, medium, nwbibspatial, nwbibsubject, from, size, hits, owner,
-					t, sort, set, location, word, corporation, raw));
+					t, sort, location, word, corporation, raw));
 		});
 	}
 
@@ -502,7 +499,6 @@ public class Application extends Controller {
 	 * @param t Type filter for resource queries
 	 * @param field The facet field (the field to facet over)
 	 * @param sort Sorting order for results ("newest", "oldest", "" -> relevance)
-	 * @param set The set, overrides the default NWBib set if not empty
 	 * @param location A polygon describing the subject area of the resources
 	 * @param word A word, a concept from the hbz union catalog
 	 * @param corporation A corporation associated with the resource
@@ -512,13 +508,13 @@ public class Application extends Controller {
 	public static Promise<Result> facets(String q, String person, String name,
 			String subject, String id, String publisher, String issued, String medium,
 			String nwbibspatial, String nwbibsubject, int from, int size,
-			String owner, String t, String field, String sort, String set,
-			String location, String word, String corporation, String raw) {
+			String owner, String t, String field, String sort, String location,
+			String word, String corporation, String raw) {
 
 		String key = String.format(
-				"facets.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s", field,
-				q, person, name, id, publisher, set, location, word, corporation, raw,
-				subject, issued, medium, nwbibspatial, nwbibsubject, owner, t);
+				"facets.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s", field, q,
+				person, name, id, publisher, location, word, corporation, raw, subject,
+				issued, medium, nwbibspatial, nwbibsubject, owner, t);
 		Result cachedResult = (Result) Cache.get(key);
 		if (cachedResult != null) {
 			return Promise.promise(() -> cachedResult);
@@ -572,24 +568,26 @@ public class Application extends Controller {
 				GeoPoint point = new GeoPoint(term);
 				term = String.format("%s,%s", point.getLat(), point.getLon());
 			}
-			String mediumQuery = !field.equals(MEDIUM_FIELD) //
-					? medium : queryParam(medium, term);
-			String typeQuery = !field.equals(TYPE_FIELD) //
-					? t : queryParam(t, term);
-			String ownerQuery = !field.equals(ITEM_FIELD) //
-					? owner : withoutAndOperator(queryParam(owner, term));
-			String nwbibsubjectQuery = !field.equals(NWBIB_SUBJECT_FIELD) //
-					? nwbibsubject : queryParam(nwbibsubject, term);
-			String nwbibspatialQuery = !field.equals(NWBIB_SPATIAL_FIELD) //
-					? nwbibspatial : queryParam(nwbibspatial, term);
-			String rawQuery = !field.equals(COVERAGE_FIELD) //
-					? raw : rawQueryParam(raw, term);
-			String locationQuery = !field.equals(SUBJECT_LOCATION_FIELD) //
-					? location : term;
-			String subjectQuery = !field.equals(SUBJECT_FIELD) //
-					? subject : queryParam(subject, term);
-			String issuedQuery = !field.equals(ISSUED_FIELD) //
-					? issued : queryParam(issued, term);
+			String mediumQuery = !field.equals(MEDIUM_FIELD) ? medium //
+					: queryParam(medium, term);
+			String typeQuery = !field.equals(TYPE_FIELD) ? t //
+					: queryParam(t, term);
+			String ownerQuery = !field.equals(ITEM_FIELD) ? owner //
+					: withoutAndOperator(queryParam(owner, term));
+			String nwbibsubjectQuery =
+					!field.equals(NWBIB_SUBJECT_FIELD) ? nwbibsubject //
+							: queryParam(nwbibsubject, term);
+			String nwbibspatialQuery =
+					!field.equals(NWBIB_SPATIAL_FIELD) ? nwbibspatial //
+							: queryParam(nwbibspatial, term);
+			String rawQuery = !field.equals(COVERAGE_FIELD) ? raw //
+					: rawQueryParam(raw, term);
+			String locationQuery = !field.equals(SUBJECT_LOCATION_FIELD) ? location //
+					: term;
+			String subjectQuery = !field.equals(SUBJECT_FIELD) ? subject //
+					: queryParam(subject, term);
+			String issuedQuery = !field.equals(ISSUED_FIELD) ? issued //
+					: queryParam(issued, term);
 
 			boolean current = current(subject, medium, nwbibspatial, nwbibsubject,
 					owner, t, field, term, raw);
@@ -598,13 +596,12 @@ public class Application extends Controller {
 					id, publisher, issuedQuery, mediumQuery, nwbibspatialQuery,
 					nwbibsubjectQuery, from, size, ownerQuery, typeQuery,
 					sort(sort, nwbibspatialQuery, nwbibsubjectQuery, subjectQuery), false,
-					set, locationQuery, word, corporation, rawQuery).url();
+					locationQuery, word, corporation, rawQuery).url();
 
-			String result = String.format(
-					"<li " + (current ? "class=\"active\"" : "")
-							+ "><a class=\"%s-facet-link\" href='%s'>"
-							+ "<input onclick=\"location.href='%s'\" class=\"facet-checkbox\" "
-							+ "type=\"checkbox\" %s>&nbsp;%s</input>" + "</a></li>",
+			String result = String.format("<li " + (current ? "class=\"active\"" : "")
+					+ "><a class=\"%s-facet-link\" href='%s'>"
+					+ "<input onclick=\"location.href='%s'\" class=\"facet-checkbox\" "
+					+ "type=\"checkbox\" %s>&nbsp;%s</input>" + "</a></li>",
 					Math.abs(field.hashCode()), routeUrl, routeUrl,
 					current ? "checked" : "", fullLabel);
 
@@ -613,7 +610,7 @@ public class Application extends Controller {
 
 		Promise<Result> promise = Lobid.getFacets(q, person, name, subject, id,
 				publisher, issued, medium, nwbibspatial, nwbibsubject, owner, field, t,
-				set, location, word, corporation, raw).map(json -> {
+				location, word, corporation, raw).map(json -> {
 					Stream<JsonNode> stream = StreamSupport.stream(
 							Spliterators.spliteratorUnknownSize(json.findValue("aggregation")
 									.get(field.split("<")[0]).elements(), 0),
@@ -625,10 +622,10 @@ public class Application extends Controller {
 								.filter(aggr -> aggr.get("key").textValue().contains(source));
 					}
 					String labelKey = String.format(
-							"facets-labels.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s",
-							field, raw, q, person, name, id, publisher, set, word,
-							corporation, subject, issued, medium, nwbibspatial, nwbibsubject,
-							raw, field.equals(ITEM_FIELD) ? "" : owner, t, location);
+							"facets-labels.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s",
+							field, raw, q, person, name, id, publisher, word, corporation,
+							subject, issued, medium, nwbibspatial, nwbibsubject, raw,
+							field.equals(ITEM_FIELD) ? "" : owner, t, location);
 
 					@SuppressWarnings("unchecked")
 					List<Pair<JsonNode, String>> labelledFacets =
@@ -648,7 +645,8 @@ public class Application extends Controller {
 	private static String sort(String sort, String nwbibspatialQuery,
 			String nwbibsubjectQuery, String subjectQuery) {
 		return (nwbibspatialQuery + nwbibsubjectQuery + subjectQuery).contains(",")
-				? ""/* relevance */ : sort;
+				? ""
+				/* relevance */ : sort;
 	}
 
 	private static boolean current(String subject, String medium,
@@ -776,8 +774,9 @@ public class Application extends Controller {
 			return Promise.pure(redirect(routes.Application.showStars(format,
 					starred.stream().collect(Collectors.joining(",")))));
 		}
-		final List<String> starredIds = starred.isEmpty() && ids.trim().isEmpty()
-				? starred : Arrays.asList(ids.split(","));
+		final List<String> starredIds =
+				starred.isEmpty() && ids.trim().isEmpty() ? starred
+						: Arrays.asList(ids.split(","));
 		String cacheKey = "starsForIds." + starredIds;
 		Object cachedJson = Cache.get(cacheKey);
 		if (cachedJson != null && cachedJson instanceof List) {

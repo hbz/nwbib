@@ -45,7 +45,7 @@ public class InternalIntegrationTest {
 		running(testServer(3333), () -> {
 			String field = Application.TYPE_FIELD;
 			Promise<JsonNode> jsonPromise = Lobid.getFacets("köln", "", "", "", "",
-					"", "", "", "", "", "", field, "", "", "", "", "", "");
+					"", "", "", "", "", "", field, "", "", "", "", "");
 			JsonNode facets = jsonPromise.get(Lobid.API_TIMEOUT);
 			assertThat(facets.findValue("aggregation").findValues("key").stream()
 					.map(e -> e.asText()).collect(Collectors.toList())).contains(
@@ -66,7 +66,7 @@ public class InternalIntegrationTest {
 		int size = 10;
 		running(testServer(3333), () -> {
 			Content html = views.html.search.render("[{}]", query, "", "", "", "", "",
-					"", "", "", "", from, size, 0L, "", "", "", "", "", "", "", "");
+					"", "", "", "", from, size, 0L, "", "", "", "", "", "", "");
 			assertThat(html.contentType()).isEqualTo("text/html");
 			String text = Helpers.contentAsString(html);
 			assertThat(text).contains("NWBib").contains("buch")

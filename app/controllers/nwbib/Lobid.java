@@ -67,9 +67,10 @@ public class Lobid {
 			return json;
 		}
 		Logger.debug("Not cached, GET: {}", url);
-		Promise<JsonNode> promise =
-				WS.url(url).get().map(response -> response.getStatus() == Http.Status.OK
-						? response.asJson() : Json.newObject());
+		Promise<JsonNode> promise = WS.url(url).get()
+				.map(response -> response.getStatus() == Http.Status.OK
+						? response.asJson()
+						: Json.newObject());
 		promise.onRedeem(jsonResponse -> {
 			Cache.set(cacheKey, jsonResponse, Application.ONE_DAY);
 		});
@@ -84,27 +85,25 @@ public class Lobid {
 			final String name, final String subject, final String id,
 			final String publisher, final String issued, final String medium,
 			final String nwbibspatial, final String nwbibsubject, final int from,
-			final int size, String owner, String t, String sort, boolean allData,
-			String set, String location, String word, String corporation,
-			String raw) {
+			final int size, String owner, String t, String sort, String location,
+			String word, String corporation, String raw) {
 		WSRequest requestHolder = WS.url(Application.CONFIG.getString("nwbib.api"))
 				.setHeader("Accept", "application/json")
 				.setQueryParameter("format", "json")
 				.setQueryParameter("from", from + "")
-				.setQueryParameter("size", size + "").setQueryParameter("sort", sort)
+				.setQueryParameter("size", size + "")//
+				.setQueryParameter("sort", sort)//
+				.setQueryParameter("filter",
+						Application.CONFIG.getString("nwbib.filter"))
 				.setQueryParameter("location", locationPolygon(location));
 
 		if (!raw.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("q",
-					prepare(
-							preprocess(q) + (preprocess(q).isEmpty() ? "" : " AND ") + raw,
-							allData, set));
+					q + (q.isEmpty() ? "" : " AND ") + raw);
 		if (!q.trim().isEmpty())
-			requestHolder = requestHolder.setQueryParameter("q",
-					prepare(preprocess(q), allData, set));
+			requestHolder = requestHolder.setQueryParameter("q", q);
 		else if (!word.isEmpty())
-			requestHolder = requestHolder.setQueryParameter("q",
-					prepare(preprocess(word), allData, set));
+			requestHolder = requestHolder.setQueryParameter("q", word);
 		if (!person.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("agent", person);
 		if (!name.trim().isEmpty())
@@ -131,33 +130,11 @@ public class Lobid {
 			requestHolder = requestHolder.setQueryParameter("agent", corporation);
 
 		if (requestHolder.getQueryParameters().get("q") == null) {
-			requestHolder.setQueryParameter("q", prepare("*", ""));
+			requestHolder.setQueryParameter("q", "*");
 		}
 		Logger.info("Request URL {}, query params {} ", requestHolder.getUrl(),
 				requestHolder.getQueryParameters());
 		return requestHolder;
-	}
-
-	private static String prepare(String q, boolean allData, String set) {
-		if (!allData && set.isEmpty())
-			return inCollection(q,
-					escapeUri(Application.CONFIG.getString("nwbib.set")));
-		else if (!set.isEmpty() && !set.equals("*"))
-			return inCollection(q, set);
-		else
-			return q;
-	}
-
-	private static String prepare(String q, String set) {
-		if (!set.isEmpty())
-			return inCollection(q, set);
-		return inCollection(q,
-				escapeUri(Application.CONFIG.getString("nwbib.set")));
-	}
-
-	private static String inCollection(String q, String set) {
-		return q == null || q.isEmpty() ? "inCollection.id:\"" + set + "\""
-				: q + " AND inCollection.id:\"" + set + "\"";
 	}
 
 	static WSRequest topicRequest(final String q, int from, int size) {
@@ -188,7 +165,7 @@ public class Lobid {
 			});
 		}
 		WSRequest requestHolder = request("", "", "", "", "", "", "", "", "", "", 0,
-				0, "", "", "", false, set, "", "", "", "");
+				0, "", "", "", "", "", "", "");
 		return requestHolder.get().map((WSResponse response) -> {
 			JsonNode json = response.asJson();
 			Long total = getTotalResults(json);
@@ -214,10 +191,10 @@ public class Lobid {
 				return cachedResult;
 			});
 		}
-		String qVal = prepare(f + ":\"" + v + "\"", set);
+		String qVal = f + ":\"" + v + "\"";
 		return WS.url(Application.CONFIG.getString("nwbib.api"))
-				.setQueryParameter("format", "json").setQueryParameter("q", qVal).get()
-				.map((WSResponse response) -> {
+				.setQueryParameter("format", "json").setQueryParameter("q", qVal)
+				.setQueryParameter("filter", set).get().map((WSResponse response) -> {
 					Long total = getTotalResults(response.asJson());
 					Cache.set(cacheKey, total, Application.ONE_HOUR);
 					return total;
@@ -353,7 +330,6 @@ public class Lobid {
 	 * @param owner Owner filter for resource queries
 	 * @param t Type filter for resource queries
 	 * @param field The facet field (the field to facet over)
-	 * @param set The set, overrides the default NWBib set if not empty
 	 * @param location A polygon describing the subject area of the resources
 	 * @param word A word, a concept from the hbz union catalog
 	 * @param corporation A corporation associated with the resource
@@ -363,8 +339,8 @@ public class Lobid {
 	public static Promise<JsonNode> getFacets(String q, String person,
 			String name, String subject, String id, String publisher, String issued,
 			String medium, String nwbibspatial, String nwbibsubject, String owner,
-			String field, String t, String set, String location, String word,
-			String corporation, String raw) {
+			String field, String t, String location, String word, String corporation,
+			String raw) {
 		WSRequest request = WS.url(Application.CONFIG.getString("nwbib.api"))
 				.setHeader("Accept", "application/json").setQueryParameter("name", name)
 				.setQueryParameter("publisher", publisher)//
@@ -377,6 +353,8 @@ public class Lobid {
 				.setQueryParameter("medium", medium)//
 				.setQueryParameter("location", locationPolygon(location))//
 				.setQueryParameter("issued", issued)//
+				.setQueryParameter("filter",
+						Application.CONFIG.getString("nwbib.filter"))//
 				.setQueryParameter("t", t);
 
 		if (!person.isEmpty())
@@ -398,7 +376,7 @@ public class Lobid {
 				&& !raw.contains(Lobid.escapeUri(Application.COVERAGE_FIELD)))
 			request = request.setQueryParameter("q", raw);
 		else if (request.getQueryParameters().get("q") == null) {
-			request.setQueryParameter("q", prepare(q, set));
+			request.setQueryParameter("q", q);
 		}
 		if (!field.equals(Application.ITEM_FIELD))
 			request = request.setQueryParameter("owner", owner);
@@ -559,7 +537,8 @@ public class Lobid {
 			Integer specificity = (Integer) vals.get(2);
 			return ((String) vals.get(0)).isEmpty()
 					|| ((String) vals.get(1)).isEmpty() //
-							? Pair.of("", specificity) : Pair.of(t, specificity);
+							? Pair.of("", specificity)
+							: Pair.of(t, specificity);
 		}).filter(t -> {
 			return !t.getLeft().isEmpty();
 		}).collect(Collectors.toList());
