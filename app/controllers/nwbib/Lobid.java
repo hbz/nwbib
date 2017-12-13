@@ -126,8 +126,13 @@ public class Lobid {
 			requestHolder = requestHolder.setQueryParameter("owner", owner);
 		if (!t.isEmpty())
 			requestHolder = requestHolder.setQueryParameter("t", t);
-		if (!corporation.isEmpty())
-			requestHolder = requestHolder.setQueryParameter("agent", corporation);
+		if (!corporation.isEmpty()) {
+			requestHolder = requestHolder.setQueryParameter("nested",
+					String.format("contribution:"
+							+ "(contribution.agent.label:\"%s\" OR contribution.agent.id:\"%s\") "
+							+ "AND contribution.agent.type:CorporateBody", corporation,
+							corporation));
+		}
 
 		if (requestHolder.getQueryParameters().get("q") == null) {
 			requestHolder.setQueryParameter("q", "*");
