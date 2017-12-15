@@ -151,6 +151,7 @@
         sourceId <- (subject \ "source" \ "id").asOpt[String];
         if sourceId == source;
         subjectId <- (subject \ "id").asOpt[String];
+        if !(doc\"spatial").asOpt[JsValue].isDefined || !Seq(10, 12, 14, 24, 28, 35, 36, 37, 52, 54, 72, 74, 96, 97).find((i: Int) => subjectId.endsWith("#n"+i));
         subjectLabel <- (subject \ "label").asOpt[String]) {
       <a href='@nwbib.routes.Application.search()?@searchParam=@subjectId.replace("#", "%23")'>@subjectLabel</a><br/>
     }
