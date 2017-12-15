@@ -104,8 +104,6 @@ public class Lobid {
 			requestHolder = requestHolder.setQueryParameter("q", q);
 		else if (!word.isEmpty())
 			requestHolder = requestHolder.setQueryParameter("q", word);
-		if (!person.trim().isEmpty())
-			requestHolder = requestHolder.setQueryParameter("agent", person);
 		if (!name.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("name", name);
 		if (!subject.trim().isEmpty())
@@ -126,13 +124,12 @@ public class Lobid {
 			requestHolder = requestHolder.setQueryParameter("owner", owner);
 		if (!t.isEmpty())
 			requestHolder = requestHolder.setQueryParameter("t", t);
-		if (!corporation.isEmpty()) {
+		if (!person.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("nested",
-					String.format("contribution:"
-							+ "(contribution.agent.label:\"%s\" OR contribution.agent.id:\"%s\") "
-							+ "AND contribution.agent.type:CorporateBody", corporation,
-							corporation));
-		}
+					nestedContribution(person, "Person"));
+		if (!corporation.trim().isEmpty())
+			requestHolder = requestHolder.setQueryParameter("nested",
+					nestedContribution(corporation, "CorporateBody"));
 
 		if (requestHolder.getQueryParameters().get("q") == null) {
 			requestHolder.setQueryParameter("q", "*");
@@ -140,6 +137,12 @@ public class Lobid {
 		Logger.info("Request URL {}, query params {} ", requestHolder.getUrl(),
 				requestHolder.getQueryParameters());
 		return requestHolder;
+	}
+
+	private static String nestedContribution(final String person, String type) {
+		return String.format("contribution:"
+				+ "(contribution.agent.label:\"%s\" OR contribution.agent.id:\"%s\") "
+				+ "AND contribution.agent.type:%s", person, person, type);
 	}
 
 	static WSRequest topicRequest(final String q, int from, int size) {
