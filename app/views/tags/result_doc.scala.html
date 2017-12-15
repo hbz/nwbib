@@ -161,8 +161,11 @@
   @if((doc\"spatial").asOpt[Seq[JsValue]].isDefined) {
     <tr>
       <td>Raumsystematik</td>
-      <td><a href='@nwbib.routes.Application.search()?q=spatial.id:"@(((doc\"spatial")(0)\"id").asOpt[String].getOrElse("--"))"'>@(((doc\"spatial")(0)\"label").asOpt[String].getOrElse("--"))</a>
-      <br/>
+      <td>
+      @for(spatial <- (doc\"spatial").as[Seq[JsValue]]) {
+        <a href='@nwbib.routes.Application.search()?q=spatial.id:"@((spatial\"id").asOpt[String].getOrElse("--"))"'>@((spatial\"label").asOpt[String].getOrElse("--"))</a>
+        <br/>
+      }
   }
   @if((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()).toString.contains(source)) {
     @if(!(doc\"spatial").asOpt[Seq[JsValue]].isDefined) { @* No opening <tr> and label <td> from above *@
