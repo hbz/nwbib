@@ -1,8 +1,9 @@
 @* Copyright 2014 Fabian Steeg, hbz. Licensed under the GPLv2 *@
 
-@(title: String)(content: Html)
+@(title: String, docJson: Option[String] = None)(content: Html)
 
 @import controllers.nwbib.Lobid
+@import play.api.libs.json._
 
 <!DOCTYPE html>
 
@@ -92,7 +93,11 @@
             </div>
             <div class="page-header">
                 <img class="media-object nrw-logo pull-right" src="@controllers.routes.Assets.at("images/wappen.png")" alt="NRW">
-                <h1>Die Nordrhein-Westfälische Bibliographie<br/><small>Mehr als 350.000 Publikationen über NRW seit 1983</small></h1>
+                @if(docJson.isDefined) {
+                  <h1>@((Json.parse(docJson.get) \ "title").asOpt[String].getOrElse("")) @for(subTitle <- (Json.parse(docJson.get) \ "otherTitleInformation").asOpt[Seq[String]]){<br/><small>@subTitle</small>}</h1>
+                } else {
+                  <h1>Die Nordrhein-Westfälische Bibliographie<br/><small>Mehr als 350.000 Publikationen über NRW seit 1983</small></h1>
+                }
             </div>
             @content
             <div class="panel panel-default nwbib-footer">

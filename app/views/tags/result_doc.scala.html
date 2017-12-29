@@ -6,6 +6,51 @@
 @import controllers.nwbib.Lobid
 @import controllers.nwbib.Application.CONFIG
 
+@labelled(label: String, key: String) = {
+  @if((doc\key).asOpt[Seq[JsValue]].isDefined) {
+    <tr>
+      <td>@label</td>
+      <td><a href='@(((doc\key)(0)\"id").asOpt[String].getOrElse("--"))'>@(((doc\key)(0)\"label").asOpt[String].getOrElse("--"))</a></td>
+    </tr>
+  }
+}
+
+@optional(label: String, key: String, v: JsValue) = {
+  @if((v\key).asOpt[String].isDefined) {
+   <br/> @((v\key).as[String])
+  }
+}
+
+@publication(pub: JsValue) = {
+  @defining(((pub\"startDate"),(pub\"endDate"))) { case (start,end) =>
+    <tr>
+      <td>
+        @if((pub \ "type").toString.contains("SecondaryPublicationEvent")){
+          Sekundärpublikation
+        } else {
+          Erschienen
+        }
+      </td>
+      <td>
+        @if(start != end &&
+            ((start.asOpt[String].isDefined && end.asOpt[String].isDefined) ||
+            (doc\"type").toString.contains("Series") || (doc\"type").toString.contains("Periodical"))) {
+          @* Show range if either both start and end are given, or if we want open ranges like "- 2015" *@
+          @start.asOpt[String].getOrElse("") &ndash; @end.asOpt[String].getOrElse("")
+        } else {
+          @* Otherwise show only one date, no range (no periodical or series, and just one date given) *@
+          @start.asOpt[String].getOrElse(end.asOpt[String].getOrElse(""))
+        }
+        @optional("Erscheinungsort", "location", pub)
+        @optional("Verlag", "publishedBy", pub)
+        @((pub\"frequency").asOpt[Seq[JsValue]].map { freq =>
+          optional("Erscheinungsweise", "label", freq.head)
+        })
+      </td>
+    </tr>
+  }
+}
+
 @table()(body: Html) = {
    <table class="table table-striped table-condensed">
   <tr>
@@ -16,34 +61,18 @@
   </table>
 }
 
-@gndEntities = @{ 
-	Option(Seq(
-	    "label",
-	    "altLabel",
-	    "preferredName",
-	    "preferredNameForTheWork",
-	    "preferredNameForTheFamily",
-	    "preferredNameForThePerson",
-	    "preferredNameForTheCorporateBody",
-	    "preferredNameForTheSubjectHeading",
-	    "preferredNameForTheConferenceOrEvent",
-	    "preferredNameForThePlaceOrGeographicName"))
-}
-
 @nestedIds(property: String) = @{
-	(doc\\property).last.asOpt[Seq[JsValue]].getOrElse(Seq()).map((v: JsValue) => (v \ "id").asOpt[String].getOrElse("No id in " + v))
+	(doc\property).get.asOpt[Seq[JsValue]].getOrElse(Seq()).map((v: JsValue) => (v \ "id").get.asOpt[String].getOrElse("No id in " + v))
 }
 
 @singleOrMultiString(property: String) = @{
-	(doc\\property).last.asOpt[Seq[String]].getOrElse(Seq((doc\\property).last.asOpt[String].getOrElse("--")))
+	(doc\property).get.asOpt[Seq[String]].getOrElse(Seq((doc\property).get.asOpt[String].getOrElse("--")))
 }
 
 @with_icon(label: String, property: String, fullField: String) = {
-  @if(!(doc\\property).isEmpty) {
-    @defining(if(Lobid.DATA_2 && property != "type") { nestedIds(property) } else { singleOrMultiString(property) }){ v =>
-      @defining((Lobid.facetIcon(v,fullField), Lobid.facetLabel(v,fullField,""))) { case (icon, value) =>
-        @if(!icon.isEmpty && !value.isEmpty) { <tr><td>@label</td><td><span class="@icon"></span> @value</td></tr> }
-      }
+  @if((doc\property).get.asOpt[JsValue].isDefined) {
+    @defining(if(property != "type") { nestedIds(property) } else { singleOrMultiString(property) }){ v =>
+      <tr><td>@label</td><td><span class="@Lobid.facetIcon(v,fullField)"></span> @Lobid.facetLabel(v,fullField,"")</td></tr>
     }
   }
 }
@@ -51,24 +80,20 @@
 @subordinated(field:String, id:String, label:String, values:(String,String)) = {
   @defining(Lobid.getTotalHits(field, id, "*").get(Lobid.API_TIMEOUT)){ hits => @if(hits > 0) {
     @defining(if(hits==1){values._1} else {values._2}){ value =>
-    <tr><td>@label</td><td><a title="@value" href="@nwbib.routes.Application.search(raw=Lobid.escapeUri(field)+":"+Lobid.escapeUri(id),set="*")">@hits @value</a></td></tr>
+    <tr><td>@label</td><td><a title="@value" href="@nwbib.routes.Application.search(raw=field+":\""+Lobid.escapeUri(id)+"\"")">@hits @value</a></td></tr>
   }}}
 }
 
-@lobidUrl(node: JsValue) = @{
-  "http://lobid.org/resource/" + (if(Lobid.DATA_2) {
-    node.asOpt[Seq[String]].getOrElse(Seq("--"))(0)
-  } else {
-    node.asOpt[String].getOrElse("--")
-  })
+@lobidUrl(hbzId: String) = @{
+  "http://lobid.org/resources/" + hbzId + "#!"
 }
 
-@lobid2_part_of(field: String, subField: String) = {
+@part_of(field: String, subField: String) = {
   @if(!(doc \ field).isInstanceOf[JsUndefined]){
       @Html(TableRow.VALUES_MULTI.process(new com.fasterxml.jackson.databind.ObjectMapper().readTree(doc.toString()),
       field,
       "q",
-      "Erschienen als",
+      if(((doc \ field)(0) \ "numbering").asOpt[String].isDefined) {"Erschienen als"} else {"Erschienen in"},
       Seq((((doc \ field)(0) \ subField)(0) \ "id").asOpt[String].getOrElse("--")),
       Optional.of(Seq(subField, "numbering"))))
   }
@@ -82,10 +107,10 @@
               c <- cs;
               agent <- (c \ "agent").toOption;
               agents = agent.asOpt[Seq[JsValue]].getOrElse(Seq(agent));
-              label = (agents(0) \ "label").toOption.getOrElse("--");
-              id = (agents(0) \ "id").toOption.getOrElse("--")) {
-        <a title="Nach weiteren Titeln von '@label' suchen" href='@nwbib.routes.Application.search(person=id.toString)'/>@label</a>
-        <a title="Linked-Data-Quelle zu '@label' abrufen" href='@id'><span class='glyphicon glyphicon-link'></span></a>
+              label = (agents(0) \ "label").asOpt[String].getOrElse("--");
+              id = (agents(0) \ "id").asOpt[String]) {
+        <a title="Nach weiteren Titeln von '@label' suchen" href='@nwbib.routes.Application.search(person=id.getOrElse("\""+label+"\""))'/>@label</a>
+        @if(id.isDefined){<a title="Linked-Data-Quelle zu '@label' abrufen" href='@id'><span class='glyphicon glyphicon-link'></span></a>}
         @if(c!=cs.last){ | }
       }</td>
     </tr>
@@ -93,95 +118,111 @@
 }
 
 @subjects(subjects: Seq[JsValue]) = {
+  @if(!subjects.isEmpty){
   <tr>
     <td>Schlagwörter</td>
     <td>
     @for(subject <- subjects;
-         label <- (subject \ "label").asOpt[String];
-         id = (subject \ "id").asOpt[String]) {
-      <a title="Nach weiteren Titeln zu '@label' suchen" href='@nwbib.routes.Application.search(subject=id.getOrElse(label))'/>@label</a>
+         components = (subject \ "componentList").asOpt[Seq[JsValue]].getOrElse(Seq(subject));
+         component <- components;
+         label <- (component \ "label").asOpt[String];
+         id = (component \ "id").asOpt[String]) {
+      <span style="white-space: nowrap;"><a title="Nach weiteren Titeln zu '@label' suchen" href='@nwbib.routes.Application.search(subject=id.getOrElse("\""+label+"\""))'/>@label</a></span>
       <a title="Nach Themen mit '@label' suchen" href='@nwbib.routes.Application.topics(q=label)'><span class='octicon octicon-ellipsis'></span></a>
-      @if(subject!=subjects.last){ | }
+      @if(components.last == component) { <br/> } else { | }
     }</td>
   </tr>
+  }
+}
+
+@sortedPublications(seq: Seq[JsValue]) = @{
+  seq.sortBy((v: JsValue) => ((v\"startDate").asOpt[String].getOrElse((v\"endDate").asOpt[String].getOrElse("0")).toInt))
+}
+
+@withPrefixedLink(label: String, prefix: String, node: JsReadable) = {
+	@for(array <- node.asOpt[Seq[JsValue]]; if array.size > 0; value <- array.head.asOpt[String]){
+		<tr><td>@label</td><td><a href='@prefix@value'>@value</a></td></tr>
+	}
+}
+
+@subject_source_links(source: String, searchParam: String) = {
+    @for(
+        subject <- (doc \ "subject").as[Seq[JsValue]];
+        sourceId <- (subject \ "source" \ "id").asOpt[String];
+        if sourceId == source;
+        subjectId <- (subject \ "id").asOpt[String];
+        if !(doc\"spatial").asOpt[JsValue].isDefined || !Seq(10, 12, 14, 24, 28, 35, 36, 37, 52, 54, 72, 74, 96, 97).find((i: Int) => subjectId.endsWith("#n"+i));
+        subjectLabel <- (subject \ "label").asOpt[String]) {
+      <a href='@nwbib.routes.Application.search()?@searchParam=@subjectId.replace("#", "%23")'>@subjectLabel</a><br/>
+    }
+}
+
+@raumsystematik(source: String) = {
+  @if((doc\"spatial").asOpt[Seq[JsValue]].isDefined) {
+    <tr>
+      <td>Raumsystematik</td>
+      <td>
+      @for(spatial <- (doc\"spatial").as[Seq[JsValue]]) {
+        <a href='@nwbib.routes.Application.search()?q=spatial.id:"@((spatial\"id").asOpt[String].getOrElse("--"))"'>@((spatial\"label").asOpt[String].getOrElse("--"))</a>
+        <br/>
+      }
+  }
+  @if((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()).toString.contains(source)) {
+    @if(!(doc\"spatial").asOpt[Seq[JsValue]].isDefined) { @* No opening <tr> and label <td> from above *@
+    <tr>
+      <td>Raumsystematik</td>
+      <td>}
+      @subject_source_links(source, "nwbibspatial")}
+      </td>
+    </tr>
+}
+
+@sachsystematik(source: String) = {
+  @if((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()).toString.contains(source)) {
+    <tr>
+      <td>Sachsystematik</td>
+      <td>@subject_source_links(source, "nwbibsubject")</td>
+    </tr>
+  }
 }
 
 @table(){
   @result_field("Titel", "title", doc, TableRow.VALUES)
   @result_field("Titelzusatz", "otherTitleInformation", doc, TableRow.VALUES)
-  @result_field("Verantwortlich", "statementOfResponsibility", doc, TableRow.VALUES)
-  @if(Lobid.DATA_2) {
-    @contributions((doc \ "contribution").asOpt[Seq[JsValue]].getOrElse(Seq()))
-  } else {
-    @result_field("Autor/in", "creator", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Autor/in", "creatorName", doc, TableRow.VALUES)
-    @result_field("Redaktion", "redaktor", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Herausgeber/in", "editor", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Mitwirkung", "contributor", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Mitwirkung", "contributorName", doc, TableRow.VALUES)
-    @result_field("Schauspieler/in", "actor", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Nachwort", "afterwordBy", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Einleitung", "introductionBy", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Drehbuch", "screenwriter", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Mitarbeit", "collaborator", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Komponist/in", "composer", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Dirigent/in", "conductor", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Kamera", "cinematographer", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Sammler/in", "collector", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Kartographie", "cartographer", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Regie", "director", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Widmungsträger/in", "dedicatee", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Stecher/in", "engraver", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Illustration", "illustrator", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Interviewte/r", "interviewee", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Interviewer/in", "interviewer", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Musik", "musician", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Fotografie", "photographer", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Interpret/in", "performer", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Produktion", "producer", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Gesang", "singer", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Gefeierte Person", "honoree", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-    @result_field("Übersetzung", "translator", doc, TableRow.VALUES, valueLabel = gndEntities, param="person")
-  }
+  @result_field("Unterreihe", "titleOfSubSeries", doc, TableRow.VALUES)
+  @result_field("Verantwortlich", "responsibilityStatement", doc, TableRow.VALUES)
+  @contributions((doc \ "contribution").asOpt[Seq[JsValue]].getOrElse(Seq()))
   @with_icon("Medientyp", "medium", controllers.nwbib.Application.MEDIUM_FIELD)
-  @with_icon("Publikationstyp", if(Lobid.DATA_2) { "type" } else { "@type" }, if(Lobid.DATA_2) { controllers.nwbib.Application.TYPE_FIELD_LOBID2 } else { controllers.nwbib.Application.TYPE_FIELD })
+  @with_icon("Publikationstyp", "type", controllers.nwbib.Application.TYPE_FIELD)
   @result_field("", "thesisInformation", doc, TableRow.VALUES)
 
-  @result_field("Erschienen", "issued", doc, TableRow.VALUES)
+  @for(pub <- sortedPublications((doc\"publication").asOpt[Seq[JsValue]].getOrElse(Seq()))){ @publication(pub) }
+
   @result_field("Auflage", "edition", doc, TableRow.VALUES)
-  @result_field("Erscheinungsort", "placeOfPublication", doc, TableRow.VALUES)
-  @result_field("Verlag", "publisher", doc, TableRow.VALUES)
-  @result_field("ISBN", if(Lobid.DATA_2) { "isbn" } else { "isbn10" }, doc, TableRow.VALUES)
-  @result_field("URN", "urn", doc, TableRow.VALUES)
+  @result_field("ISBN", "isbn", doc, TableRow.VALUES)
+  @result_field("ISSN", "issn", doc, TableRow.VALUES)
+  @withPrefixedLink("DOI", "https://dx.doi.org/", doc \ "doi")
+  @withPrefixedLink("URN", "https://nbn-resolving.org/", doc \ "urn")
   @result_field("Umfang", "extent", doc, TableRow.VALUES)
   @result_field("Quelle", "bibliographicCitation", doc, TableRow.VALUES)
   @result_field("In", "containedIn", doc, TableRow.LINKS)
-  @result_field("Erscheinungsweise", "frequency", doc, TableRow.VALUES)
-  @if(Lobid.DATA_2) {
-    @lobid2_part_of("inSeries", "series")
-    @lobid2_part_of("volumeIn", "multiVolumeWork")
-  } else {
-    @result_field("Erschienen als", "volumeIn", doc, TableRow.VALUES_MULTI, valueLabel = Option(Seq("multiVolumeWork", "numbering")))
-    @result_field("Erschienen als", "inSeries", doc, TableRow.VALUES_MULTI, valueLabel = Option(Seq("series", "numbering")))
-  }
-  @defining(lobidUrl((doc \\ "hbzId")(0))){ id =>
-   @subordinated("@graph.http://purl.org/lobid/lv#multiVolumeWork.@id", id, "Bände", ("zugehöriger Band", "zugehörige Bände"))
-   @subordinated("@graph.http://purl.org/lobid/lv#series.@id", id, "Serienbände", ("zugehöriger Serienband", "zugehörige Serienbände"))
-   @subordinated("@graph.http://purl.org/lobid/lv#containedIn.@id", id, "Enthält", ("Beitrag", "Beiträge"))
+
+  @part_of("isPartOf", "hasSuperordinate")
+  @defining(lobidUrl((doc \ "hbzId").asOpt[String].getOrElse(""))){ id =>
+   @subordinated("isPartOf.hasSuperordinate.id", id, "Bände", ("zugehöriger Band", "zugehörige Bände"))
+   @subordinated("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
   }
 
-  @result_field("Raumsystematik", "coverage", doc, TableRow.VALUES, valueLabel = Option(Seq()), param="raw")
-  @result_field("Raumsystematik", "nwbibspatial", doc, TableRow.VALUES, valueLabel = Option(Seq()), param="nwbibspatial")
-  @result_field("Sachsystematik", "nwbibsubject", doc, TableRow.VALUES, valueLabel = Option(Seq()), param="nwbibsubject")
-  @if(Lobid.DATA_2) {
-    @subjects((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()))
-  } else {
-    @result_field("Schlagwörter", "subject", doc, TableRow.VALUES, valueLabel = gndEntities, param="subject")
-  }
+  @raumsystematik("http://purl.org/lobid/nwbib-spatial")
+  @sachsystematik("http://purl.org/lobid/nwbib")
+
+  @subjects((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()))
+
   @result_field("Schlagwortfolge", "subjectChain", doc, TableRow.VALUES, valueLabel = Option(Seq()))
 
-  @if(Lobid.DATA_2) { @result_field("Inhaltsangabe", "description", doc, TableRow.LINKS) }
-  @result_field("Inhaltsverzeichnis", "tableOfContents", doc, TableRow.LINKS)
+  @labelled("Inhaltsangabe", "description")
+  @labelled("Inhaltsverzeichnis", "tableOfContents")
+
   @result_field("Weitere Informationen", "isPrimaryTopicOf", doc, TableRow.LINKS, valueLabel = Option(Seq("hbz-Verbundkatalog")))
 }
 

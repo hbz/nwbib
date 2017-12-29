@@ -298,8 +298,8 @@ public class Classification {
 	public static void indexStartup() {
 		Settings clientSettings = ImmutableSettings.settingsBuilder()
 				.put("path.home", new File(".").getAbsolutePath())
-				.put("http.port", CONFIG.getString("index.es.port.http"))
-				.put("transport.tcp.port", CONFIG.getString("index.es.port.tcp"))
+                .put("http.port", play.Play.application().isTest() ? "8855" : CONFIG.getString("index.es.port.http"))
+				.put("transport.tcp.port", play.Play.application().isTest() ? "8856" : CONFIG.getString("index.es.port.tcp"))
 				.build();
 		node =
 				NodeBuilder.nodeBuilder().settings(clientSettings).local(true).node();
