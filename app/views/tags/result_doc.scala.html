@@ -126,7 +126,8 @@
          components = (subject \ "componentList").asOpt[Seq[JsValue]].getOrElse(Seq(subject));
          component <- components;
          label <- (component \ "label").asOpt[String];
-         id = (component \ "id").asOpt[String]) {
+         id = (component \ "id").asOpt[String];
+         if !id.getOrElse("").contains("/nwbib")) {
       <span style="white-space: nowrap;"><a title="Nach weiteren Titeln zu '@label' suchen" href='@nwbib.routes.Application.search(subject=id.getOrElse("\""+label+"\""))'/>@label</a></span>
       <a title="Nach Themen mit '@label' suchen" href='@nwbib.routes.Application.topics(q=label)'><span class='octicon octicon-ellipsis'></span></a>
       @if(components.last == component) { <br/> } else { | }
