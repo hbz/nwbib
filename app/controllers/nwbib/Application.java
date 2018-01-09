@@ -247,7 +247,8 @@ public class Application extends Controller {
 		Promise<Result> result =
 				okPromise(query != null ? query : q, person, name, subject, id,
 						publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
-						owner, t, sort, details, location, word, corporation, raw, format);
+						owner, t, sort, details, location, word, corporation, raw,
+						format.isEmpty() ? "html" : format);
 		cacheOnRedeem(cacheId, result, ONE_HOUR);
 		return result;
 	}
