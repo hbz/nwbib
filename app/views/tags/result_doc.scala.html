@@ -77,8 +77,8 @@
   }
 }
 
-@subordinated(field:String, id:String, label:String, values:(String,String)) = {
-  @defining(Lobid.getTotalHits(field, id, "*").get(Lobid.API_TIMEOUT)){ hits => @if(hits > 0) {
+@subordinate(field:String, id:String, label:String, values:(String,String)) = {
+  @defining(Lobid.getTotalHits(field, id, CONFIG.getString("nwbib.filter")).get(Lobid.API_TIMEOUT)){ hits => @if(hits > 0) {
     @defining(if(hits==1){values._1} else {values._2}){ value =>
     <tr><td>@label</td><td><a title="@value" href="@nwbib.routes.Application.search(raw=field+":\""+Lobid.escapeUri(id)+"\"")">@hits @value</a></td></tr>
   }}}
@@ -210,8 +210,8 @@
 
   @part_of("isPartOf", "hasSuperordinate")
   @defining(lobidUrl((doc \ "hbzId").asOpt[String].getOrElse(""))){ id =>
-   @subordinated("isPartOf.hasSuperordinate.id", id, "Bände", ("zugehöriger Band", "zugehörige Bände"))
-   @subordinated("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
+   @subordinate("isPartOf.hasSuperordinate.id", id, "Bände", ("zugehöriger Band", "zugehörige Bände"))
+   @subordinate("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
   }
 
   @raumsystematik("http://purl.org/lobid/nwbib-spatial")
