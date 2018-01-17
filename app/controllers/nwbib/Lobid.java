@@ -141,6 +141,8 @@ public class Lobid {
 
 	private static String nestedContribution(final String person, String type) {
 		String p = person.contains(" AND ") ? person : person.replace(" ", " AND ");
+		p = p.matches("[\\d\\-X]+") ? "http://d-nb.info/gnd/" + p : p;
+		p = p.startsWith("http") ? "\"" + p + "\"" : p;
 		return String.format("contribution:(contribution.agent.label:(%s) "
 				+ "OR contribution.agent.altLabel:(%s) "
 				+ "OR contribution.agent.id:(%s)) "//
