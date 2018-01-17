@@ -123,6 +123,7 @@
     <td>Schlagwörter</td>
     <td>
     @for(subject <- subjects;
+         if (subject \ "source" \ "label").asOpt[String].getOrElse("") != "Dewey-Dezimalklassifikation";
          components = (subject \ "componentList").asOpt[Seq[JsValue]].getOrElse(Seq(subject));
          component <- components;
          label <- (component \ "label").asOpt[String];
