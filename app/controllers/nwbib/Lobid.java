@@ -140,10 +140,11 @@ public class Lobid {
 	}
 
 	private static String nestedContribution(final String person, String type) {
+		String p = person.contains(" AND ") ? person : person.replace(" ", " AND ");
 		return String.format("contribution:(contribution.agent.label:(%s) "
 				+ "OR contribution.agent.altLabel:(%s) "
-				+ "OR contribution.agent.id:%s)) "//
-				+ "AND contribution.agent.type:(%s)", person, person, person, type);
+				+ "OR contribution.agent.id:(%s)) "//
+				+ "AND contribution.agent.type:(%s)", p, p, p, type);
 	}
 
 	static WSRequest topicRequest(final String q, int from, int size) {
