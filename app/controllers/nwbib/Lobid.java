@@ -101,9 +101,9 @@ public class Lobid {
 			requestHolder = requestHolder.setQueryParameter("q",
 					q + (q.isEmpty() ? "" : " AND ") + raw);
 		if (!q.trim().isEmpty())
-			requestHolder = requestHolder.setQueryParameter("q", q);
+			requestHolder = requestHolder.setQueryParameter("word", q);
 		else if (!word.isEmpty())
-			requestHolder = requestHolder.setQueryParameter("q", word);
+			requestHolder = requestHolder.setQueryParameter("word", word);
 		if (!name.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("name", name);
 		if (!subject.trim().isEmpty())
@@ -132,7 +132,7 @@ public class Lobid {
 					nestedContribution(corporation, "CorporateBody"));
 
 		if (requestHolder.getQueryParameters().get("q") == null) {
-			requestHolder.setQueryParameter("q", "*");
+			requestHolder.setQueryParameter("word", "*");
 		}
 		Logger.info("Request URL {}, query params {} ", requestHolder.getUrl(),
 				requestHolder.getQueryParameters());
@@ -156,7 +156,9 @@ public class Lobid {
 						.setQueryParameter("format", "json")
 						.setQueryParameter("from", "" + from)
 						.setQueryParameter("size", "" + size)
-						.setQueryParameter("subject", q) // TODO use NWBib set
+						.setQueryParameter("subject", q)
+						.setQueryParameter("filter",
+								Application.CONFIG.getString("nwbib.filter"))
 						.setQueryParameter("aggregations", "topic");
 		//@formatter:on
 		Logger.info("Request URL {}, query params {} ", request.getUrl(),
@@ -388,7 +390,7 @@ public class Lobid {
 				&& !raw.contains(Lobid.escapeUri(Application.COVERAGE_FIELD)))
 			request = request.setQueryParameter("q", raw);
 		else if (request.getQueryParameters().get("q") == null) {
-			request.setQueryParameter("q", q);
+			request.setQueryParameter("word", q);
 		}
 		if (!field.equals(Application.ITEM_FIELD))
 			request = request.setQueryParameter("owner", owner);
