@@ -161,8 +161,8 @@ public class Application extends Controller {
 		WSRequest request = // @formatter:off
 				WS.url(Application.CONFIG.getString("nwbib.api"))
 						.setHeader("Accept", "application/json")
-						.setQueryParameter("subject", q) // TODO: no NWBib-Set-Restriction
-						.setQueryParameter("aggregations", "topic")
+						.setQueryParameter("subject", q)
+						.setQueryParameter("aggregations", "subject.label.raw")
 						.setQueryParameter("filter", Application.CONFIG.getString("nwbib.filter"))
 						.setQueryParameter("from", "0")
 						.setQueryParameter("size", "1"); // @formatter:on
@@ -244,11 +244,10 @@ public class Application extends Controller {
 							publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
 							0L, owner, t, sort, location, word, corporation, raw)));
 		String query = form.data().get("q");
-		Promise<Result> result =
-				okPromise(query != null ? query : q, person, name, subject, id,
-						publisher, issued, medium, nwbibspatial, nwbibsubject, from, size,
-						owner, t, sort, details, location, word, corporation, raw,
-						format.isEmpty() ? "html" : format);
+		Promise<Result> result = okPromise(query != null ? query : q, person, name,
+				subject, id, publisher, issued, medium, nwbibspatial, nwbibsubject,
+				from, size, owner, t, sort, details, location, word, corporation, raw,
+				format.isEmpty() ? "html" : format);
 		cacheOnRedeem(cacheId, result, ONE_HOUR);
 		return result;
 	}

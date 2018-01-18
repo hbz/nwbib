@@ -21,7 +21,7 @@
     }
     <ul id="root" style="display:block;">
        @for(topic <- topics) {
-         <li class="treeItem"><a href="@nwbib.routes.Application.search(q=topic.split(" \\| ").map("\""+_+"\"").mkString(" AND "))">@topic</a></li>
+         <li class="treeItem"><a href="@nwbib.routes.Application.search(subject="\""+topic+"\"")">@topic</a></li>
        }
     </ul>
     <link rel="stylesheet" href="@controllers.routes.Assets.at("stylesheets/FileTreeView.css")" />
