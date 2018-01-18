@@ -14,7 +14,7 @@
 
 @entries() = {
     @for((id,i) <- ids.zipWithIndex; doc = Json.parse(vals(i).toString())) {
-        @if(f=="details"){doc} else {@tags.result_short(id,doc,i,ids)}
+        @if(f=="details"){@tags.result_doc(doc)} else {@tags.result_short(id,doc,i,ids)}
     }
 }
 

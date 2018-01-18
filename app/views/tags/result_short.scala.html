@@ -33,7 +33,7 @@
 
 <tr>
   <td>
-    @icon_span((doc \ "type").get.asOpt[Seq[String]].getOrElse(Seq()), Application.TYPE_FIELD)<br/>
+    @icon_span((doc \ "type").asOpt[Seq[String]].getOrElse(Seq()), Application.TYPE_FIELD)<br/>
     @icon_span(Seq((doc \ "medium" \\ "id").last.asOpt[String].getOrElse("")), controllers.nwbib.Application.MEDIUM_FIELD)
   </td>
   <td> <a href="@nwbib.routes.Application.show(id)">

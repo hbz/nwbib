@@ -796,8 +796,10 @@ public class Application extends Controller {
 		}
 		Stream<Promise<JsonNode>> promises = starredIds.stream()
 				.map(id -> WS
-						.url(String.format("http://lobid.org/resource/%s?format=full", id))
-						.get().map(response -> response.asJson()));
+						.url(String
+								.format(String.format(CONFIG.getString("indexUrlFormat"), id)))
+						.setContentType("application/json").get()
+						.map(response -> response.asJson()));
 		return Promise.sequence(promises.collect(Collectors.toList()))
 				.map((List<JsonNode> vals) -> {
 					uncache(starredIds);
