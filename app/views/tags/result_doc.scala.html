@@ -160,23 +160,31 @@
 }
 
 @raumsystematik(source: String) = {
-  @if((doc\"spatial").asOpt[Seq[JsValue]].isDefined) {
-    <tr>
-      <td>Raumsystematik</td>
-      <td>
-      @for(spatial <- (doc\"spatial").as[Seq[JsValue]]) {
-        <a href='@nwbib.routes.Application.search()?q=spatial.id:"@((spatial\"id").asOpt[String].getOrElse("--"))"'>@((spatial\"label").asOpt[String].getOrElse("--")) (@((spatial\"id").asOpt[String].getOrElse("--").split("/").last))</a>
-        <br/>
+  @defining(((doc\"spatial").asOpt[Seq[JsValue]],(doc\"coverage").asOpt[Seq[JsValue]])) { case (spatial, coverage) =>
+      @for(vs <- spatial.orElse(coverage)) {
+        <tr>
+          <td>Raumsystematik</td>
+          <td>
+          @for(v <- vs) {
+              @if(spatial.isDefined){
+                  <a href='@nwbib.routes.Application.search()?q=spatial.id:"@((v\"id").asOpt[String].getOrElse("--"))"'>
+                    @((v\"label").asOpt[String].getOrElse("--")) (@((v\"id").asOpt[String].getOrElse("--").split("/").last))
+                  </a>
+              } else {
+                  <a href='@nwbib.routes.Application.search()?q=coverage:"@(v.as[String])"'>@(v.as[String])</a>
+              }
+              <br/>
+          }
       }
+      @if((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()).toString.contains(source)) {
+        @if(!spatial.orElse(coverage).isDefined) { @* No opening <tr> and label <td> from above *@
+        <tr>
+          <td>Raumsystematik</td>
+          <td>}
+          @subject_source_links(source, "nwbibspatial")}
+          </td>
+        </tr>
   }
-  @if((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()).toString.contains(source)) {
-    @if(!(doc\"spatial").asOpt[Seq[JsValue]].isDefined) { @* No opening <tr> and label <td> from above *@
-    <tr>
-      <td>Raumsystematik</td>
-      <td>}
-      @subject_source_links(source, "nwbibspatial")}
-      </td>
-    </tr>
 }
 
 @sachsystematik(source: String) = {
