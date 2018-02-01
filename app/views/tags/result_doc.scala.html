@@ -121,7 +121,8 @@
 @subjects(subjects: Seq[JsValue]) = {
   @if(!subjects.isEmpty){
     @for((key,value) <- SortedMap(subjects.groupBy(v => (v \\ "source") map ((_ \ "label"))).toSeq:_*)(Ordering.by((_: Seq[JsLookupResult]).toString).reverse);
-         source <- key;
+         if !key.isEmpty;
+         source = key.head;
          sourceLabel <- source.asOpt[String];
          if !sourceLabel.contains("Nordrhein-Westfälischen");
          if !sourceLabel.contains("RPB-Sachgruppen")) {
