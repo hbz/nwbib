@@ -5,7 +5,6 @@
 @import views.TableRow
 @import controllers.nwbib.Lobid
 @import controllers.nwbib.Application.CONFIG
-@import scala.collection.immutable.SortedMap
 
 @labelled(label: String, key: String) = {
   @if((doc\key).asOpt[Seq[JsValue]].isDefined) {
@@ -119,27 +118,38 @@
 }
 
 @subjects(subjects: Seq[JsValue]) = {
-  @if(!subjects.isEmpty){
-    @for((key,value) <- SortedMap(subjects.groupBy(v => (v \\ "source") map ((_ \ "label"))).toSeq:_*)(Ordering.by((_: Seq[JsLookupResult]).toString).reverse);
-         if !key.isEmpty;
-         source = key.head;
-         sourceLabel <- source.asOpt[String];
-         if !sourceLabel.contains("Nordrhein-Westfälischen");
-         if !sourceLabel.contains("RPB-Sachgruppen")) {
-         <tr>
-            <td>@if(sourceLabel.contains("GND")){Schlagwörter} else {@sourceLabel}</td>
-            <td>
-         @for(
-             subject <- value;
-             components = (subject \ "componentList").asOpt[Seq[JsValue]].getOrElse(Seq(subject));
-             component <- components;
-             label <- (component \ "label").asOpt[String];
-             id = (component \ "id").asOpt[String];
-             notation = (component \ "notation").asOpt[String]) {
-          <span><a title="Nach weiteren Titeln zu '@label' suchen" href='@nwbib.routes.Application.search(subject=id.getOrElse("\""+label+"\""))'/>@label @if(notation.isDefined){(@notation.get)}</a></span>
-          <a title="Nach Themen mit '@label' suchen" href='@nwbib.routes.Application.topics(q=label)'><span class='octicon octicon-ellipsis'></span></a>
-          @if(components.last == component) { <br/> } else { | }
-        }
+  @if(subjects.toString.contains("GND")){
+  <tr>
+    <td>Schlagwörter</td>
+    <td>
+    @for(subject <- subjects;
+         components = (subject \ "componentList").asOpt[Seq[JsValue]].getOrElse(Seq(subject));
+         component <- components;
+         sourceLabel = (component\"source"\"label").asOpt[String];
+         if !sourceLabel.getOrElse("").contains("Nordrhein-Westfälischen");
+         if !sourceLabel.getOrElse("").contains("RPB-Sachgruppen");
+         if !sourceLabel.getOrElse("").contains("Dewey");
+         label <- (component \ "label").asOpt[String];
+         id = (component \ "id").asOpt[String]) {
+      <span style="white-space: nowrap;"><a title="Nach weiteren Titeln zu '@label' suchen" href='@nwbib.routes.Application.search(subject=id.getOrElse("\""+label+"\""))'/>@label</a></span>
+      <a title="Nach Themen mit '@label' suchen" href='@nwbib.routes.Application.topics(q=label)'><span class='octicon octicon-ellipsis'></span></a>
+      @if(components.last == component) { <br/> } else { | }
+    }</td>
+  </tr>
+  }
+  @if(subjects.toString.contains("Dewey")){
+  <tr>
+    <td>Dewey-Dezimalklassifikation</td>
+    <td>
+    @for(subject <- subjects;
+         sourceLabel <- (subject\"source"\"label").asOpt[String];
+         if sourceLabel.contains("Dewey");
+         label <- (subject \ "label").asOpt[String];
+         id = (subject \ "id").asOpt[String];
+         notation = (subject \ "notation").asOpt[String]) {
+      <span><a title="Nach weiteren Titeln zu '@label' suchen" href='@nwbib.routes.Application.search(subject=id.getOrElse("\""+label+"\""))'/>@label @if(notation.isDefined){(@notation.get)}</a></span>
+      <a title="Nach Themen mit '@label' suchen" href='@nwbib.routes.Application.topics(q=label)'><span class='octicon octicon-ellipsis'></span></a>
+      <br/>
     }</td>
   </tr>
   }
