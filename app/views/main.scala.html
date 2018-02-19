@@ -93,11 +93,7 @@
             </div>
             <div class="page-header">
                 <img class="media-object nrw-logo pull-right" src="@controllers.routes.Assets.at("images/wappen.png")" alt="NRW">
-                @if(docJson.isDefined) {
-                  <h1>@((Json.parse(docJson.get) \ "title").asOpt[String].getOrElse("")) @for(subTitle <- (Json.parse(docJson.get) \ "otherTitleInformation").asOpt[Seq[String]]){<br/><small>@subTitle</small>}</h1>
-                } else {
-                  <h1>Die Nordrhein-Westfälische Bibliographie<br/><small>Mehr als 400.000 Publikationen über NRW seit 1983</small></h1>
-                }
+                <h1>Die Nordrhein-Westfälische Bibliographie<br/><small>Mehr als 400.000 Publikationen über NRW seit 1983</small></h1>
             </div>
             @content
             <div class="panel panel-default nwbib-footer">

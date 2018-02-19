@@ -215,8 +215,10 @@
 }
 
 @table(){
-  @result_field("Titel", "title", doc, TableRow.VALUES)
-  @result_field("Titelzusatz", "otherTitleInformation", doc, TableRow.VALUES)
+  <tr><td>Titel</td><td><b>@((doc \ "title").asOpt[String].getOrElse(""))</b></td></tr>
+  @for(x <- (doc \ "otherTitleInformation").asOpt[Seq[JsValue]]) {
+    <tr><td>Titelzusatz</td><td><i>@x.head.asOpt[String].getOrElse("")</i></td></tr>
+  }
   @result_field("Unterreihe", "titleOfSubSeries", doc, TableRow.VALUES)
   @result_field("Verantwortlich", "responsibilityStatement", doc, TableRow.VALUES)
   @contributions((doc \ "contribution").asOpt[Seq[JsValue]].getOrElse(Seq()))
