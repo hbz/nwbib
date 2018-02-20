@@ -65,7 +65,10 @@
             <dl>
             @defining((doc\\"hbzId")(0).asOpt[String].getOrElse(q)){ id =>
               <dt>@tags.star_button(id) Titeldetails:
-              <a href="@(String.format(Application.CONFIG.getString("indexUrlFormat"), id))">&nbsp;</a>
+              <small style='float:right'>
+              <a target="_top" title="Datenquelle in der hbz-Verbunddatenbank zeigen" href="http://193.30.112.134/F/?func=find-c&ccl_term=IDN%3D@id"><span class='octicon octicon-database'></span></a>
+              <a target="_top" title="Datenquelle im hbz-LOD-Dienst lobid zeigen" href="@(String.format(Application.CONFIG.getString("indexUrlFormat"), id))"><span class='glyphicon glyphicon-link'></span></a>
+              </small>
               </dt>
               <dd>@tags.result_doc(doc)</dd>
             }
