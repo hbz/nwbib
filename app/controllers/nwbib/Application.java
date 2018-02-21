@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -158,34 +159,48 @@ public class Application extends Controller {
 		Promise<Result> cachedResult = (Promise<Result>) Cache.get(cacheId);
 		if (cachedResult != null)
 			return cachedResult;
+		String aggregationField = "subject.label.raw";
 		WSRequest request = // @formatter:off
 				WS.url(Application.CONFIG.getString("nwbib.api"))
 						.setHeader("Accept", "application/json")
 						.setQueryParameter("subject", q)
-						.setQueryParameter("aggregations", "subject.label.raw")
+						.setQueryParameter("aggregations", aggregationField)
 						.setQueryParameter("filter", Application.CONFIG.getString("nwbib.filter"))
 						.setQueryParameter("from", "0")
 						.setQueryParameter("size", "1"); // @formatter:on
 		Promise<Result> result = request.get().map((WSResponse response) -> {
 			if (response.getStatus() == Http.Status.OK) {
-				List<JsonNode> terms = response.asJson().findValues("key");
-				return ok(views.html.topics.render(q, cleanSortUnique(terms)));
+				Iterator<JsonNode> jsonIterator =
+						response.asJson().findValue(aggregationField).elements();
+				Stream<JsonNode> jsonStream = StreamSupport.stream(
+						Spliterators.spliteratorUnknownSize(jsonIterator, 0), false);
+				return ok(views.html.topics.render(q, cleanSortUnique(jsonStream)));
 			}
 			Logger.error(new String(response.asByteArray()));
-			return ok(views.html.topics.render(q,
-					cleanSortUnique(Collections.emptyList())));
+			return ok(views.html.topics.render(q, Collections.emptyList()));
 		});
 		cacheOnRedeem(cacheId, result, ONE_HOUR);
 		return result;
 	}
 
-	private static List<String> cleanSortUnique(List<JsonNode> topics) {
-		List<String> filtered = topics.stream()
-				.map(topic -> topic.textValue().replaceAll("\\([\\d,]+\\)$", ""))
-				.filter(topic -> !topic.trim().startsWith(":")).map(v -> v.trim())
-				.collect(Collectors.toList());
-		SortedSet<String> sortedUnique = new TreeSet<>(
-				(s1, s2) -> Collator.getInstance(Locale.GERMAN).compare(s1, s2));
+	private static List<Pair<String, String>> cleanSortUnique(
+			Stream<JsonNode> topics) {
+		Function<JsonNode, Pair<String, String>> mapper = topic -> {
+			String key =
+					topic.get("key").textValue().replaceAll("\\([\\d,]+\\)$", "");
+			Number count = topic.get("doc_count").numberValue();
+			return Pair.of(key, count.toString());
+		};
+		Predicate<Pair<String, String>> filter = topic -> {
+			String key = topic.getLeft().trim();
+			return (key.contains("|") || key.split(",").length == 2)
+					&& !key.startsWith(":") && !key.startsWith(".");
+		};
+		Comparator<Pair<String, String>> sorter = (s1, s2) -> Collator
+				.getInstance(Locale.GERMAN).compare(s1.getLeft(), s2.getLeft());
+		List<Pair<String, String>> filtered =
+				topics.map(mapper).filter(filter).collect(Collectors.toList());
+		SortedSet<Pair<String, String>> sortedUnique = new TreeSet<>(sorter);
 		sortedUnique.addAll(filtered);
 		return new ArrayList<>(sortedUnique);
 	}

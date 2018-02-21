@@ -134,26 +134,10 @@
       <span style="white-space: nowrap;"><a title="Nach weiteren Titeln zu '@label' suchen" href='@nwbib.routes.Application.search(subject=id.getOrElse("\""+label+"\""))'/>@label</a></span>
       <a title="Nach Themen mit '@label' suchen" href='@nwbib.routes.Application.topics(q=label)'><span class='octicon octicon-ellipsis'></span></a>
       @if(components.last == component) {
-        @for(topic <- (subject\"label").asOpt[String]; hits = Lobid.getTotalHits("subject.label", topic.trim, CONFIG.getString("nwbib.filter")).get(Lobid.API_TIMEOUT); if hits > 1){
-          | <a href='@nwbib.routes.Application.search(q="subject.label:\""+topic.trim+"\"")' title="Alle @hits Titel zum Thema '@topic.trim' anzeigen"><span class='badge progress-bar-success'>@hits</span></a>
+        @for(topic <- (subject\"label").asOpt[String]; hits = Lobid.getTotalHits("subject.label.raw", topic.trim, CONFIG.getString("nwbib.filter")).get(Lobid.API_TIMEOUT); if hits > 1){
+          | <a href='@nwbib.routes.Application.search(q="subject.label.raw:\""+topic.trim+"\"")' title="Alle @hits Titel zum Thema '@topic.trim' anzeigen"><span class='badge progress-bar-success'>@hits</span></a>
         }<br/>
       } else { | }
-    }</td>
-  </tr>
-  }
-  @if(subjects.toString.contains("Dewey")){
-  <tr>
-    <td>Dewey-Dezimalklassifikation</td>
-    <td>
-    @for(subject <- subjects;
-         sourceLabel <- (subject\"source"\"label").asOpt[String];
-         if sourceLabel.contains("Dewey");
-         label <- (subject \ "label").asOpt[String];
-         id = (subject \ "id").asOpt[String];
-         notation = (subject \ "notation").asOpt[String]) {
-      <span><a title="Nach weiteren Titeln zu '@label' suchen" href='@nwbib.routes.Application.search(subject=id.getOrElse("\""+label+"\""))'/>@label @if(notation.isDefined){(@notation.get)}</a></span>
-      <a title="Nach Themen mit '@label' suchen" href='@nwbib.routes.Application.topics(q=label)'><span class='octicon octicon-ellipsis'></span></a>
-      <br/>
     }</td>
   </tr>
   }
