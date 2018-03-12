@@ -1,8 +1,9 @@
 @* Copyright 2014 Fabian Steeg, hbz. Licensed under the GPLv2 *@
 
-@(title: String)(content: Html)
+@(title: String, docJson: Option[String] = None)(content: Html)
 
 @import controllers.nwbib.Lobid
+@import play.api.libs.json._
 
 <!DOCTYPE html>
 
@@ -59,8 +60,7 @@
                           <li class="dropdown-header">Sonstige</li>
                           <li><a href="http://www.landesbibliothek-nrw.de/">Die NRW-Landesbibliotheken</a></li>
                           <li><a href="http://www.ubka.uni-karlsruhe.de/landesbibliographie/">Virtuelle Deutsche Landesbibliographie (VDL)</a></li>
-                          @* Enable after OK from H.F., see https://github.com/hbz/nwbib/issues/394#issuecomment-335094505 *@
-                          @* <li><a href="https://biographie-nrw.uni-muenster.de/">Biographisches Portal NRW</a></li> *@
+                          <li><a href="https://biographie-nrw.uni-muenster.de/">Biographisches Portal NRW</a></li>
                         </ul>
                       </li>
                     </ul>
@@ -93,7 +93,7 @@
             </div>
             <div class="page-header">
                 <img class="media-object nrw-logo pull-right" src="@controllers.routes.Assets.at("images/wappen.png")" alt="NRW">
-                <h1>Die Nordrhein-Westfälische Bibliographie<br/><small>Mehr als 350.000 Publikationen über NRW seit 1983</small></h1>
+                <h1>Die Nordrhein-Westfälische Bibliographie<br/><small>Mehr als 400.000 Publikationen über NRW seit 1983</small></h1>
             </div>
             @content
             <div class="panel panel-default nwbib-footer">
@@ -101,8 +101,7 @@
                 @defining(controllers.nwbib.Lobid.getTotalHits("").get(Lobid.API_TIMEOUT)){ hits =>
                 <img class="media-object pull-left nrw-wappen" src="@controllers.routes.Assets.at("images/wappen.png")" alt="NRW-Wappen"> 
                 <img class="media-object pull-right hbz-logo" src="@controllers.routes.Assets.at("images/hbz.png")" alt="hbz-Logo">
-                Die NWBib bietet @if(hits>0){aktuell @hits}else{mehr als 350.000 (Stand: Dezember 2014)} Literaturnachweise. Sie wird von der <a href="http://www.ulb.hhu.de/">Universitäts- und Landesbibliothek (ULB) Düsseldorf</a> und der <a href="http://www.ulb.uni-muenster.de/">ULB Münster</a> 
-	       in Zusammenarbeit mit der <a href="http://www.ulb.uni-bonn.de/">ULB Bonn</a> und dem <a href="http://www.hbz-nrw.de/">Hochschulbibliothekszentrum des Landes Nordrhein-Westfalen (hbz)</a> herausgegeben.
+                Die NWBib bietet @if(hits>0){aktuell @hits}else{mehr als 400.000 (Stand: Januar 2018)} Literaturnachweise. Sie wird von der <a href="http://www.ulb.hhu.de/">Universitäts- und Landesbibliothek (ULB) Düsseldorf</a> und der <a href="http://www.ulb.uni-muenster.de/">ULB Münster</a> in Zusammenarbeit mit der <a href="http://www.ulb.uni-bonn.de/">ULB Bonn</a> und dem <a href="http://www.hbz-nrw.de/">Hochschulbibliothekszentrum des Landes Nordrhein-Westfalen (hbz)</a> herausgegeben.
                 }
               </div>
             </div>

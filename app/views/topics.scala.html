@@ -1,6 +1,6 @@
 @* Copyright 2014 Fabian Steeg, hbz. Licensed under the GPLv2 *@
 
-@(q: String, topics: List[String])
+@(q: String, topics: List[org.apache.commons.lang3.tuple.Pair[String,String]])
 
 @import helper._
 @import play.api.libs.json.Json
@@ -20,8 +20,10 @@
     </p>
     }
     <ul id="root" style="display:block;">
-       @for(topic <- topics) {
-          <li class="treeItem"><a href="@nwbib.routes.Application.search(q="\""+topic+"\"")">@topic</a></li>
+       @for(topic <- topics; key = topic.getLeft; count = topic.getRight.toInt) {
+         <li class="treeItem"><a title="@count Treffer zum diesem Thema anzeigen" href="@nwbib.routes.Application.search(subject=q, word="subject.label.raw:\""+key+"\"")">
+           @key@if(count>1){&nbsp;<span class='badge progress-bar-success'>@count</span>}
+         </a></li>
        }
     </ul>
     <link rel="stylesheet" href="@controllers.routes.Assets.at("stylesheets/FileTreeView.css")" />

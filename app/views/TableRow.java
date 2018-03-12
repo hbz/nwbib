@@ -32,28 +32,8 @@ public enum TableRow {
 		@Override
 		public String process(JsonNode doc, String property, String param,
 				String label, List<String> values, Optional<List<String>> keys) {
-			List<String> vs = values;
-			if (doc.findValue("coverage") != null) { // https://github.com/hbz/nwbib/issues/276
-				List<String> remove = Arrays.asList(//
-						"http://purl.org/lobid/nwbib-spatial#n10",
-						"http://purl.org/lobid/nwbib-spatial#n12",
-						"http://purl.org/lobid/nwbib-spatial#n14",
-						"http://purl.org/lobid/nwbib-spatial#n24",
-						"http://purl.org/lobid/nwbib-spatial#n28",
-						"http://purl.org/lobid/nwbib-spatial#n35",
-						"http://purl.org/lobid/nwbib-spatial#n36",
-						"http://purl.org/lobid/nwbib-spatial#n37",
-						"http://purl.org/lobid/nwbib-spatial#n52",
-						"http://purl.org/lobid/nwbib-spatial#n54",
-						"http://purl.org/lobid/nwbib-spatial#n72",
-						"http://purl.org/lobid/nwbib-spatial#n74",
-						"http://purl.org/lobid/nwbib-spatial#n96",
-						"http://purl.org/lobid/nwbib-spatial#n97");
-				vs = vs.stream().filter(v -> !remove.contains(v))
-						.collect(Collectors.toList());
-			}
 			List<String> filtered =
-					vs.stream().filter(value -> !value.contains("http://dewey.info"))
+					values.stream().filter(value -> !value.contains("http://dewey.info"))
 							.collect(Collectors.toList());
 			return filtered.isEmpty() ? ""
 					: String.format("<tr><td>%s</td><td>%s</td></tr>", label,
@@ -82,14 +62,15 @@ public enum TableRow {
 				Logger.error("Could not call encode '{}'", term, e);
 			}
 			String search = String.format("/search?%s=%s", param, term);
-			JsonNode node = Lobid.DATA_2 ? doc.get(property) : doc;
+			JsonNode node = doc.get(property);
 			String label = labelForId(value, node, labels);
 			String result = labels.get().contains("numbering") ? label
 					: String.format(
 							"<a title=\"Nach weiteren Titeln suchen\" href=\"%s\">%s</a>",
 							search, label);
 			if (value.startsWith("http")) {
-				if (param.equals("person")) {
+				if (param.equals("agent")
+						&& !value.contains("http://dewey.info")) {
 					result += String.format(
 							" <a title=\"Linked-Data-Quelle abrufen\" "
 									+ "href=\"%s\"><span class=\"glyphicon glyphicon-link\"></span></a>",
@@ -112,7 +93,7 @@ public enum TableRow {
 			if (!keys.isPresent()) {
 				throw new IllegalArgumentException("VALUES_MULTI needs valueLabels");
 			}
-			JsonNode node = Lobid.DATA_2 ? doc.get(property).iterator().next() : doc;
+			JsonNode node = doc.get(property).iterator().next();
 			return values.stream()
 					.filter(value -> !value.contains("http://dewey.info"))
 					.map(val -> String.format("<tr><td>%s</td><td>%s</td></tr>", label,
@@ -127,10 +108,12 @@ public enum TableRow {
 				String currentValue = resultValues.get(i);
 				String[] refAndLabel =
 						refAndLabel(properties.get(i), currentValue, Optional.empty());
-				String result = properties.get(i).equals("numbering") ? currentValue
-						: String.format(
-								"<a title=\"Titeldetails anzeigen\" href=\"%s\">%s</a>",
-								refAndLabel[0], refAndLabel[1]);
+				String result =
+						properties.get(i).equals("numbering") || value.equals("--")
+								? currentValue
+								: String.format(
+										"<a title=\"Titeldetails anzeigen\" href=\"%s\">%s</a>",
+										refAndLabel[0], refAndLabel[1]);
 				results.add(result.replace("Band", "").trim());
 			}
 			return results.stream().collect(Collectors.joining(", Band "));
@@ -140,19 +123,14 @@ public enum TableRow {
 				List<String> keys) {
 			List<String> result = new ArrayList<>();
 			if (doc != null) {
-				if (Lobid.DATA_2) {
-					result.add(
-							doc.get(keys.get(0)).iterator().next().get("id").textValue());
-					result.add(doc.get(keys.get(1)).textValue());
-				} else {
-					for (JsonNode node : doc.findValues("@graph").get(0)) {
-						for (String key : keys) {
-							if (node.get("@id").textValue().equals(value) && node.has(key)) {
-								result.add(node.get(key).textValue());
-							}
-						}
-					}
-				}
+				JsonNode node = doc.get(keys.get(0)).iterator().next();
+				JsonNode id = node.get("id");
+				JsonNode label = node.get("label");
+				result.add(id != null ? id.textValue()
+						: label != null ? label.textValue() : "--");
+				JsonNode val = doc.get(keys.get(1));
+				if (val != null)
+					result.add(val.textValue());
 			}
 			return result.isEmpty() ? Arrays.asList(value) : result;
 		}
@@ -233,10 +211,10 @@ public enum TableRow {
 	String[] refAndLabel(String property, String value,
 			Optional<List<String>> labels) {
 		if ((property.equals("containedIn") || property.equals("hasPart")
-				|| property.equals("isPartOf") || property.equals("multiVolumeWork")
-				|| property.equals("series")) && value.contains("lobid.org")) {
+				|| property.equals("isPartOf") || property.equals("hasSuperordinate"))
+				&& value.contains("lobid.org")) {
 			return new String[] {
-					value.replaceAll("lobid.org/resources?/", "lobid.org/nwbib/"),
+					value.replaceAll("lobid.org/resources?/", "nwbib.de/"),
 					Lobid.resourceLabel(value) };
 		}
 		String label =

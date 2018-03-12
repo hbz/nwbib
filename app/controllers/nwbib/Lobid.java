@@ -4,7 +4,6 @@ package controllers.nwbib;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,7 +13,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Spliterators;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -31,7 +33,6 @@ import play.libs.ws.WS;
 import play.libs.ws.WSRequest;
 import play.libs.ws.WSResponse;
 import play.mvc.Http;
-import views.TableRow;
 
 /**
  * Access Lobid title data.
@@ -44,34 +45,15 @@ public class Lobid {
 	/** Timeout for API calls in milliseconds. */
 	public static final int API_TIMEOUT = 50000;
 
-	/** Feature toggle for using the new Lobid 2.0 data. */
-	public static boolean DATA_2 =
-			Application.CONFIG.getBoolean("feature.lobid2.enabled");
-
 	/**
 	 * @param id The resource ID
 	 * @return The resource JSON content
 	 */
 	public static JsonNode getResource(String id) {
-		DATA_2 = Application.CONFIG.getBoolean("feature.lobid2.enabled");
-		if (DATA_2) {
-			String url = String.format(
-					Application.CONFIG.getString("feature.lobid2.indexUrlFormat"), id);
-			JsonNode response = cachedJsonCall(url);
-			if (response.size() == 0) {
-				// Fall back to data 1.x if nothing found:
-				String fallbackUrl = String.format("%s/%s?format=full",
-						Application.CONFIG.getString("nwbib.api"), id);
-				Logger.warn(
-						"No response from Lobid API 2.0 URL '{}', falling back to API 1.x URL '{}'",
-						url, fallbackUrl);
-				DATA_2 = false; // required for processing individual fields
-				return cachedJsonCall(fallbackUrl);
-			}
-			return response;
-		}
-		throw new IllegalStateException(
-				"Only implemented for Lobid.DATA_2 feature");
+		String url =
+				String.format(Application.CONFIG.getString("indexUrlFormat"), id);
+		JsonNode response = cachedJsonCall(url);
+		return response;
 	}
 
 	/**
@@ -85,9 +67,10 @@ public class Lobid {
 			return json;
 		}
 		Logger.debug("Not cached, GET: {}", url);
-		Promise<JsonNode> promise =
-				WS.url(url).get().map(response -> response.getStatus() == Http.Status.OK
-						? response.asJson() : Json.newObject());
+		Promise<JsonNode> promise = WS.url(url).get()
+				.map(response -> response.getStatus() == Http.Status.OK
+						? response.asJson()
+						: Json.newObject());
 		promise.onRedeem(jsonResponse -> {
 			Cache.set(cacheKey, jsonResponse, Application.ONE_DAY);
 		});
@@ -95,39 +78,32 @@ public class Lobid {
 	}
 
 	static Long getTotalResults(JsonNode json) {
-		return json.findValue("http://sindice.com/vocab/search#totalResults")
-				.asLong();
+		return json.findValue("totalItems").asLong();
 	}
 
 	static WSRequest request(final String q, final String person,
 			final String name, final String subject, final String id,
 			final String publisher, final String issued, final String medium,
 			final String nwbibspatial, final String nwbibsubject, final int from,
-			final int size, String owner, String t, String sort, boolean allData,
-			String set, String location, String word, String corporation,
-			String raw) {
+			final int size, String owner, String t, String sort, String location,
+			String word, String corporation, String raw) {
 		WSRequest requestHolder = WS.url(Application.CONFIG.getString("nwbib.api"))
 				.setHeader("Accept", "application/json")
-				.setQueryParameter("format", "full")
+				.setQueryParameter("format", "json")
 				.setQueryParameter("from", from + "")
-				.setQueryParameter("size", size + "").setQueryParameter("sort", sort)
+				.setQueryParameter("size", size + "")//
+				.setQueryParameter("sort", sort)//
+				.setQueryParameter("filter",
+						Application.CONFIG.getString("nwbib.filter"))
 				.setQueryParameter("location", locationPolygon(location));
-		if (!allData && set.isEmpty())
-			requestHolder = requestHolder.setQueryParameter("set",
-					Application.CONFIG.getString("nwbib.set"));
-		else if (!set.isEmpty() && !set.equals("*"))
-			requestHolder = requestHolder.setQueryParameter("set", set);
-		else {
-			requestHolder = requestHolder.setQueryParameter("set", "");
-		}
+
 		if (!raw.trim().isEmpty())
-			requestHolder = requestHolder.setQueryParameter("q", raw);
+			requestHolder = requestHolder.setQueryParameter("q",
+					q + (q.isEmpty() ? "" : " AND ") + raw);
 		if (!q.trim().isEmpty())
-			requestHolder = requestHolder.setQueryParameter("word", preprocess(q));
+			requestHolder = requestHolder.setQueryParameter("word", q);
 		else if (!word.isEmpty())
-			requestHolder = requestHolder.setQueryParameter("word", preprocess(word));
-		if (!person.trim().isEmpty())
-			requestHolder = requestHolder.setQueryParameter("author", person);
+			requestHolder = requestHolder.setQueryParameter("word", word);
 		if (!name.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("name", name);
 		if (!subject.trim().isEmpty())
@@ -141,37 +117,53 @@ public class Lobid {
 		if (!medium.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("medium", medium);
 		if (!nwbibspatial.trim().isEmpty())
-			requestHolder =
-					requestHolder.setQueryParameter("nwbibspatial", nwbibspatial);
+			requestHolder = requestHolder.setQueryParameter("subject", nwbibspatial);
 		if (!nwbibsubject.trim().isEmpty())
-			requestHolder =
-					requestHolder.setQueryParameter("nwbibsubject", nwbibsubject);
+			requestHolder = requestHolder.setQueryParameter("subject", nwbibsubject);
 		if (!owner.isEmpty())
 			requestHolder = requestHolder.setQueryParameter("owner", owner);
 		if (!t.isEmpty())
 			requestHolder = requestHolder.setQueryParameter("t", t);
-		if (!corporation.isEmpty())
-			requestHolder =
-					requestHolder.setQueryParameter("corporation", corporation);
+		if (!person.trim().isEmpty())
+			requestHolder = requestHolder.setQueryParameter("nested",
+					nestedContribution(person, "Person"));
+		if (!corporation.trim().isEmpty())
+			requestHolder = requestHolder.setQueryParameter("nested",
+					nestedContribution(corporation, "CorporateBody"));
+
+		if (requestHolder.getQueryParameters().get("q") == null) {
+			requestHolder.setQueryParameter("word", "*");
+		}
 		Logger.info("Request URL {}, query params {} ", requestHolder.getUrl(),
 				requestHolder.getQueryParameters());
 		return requestHolder;
 	}
 
+	private static String nestedContribution(final String person, String type) {
+		String p = person.contains(" AND ") ? person : person.replace(" ", " AND ");
+		p = p.matches("[\\d\\-X]+") ? "http://d-nb.info/gnd/" + p : p;
+		p = p.startsWith("http") ? "\"" + p + "\"" : p;
+		return String.format("contribution:(contribution.agent.label:(%s) "
+				+ "OR contribution.agent.altLabel:(%s) "
+				+ "OR contribution.agent.id:(%s)) "//
+				+ "AND contribution.agent.type:(%s)", p, p, p, type);
+	}
+
 	static WSRequest topicRequest(final String q, int from, int size) {
-		WSRequest requestHolder = // @formatter:off
+		WSRequest request = // @formatter:off
 				WS.url(Application.CONFIG.getString("nwbib.api"))
 						.setHeader("Accept", "application/json")
-						.setQueryParameter("format", "short.subjectChain")
+						.setQueryParameter("format", "json")
 						.setQueryParameter("from", "" + from)
 						.setQueryParameter("size", "" + size)
 						.setQueryParameter("subject", q)
-						.setQueryParameter("set",
-							Application.CONFIG.getString("nwbib.set"));
+						.setQueryParameter("filter",
+								Application.CONFIG.getString("nwbib.filter"))
+						.setQueryParameter("aggregations", "topic");
 		//@formatter:on
-		Logger.info("Request URL {}, query params {} ", requestHolder.getUrl(),
-				requestHolder.getQueryParameters());
-		return requestHolder;
+		Logger.info("Request URL {}, query params {} ", request.getUrl(),
+				request.getQueryParameters());
+		return request;
 	}
 
 	/**
@@ -187,9 +179,10 @@ public class Lobid {
 			});
 		}
 		WSRequest requestHolder = request("", "", "", "", "", "", "", "", "", "", 0,
-				0, "", "", "", false, set, "", "", "", "");
+				0, "", "", "", "", "", "", "");
 		return requestHolder.get().map((WSResponse response) -> {
-			Long total = getTotalResults(response.asJson());
+			JsonNode json = response.asJson();
+			Long total = getTotalResults(json);
 			Cache.set(cacheKey, total, Application.ONE_HOUR);
 			return total;
 		});
@@ -203,7 +196,7 @@ public class Lobid {
 	 */
 	public static Promise<Long> getTotalHits(String field, String value,
 			String set) {
-		String f = escapeUri(field);
+		String f = field;
 		String v = escapeUri(value);
 		String cacheKey = String.format("totalHits.%s.%s.%s", f, v, set);
 		final Long cachedResult = (Long) Cache.get(cacheKey);
@@ -212,12 +205,10 @@ public class Lobid {
 				return cachedResult;
 			});
 		}
+		String qVal = f + ":\"" + v + "\"";
 		return WS.url(Application.CONFIG.getString("nwbib.api"))
-				.setQueryParameter("q", f + ":" + v)
-				.setQueryParameter("set",
-						set.isEmpty() ? Application.CONFIG.getString("nwbib.set")
-								: set.equals("*") ? "" : set)
-				.get().map((WSResponse response) -> {
+				.setQueryParameter("format", "json").setQueryParameter("q", qVal)
+				.setQueryParameter("filter", set).get().map((WSResponse response) -> {
 					Long total = getTotalResults(response.asJson());
 					Cache.set(cacheKey, total, Application.ONE_HOUR);
 					return total;
@@ -229,58 +220,68 @@ public class Lobid {
 	 * @return The URI string, escaped to be usable as an ES field or value
 	 */
 	public static String escapeUri(String string) {
-		return string.replaceAll("([\\.:/])", "\\\\$1");
+		return string.replaceAll("([\\.:/#!])", "\\\\$1");
 	}
 
 	/**
-	 * @param uri A Lobid-Organisation URI
-	 * @return A human readable label for the given URI
+	 * @param id A Lobid-Organisations URI or ISIL
+	 * @return A human readable label for the given id
 	 */
-	public static String organisationLabel(String uri) {
-		String cacheKey = "org.label." + uri;
-		String format = "short.altLabel";
-		return lobidLabel(uri, cacheKey, format);
-	}
-
-	/**
-	 * @param uri A Lobid-Resources URI
-	 * @return A human readable label for the given URI
-	 */
-	public static String resourceLabel(String uri) {
-		String cacheKey = "res.label." + uri;
-		String format = "short.title";
-		return lobidLabel(uri, cacheKey, format);
-	}
-
-	private static String lobidLabel(String uri, String cacheKey, String format) {
-		final String cachedResult = (String) Cache.get(cacheKey);
-		if (cachedResult != null) {
-			return cachedResult;
+	public static String organisationLabel(String id) {
+		// e.g. take DE-6 from http://lobid.org/organisations/DE-6#!
+		String simpleId =
+				id.replaceAll("https?://lobid.org/organisations?/(.+?)(#!)?$", "$1");
+		if (simpleId.startsWith("ZDB-")) {
+			return "Paket elektronischer Ressourcen: " + simpleId;
 		}
+		JsonNode org = cachedJsonCall(id.startsWith("http") ? id
+				: Application.CONFIG.getString("orgs.api") + id);
+		if (org.size() == 0) {
+			if (simpleId.split("-").length == 3) {
+				String superSigel = id.substring(0, id.lastIndexOf('-'));
+				Logger.info("No data for: {}, trying {}", id, superSigel);
+				return organisationLabel(superSigel) + ": " + simpleId;
+			}
+			Logger.warn("No data for: " + id);
+			return simpleId;
+		}
+		JsonNode json = Optional.ofNullable(org.findValue("alternateName"))
+				.orElse(Json.toJson(Arrays.asList(org.findValue("name"))));
+		String label = HtmlEscapers.htmlEscaper()
+				.escape(json == null ? "" : last(json.elements()).asText());
+		Logger.trace("Get org label, {} -> {} -> {}", id, simpleId, label);
+		return label.isEmpty() ? simpleId : label;
+	}
+
+	private static JsonNode last(Iterator<JsonNode> iterator) {
+		JsonNode result = null;
+		while (iterator.hasNext()) {
+			result = iterator.next();
+		}
+		return result;
+	}
+
+	/**
+	 * @param id A Lobid-Resources URI or hbz title ID
+	 * @return A human readable label for the given id
+	 */
+	public static String resourceLabel(String id) {
+		Callable<String> getLabel = () -> {
+			// e.g. take TT000086525 from http://lobid.org/resources/TT000086525#!
+			String simpleId =
+					id.replaceAll("https?://[^/]+/resources?/(.+?)[^A-Z0-9]*$", "$1");
+			JsonNode json = getResource(simpleId).findValue("title");
+			String label =
+					json == null ? "" : HtmlEscapers.htmlEscaper().escape(json.asText());
+			Logger.debug("Get res label, {} -> {} -> {}", id, simpleId, label);
+			return label.isEmpty() ? simpleId : label;
+		};
 		try {
-			URI.create(uri);
-			String api = Application.CONFIG.getString("nwbib.api");
-			WSRequest requestHolder = WS
-					.url(toApi1xOrg(Lobid.DATA_2
-							? uri.replaceAll("https?://lobid\\.org/resources?", api) : uri))
-					.setHeader("Accept", "application/json")
-					.setQueryParameter("format", format);
-			return requestHolder.get().map((WSResponse response) -> {
-				Iterator<JsonNode> elements = response.asJson().elements();
-				String label = "";
-				if (elements.hasNext()) {
-					label = elements.next().asText();
-				} else {
-					label = uri.substring(uri.lastIndexOf('/') + 1);
-				}
-				label = HtmlEscapers.htmlEscaper().escape(label);
-				Cache.set(cacheKey, label, Application.ONE_DAY);
-				return label;
-			}).get(Lobid.API_TIMEOUT);
-		} catch (Exception x) {
-			Logger.error("Could not get Lobid label", x);
-			return uri;
+			return Cache.getOrElse("res.label." + id, getLabel, Application.ONE_DAY);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		return "";
 	}
 
 	private static String gndLabel(String uri) {
@@ -291,23 +292,26 @@ public class Lobid {
 		}
 		WSRequest requestHolder = WS.url(Application.CONFIG.getString("nwbib.api"))
 				.setHeader("Accept", "application/json")
-				.setQueryParameter("subject", uri).setQueryParameter("format", "full")
-				.setQueryParameter("size", "1");
+				.setQueryParameter("q", "subject.componentList.id:" + escapeUri(uri))
+				.setQueryParameter("format", "json").setQueryParameter("size", "1");
 		return requestHolder.get().map((WSResponse response) -> {
-			JsonNode value = response.asJson().get(1);
-			String label = TableRow.labelForId(uri, value,
-					Optional.of(Arrays.asList( // @formatter:off
-							"preferredName",
-					    "preferredNameForTheWork",
-					    "preferredNameForTheFamily",
-					    "preferredNameForThePerson",
-					    "preferredNameForTheCorporateBody",
-					    "preferredNameForTheSubjectHeading",
-					    "preferredNameForTheConferenceOrEvent",
-					    "preferredNameForThePlaceOrGeographicName"))); // @formatter:on
+			JsonNode value = response.asJson();
+			String label = findSubjectLabelForUriInResponse(uri, value);
 			Cache.set(cacheKey, label, Application.ONE_DAY);
 			return label;
 		}).get(Lobid.API_TIMEOUT);
+	}
+
+	private static String findSubjectLabelForUriInResponse(String uri,
+			JsonNode json) {
+		List<JsonNode> complexSubjects = json.findValues("componentList");
+		String label =
+				complexSubjects.stream()
+						.flatMap((complexSubject) -> StreamSupport.stream(Spliterators
+								.spliteratorUnknownSize(complexSubject.elements(), 0), false))
+						.filter((s) -> s.has("id") && s.get("id").textValue().equals(uri))
+						.findFirst().map((s) -> s.get("label").textValue()).orElse(uri);
+		return label;
 	}
 
 	private static String nwBibLabel(String uri) {
@@ -340,7 +344,6 @@ public class Lobid {
 	 * @param owner Owner filter for resource queries
 	 * @param t Type filter for resource queries
 	 * @param field The facet field (the field to facet over)
-	 * @param set The set, overrides the default NWBib set if not empty
 	 * @param location A polygon describing the subject area of the resources
 	 * @param word A word, a concept from the hbz union catalog
 	 * @param corporation A corporation associated with the resource
@@ -350,43 +353,50 @@ public class Lobid {
 	public static Promise<JsonNode> getFacets(String q, String person,
 			String name, String subject, String id, String publisher, String issued,
 			String medium, String nwbibspatial, String nwbibsubject, String owner,
-			String field, String t, String set, String location, String word,
-			String corporation, String raw) {
-		WSRequest request =
-				WS.url(Application.CONFIG.getString("nwbib.api") + "/facets")
-						.setHeader("Accept", "application/json")
-						.setQueryParameter("author", person)//
-						.setQueryParameter("name", name)
-						.setQueryParameter("publisher", publisher)//
-						.setQueryParameter("id", id)//
-						.setQueryParameter("field", field)//
-						.setQueryParameter("from", "0")
-						.setQueryParameter("size",
-								field.equals(Application.ITEM_FIELD) ? "9999"
-										: Application.MAX_FACETS + "")
-						.setQueryParameter("corporation", corporation)//
-						.setQueryParameter("medium", medium)//
-						.setQueryParameter("nwbibspatial", nwbibspatial)//
-						.setQueryParameter("nwbibsubject", nwbibsubject)//
-						.setQueryParameter("location", locationPolygon(location))//
-						.setQueryParameter("issued", issued)//
-						.setQueryParameter("t", t);
+			String field, String t, String location, String word, String corporation,
+			String raw) {
+		WSRequest request = WS.url(Application.CONFIG.getString("nwbib.api"))
+				.setHeader("Accept", "application/json").setQueryParameter("name", name)
+				.setQueryParameter("publisher", publisher)//
+				.setQueryParameter("id", id)//
+				.setQueryParameter("aggregations", field.split("<")[0])//
+				.setQueryParameter("from", "0")//
+				.setQueryParameter("size",
+						field.equals(Application.ITEM_FIELD) ? "9999"
+								: Application.MAX_FACETS + "")
+				.setQueryParameter("medium", medium)//
+				.setQueryParameter("location", locationPolygon(location))//
+				.setQueryParameter("issued", issued)//
+				.setQueryParameter("filter",
+						Application.CONFIG.getString("nwbib.filter"))//
+				.setQueryParameter("t", t);
+
+		if (!person.isEmpty())
+			request = request.setQueryParameter("agent", person);
+		else if (!corporation.isEmpty())
+			request = request.setQueryParameter("agent", corporation);
+
+		if (!nwbibspatial.isEmpty())
+			request = request.setQueryParameter("subject", nwbibspatial);
+		else if (!nwbibsubject.isEmpty())
+			request = request.setQueryParameter("subject", nwbibsubject);
+
 		if (!q.isEmpty())
 			request = request.setQueryParameter("word", preprocess(q));
 		else if (!word.isEmpty())
 			request = request.setQueryParameter("word", preprocess(word));
-		if (!set.isEmpty())
-			request = request.setQueryParameter("set", set);
-		else
-			request = request.setQueryParameter("set",
-					Application.CONFIG.getString("nwbib.set"));
-		if (!field.equals(Application.ITEM_FIELD))
-			request = request.setQueryParameter("owner", owner);
+
 		if (!raw.isEmpty()
 				&& !raw.contains(Lobid.escapeUri(Application.COVERAGE_FIELD)))
 			request = request.setQueryParameter("q", raw);
+		else if (request.getQueryParameters().get("q") == null) {
+			request.setQueryParameter("word", q);
+		}
+		if (!field.equals(Application.ITEM_FIELD))
+			request = request.setQueryParameter("owner", owner);
 		if (!field.startsWith("http"))
 			request = request.setQueryParameter("subject", subject);
+
 		String url = request.getUrl();
 		Map<String, Collection<String>> parameters = request.getQueryParameters();
 		Logger.info("Facets request URL {}, query params {} ", url, parameters);
@@ -403,7 +413,7 @@ public class Lobid {
 
 	private static String preprocess(final String q) {
 		String result;
-		if (q.trim().isEmpty() || q.matches(".*?([+~]|AND|OR|\\s-|\\*).*?")) {
+		if (q.trim().isEmpty() || q.matches(".*?([+~]|AND|OR|\\s-|\\*|:).*?")) {
 			// if supported query string syntax is used, leave it alone:
 			result = q;
 		} else {
@@ -412,20 +422,19 @@ public class Lobid {
 					.collect(Collectors.joining(" "));
 		}
 		return result// but escape unsupported query string syntax:
-				.replace("\\", "\\\\").replace(":", "\\:").replace("^", "\\^")
-				.replace("&&", "\\&&").replace("||", "\\||").replace("!", "\\!")
-				.replace("(", "\\(").replace(")", "\\)").replace("{", "\\{")
-				.replace("}", "\\}").replace("[", "\\[").replace("]", "\\]")
+				.replace("\\", "\\\\").replace("^", "\\^").replace("&&", "\\&&")
+				.replace("||", "\\||").replace("!", "\\!").replace("(", "\\(")
+				.replace(")", "\\)").replace("{", "\\{").replace("}", "\\}")
+				.replace("[", "\\[").replace("]", "\\]")
 				// `embedded` phrases, like foo"something"bar -> foo\"something\"bar
-				.replaceAll("([^\\s])\"([^\"]+)\"([^\\s])", "$1\\\\\"$2\\\\\"$3")
+				// .replaceAll("([^\\s])\"([^\"]+)\"([^\\s])", "$1\\\\\"$2\\\\\"$3")
 				// remove inescapable range query symbols, possibly prepended with `+`:
 				.replaceAll("^\\+?<", "").replace("^\\+?>", "");
 	}
 
-	private static final Map<String, String> keys =
-			ImmutableMap.of(Application.TYPE_FIELD, "type.labels.lobid1", //
-					Application.TYPE_FIELD_LOBID2, "type.labels.lobid2", //
-					Application.MEDIUM_FIELD, "medium.labels");
+	private static final Map<String, String> keys = ImmutableMap.of(//
+			Application.TYPE_FIELD, "type.labels", //
+			Application.MEDIUM_FIELD, "medium.labels");
 
 	/**
 	 * @param types Some type URIs
@@ -467,14 +476,15 @@ public class Lobid {
 					.filter(s -> !s.trim().isEmpty()).toArray().length;
 			return String.format("%s: %s ausgewählt", label, length);
 		}
-		if (uris.size() == 1 && isOrg(uris.get(0)))
+		if (uris.size() == 1 && isOrg(uris.get(0))) {
 			return Lobid.organisationLabel(uris.get(0));
-		else if (uris.size() == 1
+		} else if (uris.size() == 1
 				&& (isNwBibClass(uris.get(0)) || isNwBibSpatial(uris.get(0))))
 			return Lobid.nwBibLabel(uris.get(0));
 		else if (uris.size() == 1 && isGnd(uris.get(0)))
 			return Lobid.gndLabel(uris.get(0));
 		String configKey = keys.getOrDefault(field, "");
+
 		String type = selectType(uris, configKey);
 		if (type.isEmpty())
 			return "";
@@ -541,7 +551,8 @@ public class Lobid {
 			Integer specificity = (Integer) vals.get(2);
 			return ((String) vals.get(0)).isEmpty()
 					|| ((String) vals.get(1)).isEmpty() //
-							? Pair.of("", specificity) : Pair.of(t, specificity);
+							? Pair.of("", specificity)
+							: Pair.of(t, specificity);
 		}).filter(t -> {
 			return !t.getLeft().isEmpty();
 		}).collect(Collectors.toList());
@@ -551,12 +562,6 @@ public class Lobid {
 				: selected.get(0).getLeft().contains("Miscellaneous")
 						&& selected.size() > 1 ? selected.get(1).getLeft()
 								: selected.get(0).getLeft();
-	}
-
-	static String toApi1xOrg(String url) {
-		String orgs2Prefix = "http://lobid.org/organisations";
-		return url.startsWith(orgs2Prefix)
-				? url.replace(orgs2Prefix, "http://lobid.org/organisation") : url;
 	}
 
 	static boolean isOrg(String term) {
@@ -584,7 +589,7 @@ public class Lobid {
 	 * @return A mapping of ISILs to item URIs
 	 */
 	public static Map<String, List<String>> items(String doc) {
-		JsonNode items = Json.parse(doc).findValue("exemplar");
+		JsonNode items = Json.parse(doc).findValue("hasItem");
 		Map<String, List<String>> result = new HashMap<>();
 		if (items != null && (items.isArray() || items.isTextual()))
 			mapIsilsToUris(items, result);
@@ -596,7 +601,7 @@ public class Lobid {
 		Iterator<JsonNode> elements =
 				items.isArray() ? items.elements() : Arrays.asList(items).iterator();
 		while (elements.hasNext()) {
-			String itemUri = elements.next().asText();
+			String itemUri = elements.next().get("id").asText();
 			try {
 				String isil = itemUri.split(":")[2];
 				List<String> uris = result.getOrDefault(isil, new ArrayList<>());
@@ -617,7 +622,7 @@ public class Lobid {
 				Play.application().resourceAsStream("isil2opac_hbzid.json")) {
 			JsonNode json = Json.parse(stream);
 			String[] hbzId_isil_sig =
-					itemUri.substring(itemUri.indexOf("item/") + 5).split(":");
+					itemUri.substring(itemUri.indexOf("items/") + 6).split(":");
 			String hbzId = hbzId_isil_sig[0];
 			String isil = hbzId_isil_sig[1];
 			Logger.debug("From item URI {}, got ISIL {} and HBZ-ID {}", itemUri, isil,

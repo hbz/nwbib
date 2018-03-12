@@ -7,7 +7,6 @@ import play.cache.Cache;
 import play.libs.F.Promise;
 import play.libs.ws.WS;
 import play.libs.ws.WSRequest;
-import play.libs.ws.WSRequestHolder;
 
 /**
  * Reverse lookup of a given geolocation to get a label for it.
