@@ -2,11 +2,13 @@
 
 Stand: 8.3.2018 [test.nwbib.de](test.nwbib.de)
 
-Zur Erklärung: Alles was `markiert` ist, findet sich in der MAB- bzw. JSON-Datei. Alles, was in eckigen Klammern steht, ist eine Option. Z.B. wird mit `540[-12][-1].[ab]` nach den MAB-Feldern und Unterfeldern mit den ersten Indikatoren "leer", "1" oder "2", dem zweiten Indikator "leer" oder "1" und den Unterfeldern "a" oder "b" gesucht. Bei nummerierten Listen wird der erste zutreffende Eintrag genommen.
+Zur Erklärung: 
+- Alles was `markiert` ist, findet sich in der MAB- bzw. JSON-Datei.
+- Alles, was in eckigen Klammern steht, ist eine Option. Z.B. wird mit `540[-12][-1].[ab]` nach den MAB-Feldern und Unterfeldern mit den ersten Indikatoren "leer", "1" oder "2", dem zweiten Indikator "leer" oder "1" und den Unterfeldern "a" oder "b" gesucht. Bei nummerierten Listen wird der erste zutreffende Eintrag genommen.
 
 Bei den Einträgen zum MAB-Feld wird kurz beschrieben, wie diese in das JSON-Feld umgewandelt werden. Punkte innerhalb der JSON- oder MAB-Notationen zeigen eine tiefere Ebene an, z.B. zeigt `publication.startDate` an, dass die Eigenschaft `startDate` in `publication` enthalten ist.
 
-Als Beispiele werden die JSON-Dateien, MAB-XML-Dateien und NWBib-URLs angegeben.
+Als Beispiele werden die JSON-Dateien, MAB-XML-Dateien und NWBib-URLs verlinkt.
 
 ## Alle Wörter
 
@@ -73,7 +75,7 @@ Suche über alle erweiterten Suchen, zu Details siehe jeweilige Beschreibung unt
 * Konferenzen und Ereignisse: Zusammengesetzt aus Ereignis (200er-Feld mit `[-abcfep][12].e`) und wenn vorhanden, Zählung (Unterfeld `n`), Datum (Unterfeld `d`) und Körperschaftsschlagwort (Ansetzung unter dem Ortssitz; Unterfeld `c`).
 * Erschaffende Körperschaften: Zusammengesetzt aus Körperschaft (ein 200er-Feld mit `[-a][12].k`) und wenn vorhanden mit Unterfeld `h`, `b` oder beidem.
 * Beitragende Körperschaften: Wie bei den erschaffenden Körperschaften nur mit dem ersten Indikator `b`, `c`, `e`, `f` oder `p`.
-	* Verbindungen von geografischen Einheiten bzw. Körperschaften mit hierarchischer Information. Z.B. in BT000002852.
+	* Verbindungen von geografischen Einheiten bzw. Körperschaften mit hierarchischer Information. Z.B. in [BT000002852](http://lobid.org/hbz01/BT000002852).
 
 ##### Beispiele
 
@@ -88,11 +90,11 @@ Suche über alle erweiterten Suchen, zu Details siehe jeweilige Beschreibung unt
 
 ##### MAB
 
-* Formalschlagwörter: `9[01234][27]-[-12].f`. Z.B. in HT002215064 ("Zeitschrift").
-* Sachschlagwörter: `9[01234][27]-[-12].s`. Z.B. in BT000004645 ("Führer").
+* Formschlagwörter: `9[01234][27]-[-12].f`. Z.B. in [HT002215064](http://lobid.org/hbz01/HT002215064) ("Zeitschrift").
+* Sachschlagwörter: `9[01234][27]-[-12].s`. Z.B. in [BT000004645](http://lobid.org/hbz01/BT000004645) ("Führer").
 * Personen, Körperschaften, Ereignisse, Konferenzen, Orte wird ähnlich wie im Abschnitt "Person" bzw. "Körperschaft" erstellt.
-* Werke: Besteht `9[01234][27]-[-12].t` wird es teilweise mit dem Autoren verbunden. Z.B. in HT017034736 ("Viebig, Clara: Das Kreuz im Venn").
-* Freie Schlagwörter: `710[-abcdfz][123].a`. Z.B. in HT006934472 ("Düsseldorf").
+* Werke: Besteht `9[01234][27]-[-12].t` wird es teilweise mit dem Autoren verbunden. Z.B. in [HT017034736](http://lobid.org/hbz01/HT017034736) ("Viebig, Clara: Das Kreuz im Venn").
+* Freie Schlagwörter: `710[-abcdfz][123].a`. Z.B. in [HT006934472](http://lobid.org/hbz01/HT006934472) ("Düsseldorf").
 * `subjectAltLabel`: MAB `[56][27]` sind Verweisungsformen auf die Schlagwörter aus MAB 902-947.
 	1. Wenn `9[56][27]-[12].[acefgkps]` vorhanden ist, verbinde es mit `9[56][27]-[12].b` oder `9[56][27]-[12].x` oder `9[56][27]-[12].[cdhmortuz]`.
 	2. `9[56][27]-[12].[acefgkps]`
