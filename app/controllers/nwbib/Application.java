@@ -174,7 +174,7 @@ public class Application extends Controller {
 						response.asJson().findValue(aggregationField).elements();
 				Stream<JsonNode> jsonStream = StreamSupport.stream(
 						Spliterators.spliteratorUnknownSize(jsonIterator, 0), false);
-				return ok(views.html.topics.render(q, cleanSortUnique(jsonStream)));
+				return ok(views.html.topics.render(q, cleanSortUnique(jsonStream, q)));
 			}
 			Logger.error(new String(response.asByteArray()));
 			return ok(views.html.topics.render(q, Collections.emptyList()));
@@ -184,7 +184,7 @@ public class Application extends Controller {
 	}
 
 	private static List<Pair<String, String>> cleanSortUnique(
-			Stream<JsonNode> topics) {
+			Stream<JsonNode> topics, String q) {
 		Function<JsonNode, Pair<String, String>> mapper = topic -> {
 			String key =
 					topic.get("key").textValue().replaceAll("\\([\\d,]+\\)$", "");
@@ -193,8 +193,9 @@ public class Application extends Controller {
 		};
 		Predicate<Pair<String, String>> filter = topic -> {
 			String key = topic.getLeft().trim();
-			return (key.contains("|") || key.split(",").length == 2)
-					&& !key.startsWith(":") && !key.startsWith(".");
+			return Arrays.asList(q.split("[ -]")).stream()
+					.filter((String e) -> key.toLowerCase().contains(e.toLowerCase()))
+					.count() > 0 && !key.startsWith(":") && !key.startsWith(".");
 		};
 		Comparator<Pair<String, String>> sorter = (s1, s2) -> Collator
 				.getInstance(Locale.GERMAN).compare(s1.getLeft(), s2.getLeft());
