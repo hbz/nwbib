@@ -5,6 +5,7 @@
 @import helper._
 @import play.api.libs.json.Json
 @import play.api.libs.json.JsValue
+@import controllers.nwbib.Lobid
 
 @main("NWBib - Themensuche") {
     @helper.form(action = controllers.nwbib.routes.Application.topics(q), 'id -> "nwbib-form") {
@@ -16,7 +17,17 @@
     }
     @if(!q.isEmpty){
     <p>
-      <b>@if(topics.isEmpty) {Keine Themen gefunden für Anfrage: <code>@q</code>} else { @topics.size @if(topics.size==1) {Thema} else {Themen} gefunden:}</b>
+      <b>@if(topics.isEmpty) {
+          Keine Themen gefunden für Anfrage: <code>@q</code>
+          @defining(Lobid.gndMainHeadings(q)) { mainHeadings =>
+              @if(!mainHeadings.isEmpty) {
+                  <p/>@if(mainHeadings.size > 1){Suchvorschläge} else {Suchvorschlag}:
+                  @for(heading <- mainHeadings) {
+                      <a href="@nwbib.routes.Application.topics(q=heading)">@heading</a>@if(!mainHeadings.last==heading){, }
+                  }
+              }
+          }
+      } else { @topics.size @if(topics.size==1) {Thema} else {Themen} gefunden:}</b>
     </p>
     }
     <ul id="root" style="display:block;">

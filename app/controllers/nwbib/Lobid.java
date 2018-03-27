@@ -208,7 +208,9 @@ public class Lobid {
 		String qVal = f + ":\"" + v + "\"";
 		return WS.url(Application.CONFIG.getString("nwbib.api"))
 				.setQueryParameter("format", "json").setQueryParameter("q", qVal)
-				.setQueryParameter("filter", set).get().map((WSResponse response) -> {
+				.setQueryParameter("filter",
+						set.isEmpty() ? Application.CONFIG.getString("nwbib.filter") : set)
+				.get().map((WSResponse response) -> {
 					Long total = getTotalResults(response.asJson());
 					Cache.set(cacheKey, total, Application.ONE_HOUR);
 					return total;
@@ -282,6 +284,25 @@ public class Lobid {
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	/**
+	 * @param q The query
+	 * @return Main headings for q
+	 */
+	public static List<String> gndMainHeadings(String q) {
+		List<JsonNode> result = WS.url("http://lobid.org/gnd/search")
+				.setHeader("Accept", "application/json")
+				.setQueryParameter("q", "variantName:" + q).get()
+				.map((WSResponse response) -> {
+					JsonNode value = response.asJson();
+					List<JsonNode> names = value.findValues("preferredName");
+					return names;
+				}).get(Lobid.API_TIMEOUT);
+		return result.stream().map(r -> r.textValue())
+				.filter(t -> getTotalHits("subject.componentList.label", t, "")
+						.get(API_TIMEOUT) > 0)
+				.collect(Collectors.toList());
 	}
 
 	private static String gndLabel(String uri) {
