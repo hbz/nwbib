@@ -293,8 +293,8 @@ public class Lobid {
 	public static List<String> gndMainHeadings(String q) {
 		List<JsonNode> result = WS.url("http://lobid.org/gnd/search")
 				.setHeader("Accept", "application/json")
-				.setQueryParameter("q", "variantName:" + q).get()
-				.map((WSResponse response) -> {
+				.setQueryParameter("q", "variantName:" + q)
+				.setQueryParameter("size", "1000").get().map((WSResponse response) -> {
 					JsonNode value = response.asJson();
 					List<JsonNode> names = value.findValues("preferredName");
 					return names;
