@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -299,10 +300,17 @@ public class Lobid {
 					List<JsonNode> names = value.findValues("preferredName");
 					return names;
 				}).get(Lobid.API_TIMEOUT);
-		return result.stream().map(r -> r.textValue())
-				.filter(t -> getTotalHits("subject.componentList.label", t, "")
-						.get(API_TIMEOUT) > 0)
-				.collect(Collectors.toList());
+		List<String> list = result.stream()
+				.filter(r -> !r.textValue().contains(" ")
+						&& !r.textValue().contains("-") && !r.textValue().equals(q))
+				.map(r -> Pair.of(r.textValue(),
+						getTotalHits("subject.componentList.label", r.textValue(), "")
+								.get(API_TIMEOUT)))
+				.filter(pair -> pair.getRight() > 0)
+				.sorted(
+						Collections.reverseOrder(Comparator.comparingLong(Pair::getRight)))//
+				.map(Pair::getLeft).collect(Collectors.toList());
+		return list;
 	}
 
 	private static String gndLabel(String uri) {

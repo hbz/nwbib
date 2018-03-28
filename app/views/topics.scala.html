@@ -19,14 +19,6 @@
     <p>
       <b>@if(topics.isEmpty) {
           Keine Themen gefunden für Anfrage: <code>@q</code>
-          @defining(Lobid.gndMainHeadings(q)) { mainHeadings =>
-              @if(!mainHeadings.isEmpty) {
-                  <p/>@if(mainHeadings.size > 1){Suchvorschläge} else {Suchvorschlag}:
-                  @for(heading <- mainHeadings) {
-                      <a href="@nwbib.routes.Application.topics(q=heading)">@heading</a>@if(mainHeadings.last!=heading){, }
-                  }
-              }
-          }
       } else { @topics.size @if(topics.size==1) {Thema} else {Themen} gefunden:}</b>
     </p>
     }
@@ -37,5 +29,13 @@
          </a></li>
        }
     </ul>
+    @defining(Lobid.gndMainHeadings(q)) { mainHeadings =>
+      @if(!mainHeadings.isEmpty) {
+          <p/><b>@if(mainHeadings.size > 1){Suchvorschläge} else {Suchvorschlag}:</b>
+          @for(heading <- mainHeadings) {
+              <a href="@nwbib.routes.Application.topics(q=heading)">@heading</a>@if(mainHeadings.last!=heading){, }
+          }
+      }
+    }
     <link rel="stylesheet" href="@controllers.routes.Assets.at("stylesheets/FileTreeView.css")" />
 }
