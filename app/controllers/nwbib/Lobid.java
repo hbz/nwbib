@@ -300,16 +300,18 @@ public class Lobid {
 					List<JsonNode> names = value.findValues("preferredName");
 					return names;
 				}).get(Lobid.API_TIMEOUT);
-		List<String> list = result.stream()
-				.filter(r -> !r.textValue().contains(" ")
-						&& !r.textValue().contains("-") && !r.textValue().equals(q))
-				.map(r -> Pair.of(r.textValue(),
-						getTotalHits("subject.componentList.label", r.textValue(), "")
-								.get(API_TIMEOUT)))
-				.filter(pair -> pair.getRight() > 0)
-				.sorted(
-						Collections.reverseOrder(Comparator.comparingLong(Pair::getRight)))//
-				.map(Pair::getLeft).collect(Collectors.toList());
+		List<String> list =
+				result.stream()
+						.filter(r -> !r.textValue().contains(" ")
+								&& !r.textValue().contains("-")
+								&& !r.textValue().equalsIgnoreCase(q))
+						.map(r -> Pair.of(r.textValue(),
+								getTotalHits("subject.componentList.label", r.textValue(), "")
+										.get(API_TIMEOUT)))
+						.filter(pair -> pair.getRight() > 0)
+						.sorted(Collections
+								.reverseOrder(Comparator.comparingLong(Pair::getRight)))//
+						.map(Pair::getLeft).collect(Collectors.toList());
 		return list;
 	}
 
