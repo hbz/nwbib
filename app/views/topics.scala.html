@@ -16,20 +16,6 @@
      </div>
     }
     @if(!q.isEmpty){
-    <p>
-      <b>@if(topics.isEmpty) {
-          Keine Themen gefunden für Anfrage: <code>@q</code>
-      } else { @topics.size @if(topics.size==1) {Thema} else {Themen} gefunden:}</b>
-    </p>
-    }
-    <ul id="root" style="display:block;">
-       @for(topic <- topics; key = topic.getLeft; count = topic.getRight.toInt) {
-         <li class="treeItem"><a title="@count Treffer zum diesem Thema anzeigen" href="@nwbib.routes.Application.search(subject=q, word="subject.label.raw:\""+key+"\"")">
-           @key@if(count>1){&nbsp;<span class='badge progress-bar-success'>@count</span>}
-         </a></li>
-       }
-    </ul>
-    @if(!q.isEmpty){
       @defining(Lobid.gndMainHeadings(q)) { mainHeadings =>
         @if(!mainHeadings.isEmpty) {
           <p/><b>@if(mainHeadings.size > 1){Suchvorschläge} else {Suchvorschlag}:</b>
@@ -38,6 +24,18 @@
           }
         }
       }
+      <p>
+        <b>@if(topics.isEmpty) {
+            Keine Themen gefunden für Anfrage: <code>@q</code>
+        } else { @topics.size @if(topics.size==1) {Thema} else {Themen} gefunden:}</b>
+      </p>
     }
+    <ul id="root" style="display:block;">
+       @for(topic <- topics; key = topic.getLeft; count = topic.getRight.toInt) {
+         <li class="treeItem"><a title="@count Treffer zum diesem Thema anzeigen" href="@nwbib.routes.Application.search(subject=q, word="subject.label.raw:\""+key+"\"")">
+           @key@if(count>1){&nbsp;<span class='badge progress-bar-success'>@count</span>}
+         </a></li>
+       }
+    </ul>
     <link rel="stylesheet" href="@controllers.routes.Assets.at("stylesheets/FileTreeView.css")" />
 }
