@@ -44,7 +44,6 @@ input#owner {
 
 ul#root {
 	padding-left: 0;
-	padding-bottom: 10px;
 }
 
 ul.facet {
@@ -134,7 +133,7 @@ table {
 }
 
 .nwbib-footer {
-	margin-top: 10px;
+	margin-top: 15px;
 	text-align: center;
 }
 
