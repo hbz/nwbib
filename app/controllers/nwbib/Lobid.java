@@ -207,15 +207,15 @@ public class Lobid {
 			});
 		}
 		String qVal = f + ":\"" + v + "\"";
-		return WS.url(Application.CONFIG.getString("nwbib.api"))
+		WSRequest request = WS.url(Application.CONFIG.getString("nwbib.api"))
 				.setQueryParameter("format", "json").setQueryParameter("q", qVal)
 				.setQueryParameter("filter",
-						set.isEmpty() ? Application.CONFIG.getString("nwbib.filter") : set)
-				.get().map((WSResponse response) -> {
-					Long total = getTotalResults(response.asJson());
-					Cache.set(cacheKey, total, Application.ONE_HOUR);
-					return total;
-				});
+						set.isEmpty() ? Application.CONFIG.getString("nwbib.filter") : set);
+		return request.get().map((WSResponse response) -> {
+			Long total = getTotalResults(response.asJson());
+			Cache.set(cacheKey, total, Application.ONE_HOUR);
+			return total;
+		});
 	}
 
 	/**
@@ -295,24 +295,31 @@ public class Lobid {
 		List<JsonNode> result = WS.url("http://lobid.org/gnd/search")
 				.setHeader("Accept", "application/json")
 				.setQueryParameter("q", "variantName:" + q)
-				.setQueryParameter("size", "1000").get().map((WSResponse response) -> {
-					JsonNode value = response.asJson();
-					List<JsonNode> names = value.findValues("preferredName");
-					return names;
-				}).get(Lobid.API_TIMEOUT);
-		List<String> list =
-				result.stream()
-						.filter(r -> !r.textValue().contains(" ")
-								&& !r.textValue().contains("-")
-								&& !r.textValue().equalsIgnoreCase(q))
-						.map(r -> Pair.of(r.textValue(),
-								getTotalHits("subject.componentList.label", r.textValue(), "")
-										.get(API_TIMEOUT)))
-						.filter(pair -> pair.getRight() > 0)
-						.sorted(Collections
-								.reverseOrder(Comparator.comparingLong(Pair::getRight)))//
-						.map(Pair::getLeft).collect(Collectors.toList());
+				.setQueryParameter("size", "1000").get()
+				.map((WSResponse response) -> response.asJson()
+						.findValues("preferredName"))
+				.get(Lobid.API_TIMEOUT);
+		List<String> list = result.stream()
+				.filter(preferredName -> !preferredName.textValue().contains(" ")
+						&& !preferredName.textValue().equalsIgnoreCase(q))
+				.collect(Collectors.toSet()).stream()
+				.sorted((n1, n2) -> lengthDiff(q, n1).compareTo(lengthDiff(q, n2)))
+				.limit(10).map(r -> Pair.of(r.textValue(), totalHits(r)))
+				.filter(pair -> pair.getRight() > 0)
+				.sorted(
+						Collections.reverseOrder(Comparator.comparingLong(Pair::getRight)))
+				.map(Pair::getLeft).collect(Collectors.toList());
 		return list;
+	}
+
+	private static Long totalHits(JsonNode r) {
+		return getTotalHits("subject.componentList.label", r.textValue(), "")
+				.get(API_TIMEOUT);
+	}
+
+	private static Integer lengthDiff(String q, JsonNode preferredName) {
+		return Integer
+				.valueOf(Math.abs(q.length() - preferredName.textValue().length()));
 	}
 
 	private static String gndLabel(String uri) {
