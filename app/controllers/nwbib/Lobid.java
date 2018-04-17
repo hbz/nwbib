@@ -302,7 +302,7 @@ public class Lobid {
 		List<String> list = result.stream()
 				.filter(preferredName -> !preferredName.textValue().contains(" ")
 						&& !preferredName.textValue().equalsIgnoreCase(q))
-				.collect(Collectors.toSet()).stream()
+				.distinct()
 				.sorted((n1, n2) -> lengthDiff(q, n1).compareTo(lengthDiff(q, n2)))
 				.limit(10).map(r -> Pair.of(r.textValue(), totalHits(r)))
 				.filter(pair -> pair.getRight() > 0)
