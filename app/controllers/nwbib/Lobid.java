@@ -223,7 +223,7 @@ public class Lobid {
 	 * @return The URI string, escaped to be usable as an ES field or value
 	 */
 	public static String escapeUri(String string) {
-		return string.replaceAll("([\\.:/#!])", "\\\\$1");
+		return string.replaceAll("([\\.:/#!\"])", "\\\\$1");
 	}
 
 	/**
@@ -292,34 +292,26 @@ public class Lobid {
 	 * @return Main headings for q
 	 */
 	public static List<String> gndMainHeadings(String q) {
-		List<JsonNode> result = WS.url("http://lobid.org/gnd/search")
+		List<JsonNode> gndUris = WS.url("http://lobid.org/gnd/search")
 				.setHeader("Accept", "application/json")
 				.setQueryParameter("q", "variantName:" + q)
-				.setQueryParameter("size", "1000").get()
-				.map((WSResponse response) -> response.asJson()
-						.findValues("preferredName"))
+				.setQueryParameter("filter", "type:(* AND NOT ConferenceOrEvent Work)")
+				.setQueryParameter("size", "500").get()
+				.map((WSResponse response) -> response.asJson().findValues("id"))
 				.get(Lobid.API_TIMEOUT);
-		List<String> list = result.stream()
-				.filter(preferredName -> !preferredName.textValue().contains(" ")
-						&& !preferredName.textValue().equalsIgnoreCase(q))
-				.distinct()
-				.sorted((n1, n2) -> lengthDiff(q, n1).compareTo(lengthDiff(q, n2)))
-				.limit(10).map(r -> Pair.of(r.textValue(), totalHits(r)))
-				.filter(pair -> pair.getRight() > 0)
+		return gndUris.stream()//
+				.map(gndUri -> Pair.of(gndUri.textValue(), hitsInNwbib(gndUri)))
+				.filter(uriAndHits -> uriAndHits.getRight() > 5)
 				.sorted(
 						Collections.reverseOrder(Comparator.comparingLong(Pair::getRight)))
-				.map(Pair::getLeft).collect(Collectors.toList());
-		return list;
+				.map(pair -> Lobid.gndLabel(pair.getLeft()))
+				.filter(label -> !label.equalsIgnoreCase(q))//
+				.limit(3).collect(Collectors.toList());
 	}
 
-	private static Long totalHits(JsonNode r) {
-		return getTotalHits("subject.componentList.label", r.textValue(), "")
+	private static Long hitsInNwbib(JsonNode r) {
+		return getTotalHits("subject.componentList.id", r.textValue(), "")
 				.get(API_TIMEOUT);
-	}
-
-	private static Integer lengthDiff(String q, JsonNode preferredName) {
-		return Integer
-				.valueOf(Math.abs(q.length() - preferredName.textValue().length()));
 	}
 
 	private static String gndLabel(String uri) {
