@@ -295,7 +295,7 @@ public class Lobid {
 		List<JsonNode> gndUris = WS.url("http://lobid.org/gnd/search")
 				.setHeader("Accept", "application/json")
 				.setQueryParameter("q", "variantName:" + q)
-				.setQueryParameter("filter", "type:(* AND NOT ConferenceOrEvent Work)")
+				.setQueryParameter("filter", "type:(NOT (ConferenceOrEvent Work))")
 				.setQueryParameter("size", "500").get()
 				.map((WSResponse response) -> response.asJson().findValues("id"))
 				.get(Lobid.API_TIMEOUT);
