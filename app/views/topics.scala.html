@@ -20,7 +20,7 @@
         @if(!mainHeadings.isEmpty) {
           <p/><b>@if(mainHeadings.size > 1){Suchvorschläge} else {Suchvorschlag}:</b>
           @for(heading <- mainHeadings) {
-              <a href="@nwbib.routes.Application.topics(q=heading)">@heading</a>@if(mainHeadings.last!=heading){, }
+              <a href="@nwbib.routes.Application.topics(q=heading)">@heading</a>@if(mainHeadings.last!=heading){ | }
           }
         }
       }
