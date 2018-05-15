@@ -508,7 +508,7 @@ Universitäts- und Landesbibliothek (ULB) Düsseldorf (Kontaktadressen siehe
 Die rot markierten Bereiche liegen in der Zuständigkeit der ULB Münster (Kontaktadressen
 unter der "ULB Münster-Webseite(ULB Münster)":https://www.ulb.uni-muenster.de/landesbibliothek/profil/ansprechpartner/index.html).
 Für selbstständige Werke, die dem Pflichtexemplarrecht unterliegen, sollte die ULB
-Bonn kontaktiert werden ("Kontaktperson"(Kontaktperson der ULB Bonn)":https://www.ulb.uni-bonn.de/de/die-ulb/organisation-ansprechpartner/ansprechpartner-von-a-z/albrink).
+Bonn kontaktiert werden ("Kontaktperson(Kontaktperson der ULB Bonn)":https://www.ulb.uni-bonn.de/de/die-ulb/organisation-ansprechpartner/ansprechpartner-von-a-z/albrink).
 Einen Tag nach der Korrektur in der GND bzw. im Verbundkatalog sind die Daten in der
 NWBib aktualisiert.
 
