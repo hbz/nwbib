@@ -501,14 +501,14 @@ h3. 8.5 Widerspruchs- und Beseitigungsmöglichkeit
 *55* Finden Nutzer Daten, die über sie Aussagen treffen und nicht notwendig sind, um 
 den Zweck der Anwendung zu erfüllen bzw. Fehler in diesen Daten, können sie sich über 
 verschiedene E-Mail-Adressen an die passenden Stellen wenden. Auf der Startseite
-https://nwbib.de findet sich eine Karte. Die dort grün markierten Kreise und 
-kreisfreien Städte im westlichen Bereich NRWs liegen in der Zuständigkeit der
-Universitäts- und Landesbibliothek (ULB) Düsseldorf (Kontaktadressen siehe
-"ULB Düsseldorf-Webseite(ULB Düsseldorf)":https://www.ulb.hhu.de/ueberblick-gewinnen/ansprechpartnerinnen-und-ansprechpartner.html#nwbib.
+https://nwbib.de findet sich eine Karte. 
+Die dort grün markierten Kreise und kreisfreien Städte im westlichen Bereich NRWs 
+liegen in der Zuständigkeit der Universitäts- und Landesbibliothek (ULB) Düsseldorf 
+(Kontaktadressen siehe "ULB Düsseldorf-Webseite(ULB Düsseldorf)":https://www.ulb.hhu.de/ueberblick-gewinnen/ansprechpartnerinnen-und-ansprechpartner.html#nwbib.
 Die rot markierten Bereiche liegen in der Zuständigkeit der ULB Münster (Kontaktadressen
 unter der "ULB Münster-Webseite(ULB Münster)":https://www.ulb.uni-muenster.de/landesbibliothek/profil/ansprechpartner/index.html).
 Für selbstständige Werke, die dem Pflichtexemplarrecht unterliegen, sollte die ULB
-Bonn kontaktiert werden ("Kontaktperson(Kontaktperson der ULB Bonn)":https://www.ulb.uni-bonn.de/de/die-ulb/organisation-ansprechpartner/ansprechpartner-von-a-z/albrink).
+Bonn kontaktiert werden ("Kontaktperson der ULB Bonn(Kontaktperson der ULB Bonn)":https://www.ulb.uni-bonn.de/de/die-ulb/organisation-ansprechpartner/ansprechpartner-von-a-z/albrink).
 Einen Tag nach der Korrektur in der GND bzw. im Verbundkatalog sind die Daten in der
 NWBib aktualisiert.
 
