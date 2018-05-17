@@ -364,8 +364,8 @@ verarbeitung nach Art. 6 Abs. 1 lit. f DSGVO.
 
 h3. 5.4 Dauer der Speicherung
 
-*37* Im Falle der Speicherung der Daten in Logfiles ist dies nach spätestens sieben
-Tagen der Fall. Eine darüber hinausgehende Speicherung ist möglich. In diesem
+*37* In Logfiles werden personenbezogene Daten maximal sieben Tage gespeichert und 
+danach gelöscht. Eine darüber hinausgehende Speicherung ist möglich. In diesem
 Fall werden die IP-Adressen der Nutzer gelöscht oder verfremdet, sodass eine
 Zuordnung des aufrufenden Clients nicht mehr möglich ist.
 
@@ -420,9 +420,9 @@ h2. 7. Webanalyse durch matomo
 
 h3. 7.1 Umfang der Verarbeitung personenbezogener Daten
 
-*46* Wir nutzen auf unserer Website das Open-Source-Software-Tool matomo zur
-Analyse des Surfverhaltens unserer Nutzer. Werden Einzelseiten unserer Website
-aufgerufen, so werden folgende Daten gespeichert:
+*46* Wir nutzen das Open-Source-Software-Tool matomo zur Analyse des Surfverhaltens 
+unserer Nutzer auf den lobid-Seiten. Dafür werten wir unsere Logdateien aus, die bei Aktivität des Nutzers 
+mit folgenden Daten befüllt werden:
 * Die aufgerufene Webseite
 * Die Website, von der der Nutzer auf die aufgerufene Webseite gelangt ist (Referrer).
 * Die Häufigkeit des Aufrufs der Webseite.
