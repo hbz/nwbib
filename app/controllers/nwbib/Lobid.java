@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.elasticsearch.common.collect.Lists;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
@@ -297,7 +298,9 @@ public class Lobid {
 				.setQueryParameter("q", "variantName:" + q)
 				.setQueryParameter("filter", "type:(NOT (ConferenceOrEvent Work))")
 				.setQueryParameter("size", "500").get()
-				.map((WSResponse response) -> response.asJson().findValues("id"))
+				.map((WSResponse response) -> Lists
+						.newArrayList(response.asJson().get("member").elements()).stream()
+						.map(node -> node.get("id")).collect(Collectors.toList()))
 				.get(Lobid.API_TIMEOUT);
 		return gndUris.stream()//
 				.map(gndUri -> Pair.of(gndUri.textValue(), hitsInNwbib(gndUri)))
