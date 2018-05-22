@@ -467,14 +467,16 @@ h3. 7.5 Widerspruchs- und Beseitigungsmöglichkeit
 Daten werden nach 7 Tagen gelöscht, anonymisierte Daten werden nicht gelöscht,
 da sie keiner Person mehr zuordbar sind.
 
-h2. 8. Daten der Gemeinsamen Normdatei
+h2. 8. Daten der Gemeinsamen Normdatei und aus dem Verbundkatalog
 
 h3. 8.1 Beschreibung und Umfang der Datenverarbeitung
 
 *51* In der NWBib werden Daten der Gemeinsamen
 Normdatei (GND) der Deutschen Nationalbibliothek (DNB) verwendet. Dies sind 
 Namen von Autoren, sonstigen am Werk beteiligten Personen und Personen, die 
-Thema des Werk sind und als Schlagwort verwendet werden.
+Thema des Werk sind und als Schlagwort verwendet werden. Aus dem Verbundkatalog
+stammen zusätzlich die Rollen, die den am Werk beteiligten Personen zugeordnet
+werden (z.B. Autor oder Fotograf).
 
 h3. 8.2 Rechtsgrundlage für die Verarbeitung personenbezogenen Daten
 
