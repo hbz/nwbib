@@ -1,6 +1,4 @@
-Entwurf
-
-h1. Datenschutzerklärung NWBib – Stand 15.05.2018
+h1. Datenschutzerklärung NWBib – Stand 22.05.2018
 
 Wir freuen uns sehr über Ihr Interesse an unserer Einrichtung. Unsere Datenschutz-
 erklärung dient zu Ihrer Information, ob und zu welchem Zweck personenbezogene
@@ -528,3 +526,4 @@ h2. 11. Aktualität und Änderung dieser Datenschutzerklärung
 
 |Version|Datum|Beschreibung|
 |0.1|15.05.2018|Der erste Entwurf.|
+|1.0|22.05.2018|Erste offizielle Fassung.|
