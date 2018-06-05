@@ -348,7 +348,7 @@ Nutzers findet nicht statt.
 h3. 5.2 Rechtsgrundlage für die Datenverarbeitung 
 
 *34* Rechtsgrundlage für die vorübergehende Speicherung der Daten und der Logfiles
-ist Art. 6 Abs. 1 lit. e und f DSGVO.
+ist Art. 6 Abs. 1 lit. f DSGVO.
 
 h3. 5.3 Zweck der Datenverarbeitung
 
@@ -481,7 +481,9 @@ werden (z.B. Autor oder Fotograf).
 h3. 8.2 Rechtsgrundlage für die Verarbeitung personenbezogenen Daten
 
 *52* Rechtsgrundlage für die Verarbeitung personenbezogener Daten ist Art. 6 
-Abs. 1 lit. e DSGVO. 
+Abs. 1 lit. e DSGVO. Das öffentliche Interesse äußert sich im Auftrag des
+Landes Nordrhein-Westfalen an die zuständigen Bibliotheken und das hbz
+(für das hbz siehe §2 Abs. 3 Pflichtexemplargesetz Nordrhein-Westfalen).
 
 h3. 8.3 Zweck der Datenverarbeitung
 
@@ -489,7 +491,7 @@ h3. 8.3 Zweck der Datenverarbeitung
 Dienstleistungen anzubieten. Ohne diese Daten können Autoren und andere 
 beteiligte Personen nicht einem Werk zugeordnet bzw. unterschieden werden. 
 Gleiches gilt für das Setzen von Schlagwörtern. In diesen Zwecken liegt auch
-unser berechtigtes Interesse nach Art. 6 Abs. 1 lit. e DSGVO.
+unser berechtigtes Interesse nach Art. 6 Abs. 1 lit. f DSGVO.
 
 h3. 8.4 Dauer der Speicherung
 
@@ -529,3 +531,4 @@ h2. 11. Aktualität und Änderung dieser Datenschutzerklärung
 |Version|Datum|Beschreibung|
 |0.1|15.05.2018|Der erste Entwurf.|
 |1.0|22.05.2018|Erste offizielle Fassung.|
+|1.1|05.06.2018|Aktualisierung Rechtsgrundlage.|
