@@ -1,4 +1,4 @@
-h1. Datenschutzerklärung NWBib – Stand 05.06.2018
+h1. Datenschutzerklärung NWBib – Stand 06.07.2018
 
 Wir freuen uns sehr über Ihr Interesse an unserer Einrichtung. Unsere Datenschutz-
 erklärung dient zu Ihrer Information, ob und zu welchem Zweck personenbezogene
@@ -26,7 +26,12 @@ zahlreiche technische und organisatorische Maßnahmen umgesetzt, um einen mögli
 lückenlosen Schutz der über diese Internetseite verarbeiteten personenbezogenen
 Daten sicherzustellen. Dennoch können internetbasierte Datenübertragungen
 grundsätzlich Sicherheitslücken aufweisen, sodass ein absoluter Schutz nicht
-gewährleistet werden kann.
+gewährleistet werden kann. Für die technische Organisation und Verarbeitung der
+Daten in der Nordrhein-Westfälischen Bibliographie (NWBib) ist das 
+Hochschulbibliothekszentrum NRW zuständig, für die Qualität der Daten die 
+Universitäts- und Landesbibliotheken Bonn, Düsseldorf und Münster
+(Zuständigkeitsbereich und Kontaktinformationen für letztere finden sich im
+Abschnitt 8.5 oder auf der Seite unter dem "i"-Icon).
 
 h2. 1. Name und Anschrift des Verantwortlichen
 
@@ -532,3 +537,4 @@ h2. 11. Aktualität und Änderung dieser Datenschutzerklärung
 |0.1|15.05.2018|Der erste Entwurf.|
 |1.0|22.05.2018|Erste offizielle Fassung.|
 |1.1|05.06.2018|Aktualisierung Rechtsgrundlage.|
+|1.2|06.07.2018|Ergänzung zur Aufgabenteilung zwischen hbz und den Landesbibliotheken.|
