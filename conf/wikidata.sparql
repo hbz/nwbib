@@ -45,7 +45,7 @@ WHERE {
            { ?item p:P31 [ ps:P31 wd:Q4286337 ] . }
   FILTER (?item != wd:Q1787449 && ?item != wd:Q16500124 && ?item != wd:Q1465811 && ?item != wd:Q1787449
   && ?item != wd:Q16832627 && ?item != wd:Q1113210 && ?item != wd:Q19288281 && ?item != wd:Q1662807
-  && ?item != wd:Q1803134 ) # Herausfiltern von Altkreisen, die nicht benötigt werden
+  && ?item != wd:Q1803134 && ?item != wd:Q1351319 ) # Herausfiltern von Altkreisen, die nicht benötigt werden
   SERVICE wikibase:label {  bd:serviceParam wikibase:language "de" }
   OPTIONAL { ?item wdt:P227 ?gnd }
   OPTIONAL { ?item wdt:P576 ?dissolutionDate }
