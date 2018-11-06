@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.base.Charsets;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.io.Streams;
@@ -38,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
+import controllers.nwbib.Classification.Type;
 import play.Logger;
 import play.Play;
 import play.cache.Cache;
@@ -322,13 +322,13 @@ public class Application extends Controller {
 		if (t.isEmpty()) {
 			result = ok(register.render());
 		} else {
-			SearchResponse response = Classification.dataFor(t);
-			if (response == null) {
+			Type classification = Classification.Type.from(t);
+			if (classification == null) {
 				Logger.error("Failed to get data for register type: " + t);
 				flashError();
 				return internalServerError(browse_register.render(null, t, ""));
 			}
-			JsonNode sorted = Classification.sorted(response);
+			JsonNode sorted = classification.buildRegister();
 			String placeholder = "Register zur " + t + " filtern";
 			result = ok(browse_register.render(sorted.toString(), t, placeholder));
 		}
@@ -383,14 +383,13 @@ public class Application extends Controller {
 		if (t.isEmpty()) {
 			result = ok(classification.render());
 		} else {
-			SearchResponse response = Classification.dataFor(t);
-			if (response == null) {
+			if (Classification.Type.from(t) == null) {
 				Logger.error("Failed to get data for classification type: " + t);
 				flashError();
 				return internalServerError(
 						browse_classification.render(null, null, t, ""));
 			}
-			result = classificationResult(response, t, placeholder);
+			result = classificationResult(t, placeholder);
 		}
 		Cache.set("classification." + t, result, ONE_DAY);
 		return result;
@@ -407,14 +406,12 @@ public class Application extends Controller {
 				placeholder));
 	}
 
-	private static Result classificationResult(SearchResponse response, String t,
-			String placeholder) {
-		List<JsonNode> topClasses = new ArrayList<>();
-		Map<String, List<JsonNode>> subClasses = new HashMap<>();
-		Classification.buildHierarchy(response, topClasses, subClasses);
-		String topClassesJson = Json.toJson(topClasses).toString();
-		return ok(browse_classification.render(topClassesJson, subClasses, t,
-				placeholder));
+	private static Result classificationResult(String t, String placeholder) {
+		Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
+				Classification.Type.from(t).buildHierarchy();
+		String topClassesJson = Json.toJson(topAndSub.getLeft()).toString();
+		return ok(browse_classification.render(topClassesJson, topAndSub.getRight(),
+				t, placeholder));
 	}
 
 	private static Promise<Result> okPromise(final String q, final String person,
