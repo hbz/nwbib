@@ -10,12 +10,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -42,6 +44,7 @@ import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.jena.JenaRDFParser;
 import com.github.jsonldjava.utils.JSONUtils;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterators;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
@@ -233,8 +236,10 @@ public class Classification {
 
 	// Prototype, see https://github.com/hbz/nwbib/issues/392
 	@SuppressWarnings("javadoc")
-	public static void buildHierarchyWikidata(JsonNode json,
-			List<JsonNode> topClasses, Map<String, List<JsonNode>> subClasses) {
+	public static Pair<List<JsonNode>, Map<String, List<JsonNode>>> buildHierarchyWikidata(
+			JsonNode json) {
+		List<JsonNode> topClasses = new ArrayList<>();
+		Map<String, List<JsonNode>> subClasses = new HashMap<>();
 		json.elements().forEachRemaining(item -> {
 			String id = item.get("item").get("value").textValue();
 			String label = item.get("itemLabel").get("value").textValue();
@@ -256,8 +261,9 @@ public class Classification {
 				topClasses.add(Json
 						.toJson(ImmutableMap.of("value", id, "label", label, "gnd", gnd)));
 			}
-			if (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
-					|| (broaderId.equals(nrw))) {
+			if (isItem(json, broaderId)
+					&& (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
+							|| (broaderId.equals(nrw)))) {
 				if (!subClasses.containsKey(broaderId))
 					subClasses.put(broaderId, new ArrayList<JsonNode>());
 				List<JsonNode> sub = subClasses.get(broaderId);
@@ -267,7 +273,39 @@ public class Classification {
 			}
 		});
 		Collections.sort(topClasses, comparator);
+		return Pair.of(topClasses, removeDuplicates(subClasses));
+	}
 
+	private static boolean isItem(JsonNode json, String broaderId) {
+		return Arrays.asList(Iterators.toArray(json.elements(), JsonNode.class))
+				.stream().anyMatch(
+						i -> i.get("item").get("value").textValue().equals(broaderId));
+	}
+
+	private static Map<String, List<JsonNode>> removeDuplicates(
+			Map<String, List<JsonNode>> subClasses) {
+		List<String> ids = new ArrayList<>(subClasses.keySet());
+		Collections.sort(ids, Comparator.comparingInt(s -> Integer
+				.parseInt(s.substring("http://www.wikidata.org/entity/Q".length()))));
+		for (int i = 0; i < ids.size(); i++) {
+			String key = ids.get(i);
+			final int j = i + 1;
+			subClasses.put(key, subClasses.get(key).stream()
+					.filter(unique(subClasses, ids, j)).collect(Collectors.toList()));
+		}
+		return subClasses;
+	}
+
+	private static Predicate<? super JsonNode> unique(
+			Map<String, List<JsonNode>> subClasses, List<String> list, final int j) {
+		return json -> {
+			for (int i = j; i < list.size(); i++) {
+				if (subClasses.get(list.get(i)).contains(json)) {
+					return false;
+				}
+			}
+			return true;
+		};
 	}
 
 	private static void addAsSubClass(Map<String, List<JsonNode>> subClasses,
