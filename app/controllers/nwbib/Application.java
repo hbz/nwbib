@@ -398,12 +398,11 @@ public class Application extends Controller {
 	// Prototype, see https://github.com/hbz/nwbib/issues/392
 	private static Result classificationResultWikidata(JsonNode json, String t,
 			String placeholder) {
-		List<JsonNode> topClasses = new ArrayList<>();
-		Map<String, List<JsonNode>> subClasses = new HashMap<>();
-		Classification.buildHierarchyWikidata(json, topClasses, subClasses);
-		String topClassesJson = Json.toJson(topClasses).toString();
-		return ok(browse_classification.render(topClassesJson, subClasses, t,
-				placeholder));
+		Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
+				Classification.buildHierarchyWikidata(json);
+		String topClassesJson = Json.toJson(topAndSub.getLeft()).toString();
+		return ok(browse_classification.render(topClassesJson, topAndSub.getRight(),
+				t, placeholder));
 	}
 
 	private static Result classificationResult(String t, String placeholder) {

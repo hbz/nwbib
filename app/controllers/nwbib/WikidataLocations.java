@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.elasticsearch.common.lang3.tuple.Pair;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -116,34 +118,42 @@ public class WikidataLocations {
 			int cacheDuration = Integer.MAX_VALUE;
 			return Cache.getOrElse("spatialQuery." + id, () -> {
 				String baseUrl = "http://lobid.org/resources/search";
-				String qParamValue = String.format("spatial.id:\"%s\"", id);
-				String fullUrl = baseUrl + "?q=" + qParamValue;
-				WSResponse response =
-						WS.url(baseUrl).setQueryParameter("q", qParamValue)
-								.setQueryParameter("format", "json").execute().get(60 * 1000);
-				if (response.getStatus() == Http.Status.OK) {
-					JsonNode json = response.asJson();
-					requestCounter++;
-					long hits = json.get("totalItems").longValue();
-					String coverage = collectCoverageValues(json.findValues("coverage"));
-					if (requestCounter == 1 || requestCounter % 500 == 0) {
-						Logger.debug("Request {}", requestCounter);
-					}
-					Logger.trace("{}: {} -> {} hits, coverage: {}", requestCounter, id,
-							hits, coverage);
-					String html = String.format(
-							"<a title='Nach Titeln suchen | %s' href='%s'><span class='glyphicon glyphicon-search'></span></a> %s",
-							coverage, fullUrl, hits);
-					return hits == 0 ? "" : html;
-				}
-				Logger.error("Response status: {}: {}", response.getStatusText(),
-						response.getBody());
-				return "";
+				String q = String.format("spatial.id:\"%s\"", id);
+				String fullUrl = baseUrl + "?q=" + q;
+				Pair<String, Long> coverageAndHits = coverageAndHits(baseUrl, q);
+				String html = String.format(
+						"<a title='Nach Titeln suchen | %s' href='%s'><span class='glyphicon glyphicon-search'></span></a> %s",
+						coverageAndHits.getLeft(), fullUrl, coverageAndHits.getRight());
+				return coverageAndHits.getRight() > 0L ? html : "";
 			}, cacheDuration);
 		} catch (Exception e) {
 			Logger.error("Could not query for " + id, e);
 			return "";
 		}
+	}
+
+	private static Pair<String, Long> coverageAndHits(String baseUrl, String q) {
+		try {
+			WSResponse response = WS.url(baseUrl).setQueryParameter("q", q)
+					.setQueryParameter("format", "json").execute().get(1000);
+			if (response.getStatus() == Http.Status.OK) {
+				JsonNode json = response.asJson();
+				requestCounter++;
+				long hits = json.get("totalItems").longValue();
+				String coverage = collectCoverageValues(json.findValues("coverage"));
+				if (requestCounter == 1 || requestCounter % 500 == 0) {
+					Logger.debug("Request {}", requestCounter);
+				}
+				Logger.trace("{}: {} -> {} hits, coverage: {}", requestCounter, q, hits,
+						coverage);
+				return Pair.of(coverage, hits);
+			}
+			Logger.error("Response not OK, status: {}: {}", response.getStatusText(),
+					response.getBody());
+		} catch (Exception x) {
+			Logger.error("Error for q={}: {}", q, x.getMessage());
+		}
+		return Pair.of("", 0L);
 	}
 
 	private static String collectCoverageValues(List<JsonNode> coverageNodes) {
