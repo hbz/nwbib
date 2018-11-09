@@ -12,11 +12,13 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -71,6 +73,54 @@ public class Classification {
 			this.elasticsearchType = elasticsearchType;
 			this.queryParameter = queryParameter;
 		}
+
+		/**
+		 * @param t The query parameter string for the classification type
+		 * @return The type objects for the given string, or null
+		 */
+		public static Type from(String t) {
+			for (Type indexType : Type.values())
+				if (indexType.queryParameter.equalsIgnoreCase(t))
+					return indexType;
+			return null;
+		}
+
+		/**
+		 * @return A pair of the list of top-level items and the hierarchy of items
+		 */
+		public Pair<List<JsonNode>, Map<String, List<JsonNode>>> buildHierarchy() {
+			List<JsonNode> topClasses = new ArrayList<>();
+			Map<String, List<JsonNode>> subClasses = new HashMap<>();
+			for (SearchHit hit : classificationData().getHits()) {
+				JsonNode json = Json.toJson(hit.getSource());
+				JsonNode broader = json.findValue(Property.BROADER.value);
+				if (broader == null)
+					topClasses.addAll(valueAndLabelWithNotation(hit, json));
+				else
+					addAsSubClass(subClasses, hit, json,
+							broader.findValue("@id").asText());
+			}
+			Collections.sort(topClasses, comparator);
+			return Pair.of(topClasses, subClasses);
+		}
+
+		/**
+		 * @return A sorted register of items
+		 */
+		public JsonNode buildRegister() {
+			final List<JsonNode> result = ids(classificationData()).stream()
+					.sorted(comparator).collect(Collectors.toList());
+			return Json.toJson(result);
+		}
+
+		private SearchResponse classificationData() {
+			int maxSize = 10000; // default max_result_window
+			MatchAllQueryBuilder matchAll = QueryBuilders.matchAllQuery();
+			SearchRequestBuilder requestBuilder = client.prepareSearch(INDEX)
+					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setQuery(matchAll)
+					.setTypes(elasticsearchType).setFrom(0).setSize(maxSize);
+			return requestBuilder.execute().actionGet();
+		}
 	}
 
 	private enum Property {
@@ -116,25 +166,6 @@ public class Classification {
 			Logger.error("Could not convert to JSON-LD", e);
 		}
 		return null;
-	}
-
-	static SearchResponse dataFor(final String tQueryParameter) {
-		try {
-			for (Type indexType : Type.values())
-				if (indexType.queryParameter.equalsIgnoreCase(tQueryParameter))
-					return classificationData(indexType.elasticsearchType);
-		} catch (Throwable t) {
-			return null;
-		}
-		return null;
-	}
-
-	private static SearchResponse classificationData(String type) {
-		MatchAllQueryBuilder queryBuilder = QueryBuilders.matchAllQuery();
-		SearchRequestBuilder requestBuilder = client.prepareSearch(INDEX)
-				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setQuery(queryBuilder)
-				.setTypes(type).setFrom(0).setSize(1000);
-		return requestBuilder.execute().actionGet();
 	}
 
 	/**
@@ -196,12 +227,6 @@ public class Classification {
 		return result;
 	}
 
-	static JsonNode sorted(SearchResponse response) {
-		final List<JsonNode> result =
-				ids(response).stream().sorted(comparator).collect(Collectors.toList());
-		return Json.toJson(result);
-	}
-
 	private static String labelText(JsonNode json) {
 		return json.get("label").asText();
 	}
@@ -243,19 +268,6 @@ public class Classification {
 		});
 		Collections.sort(topClasses, comparator);
 
-	}
-
-	static void buildHierarchy(SearchResponse response, List<JsonNode> topClasses,
-			Map<String, List<JsonNode>> subClasses) {
-		for (SearchHit hit : response.getHits()) {
-			JsonNode json = Json.toJson(hit.getSource());
-			JsonNode broader = json.findValue(Property.BROADER.value);
-			if (broader == null)
-				topClasses.addAll(valueAndLabelWithNotation(hit, json));
-			else
-				addAsSubClass(subClasses, hit, json, broader.findValue("@id").asText());
-		}
-		Collections.sort(topClasses, comparator);
 	}
 
 	private static void addAsSubClass(Map<String, List<JsonNode>> subClasses,

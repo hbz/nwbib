@@ -9,15 +9,18 @@ import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 import controllers.nwbib.Application;
+import controllers.nwbib.Classification;
 import controllers.nwbib.Lobid;
 import play.libs.F.Promise;
 import play.mvc.Http;
@@ -120,4 +123,30 @@ public class ExternalIntegrationTest {
 		});
 	}
 
+	@Test
+	public void classificationNwbibsubjectHierarchy() {
+		running(testServer(3333), () -> {
+			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
+					Classification.Type.from("Sachsystematik").buildHierarchy();
+			String nwbib = "http://purl.org/lobid/nwbib#";
+			assertThat(topAndSub.getRight().get(nwbib + "s882000")).isNotNull();
+			assertThat(topAndSub.getRight().get(nwbib + "s882000").size())
+					.describedAs("s882000").isGreaterThan(1);
+			assertThat(topAndSub.getRight().get(nwbib + "s884000")).isNull();
+			assertThat(topAndSub.getRight().get(nwbib + "s880000")).isNotNull();
+			assertThat(topAndSub.getRight().get(nwbib + "s880000").size())
+					.describedAs("s880000").isGreaterThan(1);
+		});
+	}
+
+	@Test
+	public void classificationNwbibsubjectRegister() {
+		running(testServer(3333), () -> {
+			JsonNode register =
+					Classification.Type.from("Sachsystematik").buildRegister();
+			assertThat(register.toString()).contains("Audiovisuelle Medien")
+					.contains("Publizistik. Information und Dokumentation - Allgemeines")
+					.contains("Bibliotheksgeschichte").contains("Schulbibliotheken");
+		});
+	}
 }
