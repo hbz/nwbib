@@ -144,7 +144,8 @@ public class Classification {
 	private static Client client;
 	private static Node node;
 
-	static Comparator<JsonNode> comparator =
+	/** Compare German strings */
+	public static Comparator<JsonNode> comparator =
 			(JsonNode o1, JsonNode o2) -> Collator.getInstance(Locale.GERMAN)
 					.compare(labelText(o1), labelText(o2));
 
@@ -231,7 +232,22 @@ public class Classification {
 	}
 
 	private static String labelText(JsonNode json) {
-		return json.get("label").asText();
+		String label = json.get("label").asText();
+		if (label.contains("Stadtbezirk")) {
+			List<Pair<String, String>> roman = Arrays.asList(Pair.of("I", "a"),
+					Pair.of("II", "b"), Pair.of("III", "c"), Pair.of("IV", "d"),
+					Pair.of("V", "e"), Pair.of("VI", "f"), Pair.of("VII", "g"),
+					Pair.of("VIII", "h"), Pair.of("IX", "i"), Pair.of("X", "j"));
+			Collections.sort(roman, // replace longest first
+					(p1, p2) -> Integer.valueOf(p1.getLeft().length())
+							.compareTo(Integer.valueOf(p2.getLeft().length())));
+			for (int i = 10; i > 0; i--) { // start from end
+				label = label //
+						.replace(String.valueOf(i), "" + (char) ('a' + i)) // arabic 10 to 1
+						.replace(roman.get(i - 1).getLeft(), roman.get(i - 1).getRight());
+			}
+		}
+		return label;
 	}
 
 	// Prototype, see https://github.com/hbz/nwbib/issues/392
