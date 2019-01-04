@@ -103,6 +103,13 @@ public class Classification {
 					addAsSubClass(subClasses, hit, json,
 							broader.findValue("@id").asText());
 			}
+			if (this == SPATIAL) {
+				JsonNode wikidataJson = WikidataLocations.load();
+				Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
+						Classification.buildHierarchyWikidata(wikidataJson);
+				topClasses.addAll(topAndSub.getLeft());
+				subClasses.putAll(topAndSub.getRight());
+			}
 			Collections.sort(topClasses, comparator);
 			return Pair.of(topClasses, subClasses);
 		}
