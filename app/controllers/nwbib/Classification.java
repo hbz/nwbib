@@ -107,7 +107,8 @@ public class Classification {
 				JsonNode wikidataJson = WikidataLocations.load();
 				Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
 						Classification.buildHierarchyWikidata(wikidataJson);
-				topClasses.addAll(topAndSub.getLeft());
+				subClasses.get("http://purl.org/lobid/nwbib-spatial#n9")
+						.addAll(topAndSub.getLeft());
 				subClasses.putAll(topAndSub.getRight());
 			}
 			Collections.sort(topClasses, comparator);
