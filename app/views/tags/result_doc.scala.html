@@ -175,7 +175,7 @@
           <td>
           @for(v <- vs) {
               @if(spatial.isDefined){
-                  <a href='@nwbib.routes.Application.search()?q=spatial.id:"@((v\"id").asOpt[String].getOrElse("--"))"'>
+                  <a href='@nwbib.routes.Application.search()?nwbibspatial=@((v\"id").asOpt[String].getOrElse("--"))'>
                     @((v\"label").asOpt[String].getOrElse("--")) (@((v\"id").asOpt[String].getOrElse("--").split("/").last))
                   </a>
               } else {

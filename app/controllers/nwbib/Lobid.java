@@ -119,7 +119,7 @@ public class Lobid {
 		if (!medium.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("medium", medium);
 		if (!nwbibspatial.trim().isEmpty())
-			requestHolder = requestHolder.setQueryParameter("subject", nwbibspatial);
+			requestHolder = setUpNwbibspatial(nwbibspatial, requestHolder);
 		if (!nwbibsubject.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("subject", nwbibsubject);
 		if (!owner.isEmpty())
@@ -133,12 +133,21 @@ public class Lobid {
 			requestHolder = requestHolder.setQueryParameter("nested",
 					nestedContribution(corporation, "CorporateBody"));
 
-		if (requestHolder.getQueryParameters().get("q") == null) {
+		if (requestHolder.getQueryParameters().get("q") == null
+				&& requestHolder.getQueryParameters().get("word") == null) {
 			requestHolder.setQueryParameter("word", "*");
 		}
 		Logger.info("Request URL {}, query params {} ", requestHolder.getUrl(),
 				requestHolder.getQueryParameters());
 		return requestHolder;
+	}
+
+	/**
+	 * @param uri The URI to test
+	 * @return True, if the given URI is a Wikidata URI
+	 */
+	public static boolean isWikidata(final String uri) {
+		return uri.contains("wikidata");
 	}
 
 	private static String nestedContribution(final String person, String type) {
@@ -409,9 +418,9 @@ public class Lobid {
 		else if (!corporation.isEmpty())
 			request = request.setQueryParameter("agent", corporation);
 
-		if (!nwbibspatial.isEmpty())
-			request = request.setQueryParameter("subject", nwbibspatial);
-		else if (!nwbibsubject.isEmpty())
+		if (!nwbibspatial.isEmpty()) {
+			request = setUpNwbibspatial(nwbibspatial, request);
+		} else if (!nwbibsubject.isEmpty())
 			request = request.setQueryParameter("subject", nwbibsubject);
 
 		if (!q.isEmpty())
@@ -442,6 +451,14 @@ public class Lobid {
 			return Json.toJson(ImmutableMap.of("entries", Arrays.asList(), "field",
 					field, "count", 0));
 		});
+	}
+
+	private static WSRequest setUpNwbibspatial(String nwbibspatial,
+			WSRequest request) {
+		return request.setQueryParameter(
+				isWikidata(nwbibspatial) ? "word" : "subject", //
+				isWikidata(nwbibspatial) ? "spatial.id:\"" + nwbibspatial + "\""
+						: nwbibspatial);
 	}
 
 	private static String preprocess(final String q) {
@@ -516,6 +533,8 @@ public class Lobid {
 			return Lobid.nwBibLabel(uris.get(0));
 		else if (uris.size() == 1 && isGnd(uris.get(0)))
 			return Lobid.gndLabel(uris.get(0));
+		else if (uris.size() == 1 && isWikidata(uris.get(0)))
+			return WikidataLocations.label(uris.get(0));
 		String configKey = keys.getOrDefault(field, "");
 
 		String type = selectType(uris, configKey);

@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.elasticsearch.common.lang3.tuple.Pair;
@@ -36,6 +38,24 @@ public class WikidataLocations {
 
 	private static final int ONE_DAY = 60 * 60 * 24;
 	private static int requestCounter;
+
+	private static final Map<String, String> WIKIDATA_LABELS = new HashMap<>();
+
+	static {
+		load().elements().forEachRemaining(item -> {
+			String id = item.get("item").get("value").textValue();
+			String label = item.get("itemLabel").get("value").textValue();
+			WIKIDATA_LABELS.put(id, label);
+		});
+	}
+
+	/**
+	 * @param uri The Wikidata URI
+	 * @return The Wikidata label for the URI
+	 */
+	public static String label(String uri) {
+		return WIKIDATA_LABELS.get(uri);
+	}
 
 	/**
 	 * @return The Wikidata locations as JSON
