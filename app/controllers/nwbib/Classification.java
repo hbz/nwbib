@@ -107,8 +107,13 @@ public class Classification {
 				JsonNode wikidataJson = WikidataLocations.load();
 				Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
 						Classification.buildHierarchyWikidata(wikidataJson);
-				subClasses.get("http://purl.org/lobid/nwbib-spatial#n9")
-						.addAll(topAndSub.getLeft());
+				String n9 = "http://purl.org/lobid/nwbib-spatial#n9";
+				String euregio = "http://purl.org/lobid/nwbib-spatial#n91";
+				List<JsonNode> n9Sub = subClasses.get(n9).stream()
+						.filter(json -> json.get("value").textValue().equals(euregio))
+						.collect(Collectors.toList());
+				n9Sub.addAll(topAndSub.getLeft());
+				subClasses.put(n9, n9Sub);
 				subClasses.putAll(topAndSub.getRight());
 			}
 			Collections.sort(topClasses, comparator);
