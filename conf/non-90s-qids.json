@@ -1,18 +1,8 @@
 [
   {
-    "qid": "http://www.wikidata.org/entity/Q1020097",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q1123895",
     "notation": "10",
-    "label": "Südmünsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1173415",
-    "notation": "10",
-    "label": "Münsterland"
+    "label": "Ostmünsterland"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1184019",
@@ -20,99 +10,9 @@
     "label": "Delbrücker Land"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q1184042",
-    "notation": "10",
-    "label": "Hellwegbörden"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1221477",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1343346",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1370875",
-    "notation": "10",
-    "label": "Paderborner Hochfläche"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1414992",
-    "notation": "10",
-    "label": "Südmünsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q142780",
-    "notation": "10",
-    "label": "Westmünsterland"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q1432757",
     "notation": "10",
     "label": "Paderborner Hochfläche"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q14895",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q14900",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q14914",
-    "notation": "10",
-    "label": "Westmünsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q14917",
-    "notation": "10",
-    "label": "Westmünsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q14921",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q14937",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1496176",
-    "notation": "10",
-    "label": "Südmünsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1497161",
-    "notation": "10",
-    "label": "Senne"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1579548",
-    "notation": "10",
-    "label": "Hellwegbörden"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q16146",
-    "notation": "10",
-    "label": "Delbrücker Land"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1625155",
-    "notation": "10",
-    "label": "Westmünsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q162771",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1700",
@@ -125,149 +25,9 @@
     "label": "Westmünsterland"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q181541",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q181673",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1824274",
-    "notation": "10",
-    "label": "Ostmünsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q183515",
-    "notation": "10",
-    "label": "Hellwegbörden"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1989144",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q200208",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q200549",
-    "notation": "10",
-    "label": "Westmünsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2100",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2103",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q225375",
-    "notation": "10",
-    "label": "Senne"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2281440",
-    "notation": "10",
-    "label": "Hellwegbörden"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q23835486",
-    "notation": "10",
-    "label": "Westmünsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q242757",
-    "notation": "10",
-    "label": "Senne"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2443",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q26271345",
     "notation": "10",
     "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2742",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2765",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2779256",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q30074363",
-    "notation": "10",
-    "label": "Hellwegbörden"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q3050",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q3771",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q3822",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q3886",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q3898",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q3905",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q3917",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q3939",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q3985",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q43161686",
-    "notation": "10",
-    "label": "Münsterland"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q56033157",
@@ -280,49 +40,9 @@
     "label": "Südmünsterland"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q56042004",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q6191",
-    "notation": "10",
-    "label": "Emscher-Lippe-Region"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q6214",
-    "notation": "10",
-    "label": "Westmünsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q6224",
+    "qid": "http://www.wikidata.org/entity/Q767106",
     "notation": "10",
     "label": "Senne"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q6230",
-    "notation": "10",
-    "label": "Paderborner Hochfläche"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q721316",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q7920",
-    "notation": "10",
-    "label": "Münsterland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q821904",
-    "notation": "10",
-    "label": "Hellwegbörden"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q866394",
-    "notation": "10",
-    "label": "Münsterland"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q896058",
@@ -335,39 +55,9 @@
     "label": "Teutoburger Wald"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q14817",
-    "notation": "12",
-    "label": "Ravensberger Land"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q14954",
-    "notation": "12",
-    "label": "Ravensberger Land"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q15549893",
-    "notation": "12",
-    "label": "Ravensberger Land"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q162890",
-    "notation": "12",
-    "label": "Teutoburger Wald"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q182938",
-    "notation": "12",
-    "label": "Minden-Ravensberg"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q2011523",
     "notation": "12",
     "label": "Oberwälder Land"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q20182568",
-    "notation": "12",
-    "label": "Teutoburger Wald"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q2133651",
@@ -375,24 +65,9 @@
     "label": "Ravensberger Land"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q242195",
-    "notation": "12",
-    "label": "Teutoburger Wald"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q242632",
-    "notation": "12",
-    "label": "Teutoburger Wald"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q2548986",
     "notation": "12",
     "label": "Warburger Börde"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2554376",
-    "notation": "12",
-    "label": "Minden-Ravensberg"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q30602340",
@@ -405,54 +80,14 @@
     "label": "Tecklenburger Land"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q3890",
-    "notation": "12",
-    "label": "Teutoburger Wald"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q3971",
-    "notation": "12",
-    "label": "Ravensberger Land"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q4108",
-    "notation": "12",
-    "label": "Ravensberger Land"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q4175",
-    "notation": "12",
-    "label": "Tecklenburger Land"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q464473",
     "notation": "12",
-    "label": "Teutoburger Wald"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q47462263",
-    "notation": "12",
-    "label": "Tecklenburger Land"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q6239",
-    "notation": "12",
-    "label": "Ravensberger Land"
+    "label": "Eggegebirge"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q702826",
     "notation": "12",
     "label": "Wiehengebirge"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q767106",
-    "notation": "12",
-    "label": "Teutoburger Wald"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q7923",
-    "notation": "12",
-    "label": "Teutoburger Wald"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q875161",
@@ -465,29 +100,9 @@
     "label": "Minden-Ravensberg"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q10923",
-    "notation": "14",
-    "label": "Rothaargebirge"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1427624",
-    "notation": "14",
-    "label": "Rothaargebirge"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q1487002",
     "notation": "14",
-    "label": "Arnsberger Wald"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1700980",
-    "notation": "14",
-    "label": "Südsauerland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q26696030",
-    "notation": "14",
-    "label": "Nordsauerland"
+    "label": "Homert"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q31553414",
@@ -500,24 +115,19 @@
     "label": "Rothaargebirge"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q5573",
-    "notation": "14",
-    "label": "Ebbegebirge"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q5575",
-    "notation": "14",
-    "label": "Ebbegebirge"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q56041996",
     "notation": "14",
     "label": "Nordsauerland"
   },
   {
+    "qid": "http://www.wikidata.org/entity/Q56042004",
+    "notation": "14",
+    "label": "Ostsauerland"
+  },
+  {
     "qid": "http://www.wikidata.org/entity/Q56042007",
     "notation": "14",
-    "label": "Nordsauerland"
+    "label": "Westsauerland"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q56042224",
@@ -525,24 +135,39 @@
     "label": "Südsauerland"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q5632",
-    "notation": "14",
-    "label": "Arnsberger Wald"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q5644",
-    "notation": "14",
-    "label": "Rothaargebirge"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q778810",
     "notation": "14",
     "label": "Ebbegebirge"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q881776",
-    "notation": "14",
-    "label": "Rothaargebirge"
+    "qid": "http://www.wikidata.org/entity/Q1243933",
+    "notation": "24",
+    "label": "Ville"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1243986",
+    "notation": "24",
+    "label": "Niederrheinische Bucht"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1749655",
+    "notation": "24",
+    "label": "Niederrheinischer Höhenzug"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q212520",
+    "notation": "24",
+    "label": "Niederrheinisches Tiefland"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q2147825",
+    "notation": "24",
+    "label": "Rheinisches Braunkohlerevier"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47444602",
+    "notation": "24",
+    "label": "Niederrheinische Sandplatten"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47445689",
@@ -550,14 +175,24 @@
     "label": "Schwalm-Nette-Platte"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q1017",
-    "notation": "28",
-    "label": "Nordeifel"
+    "qid": "http://www.wikidata.org/entity/Q47454940",
+    "notation": "24",
+    "label": "Jülicher Börde"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q1243986",
-    "notation": "28",
-    "label": "Rureifel"
+    "qid": "http://www.wikidata.org/entity/Q47454950",
+    "notation": "24",
+    "label": "Zülpicher Börde"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q884315",
+    "notation": "24",
+    "label": "Kölner Bucht"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q981347",
+    "notation": "24",
+    "label": "Selfkant"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1406857",
@@ -570,52 +205,7 @@
     "label": "Kalkeifel"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q151287",
-    "notation": "28",
-    "label": "Nordeifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q164458",
-    "notation": "28",
-    "label": "Rureifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1801610",
-    "notation": "28",
-    "label": "Monschauer Heckenland"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q1997843",
-    "notation": "28",
-    "label": "Nordeifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q199974",
-    "notation": "28",
-    "label": "Nordeifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q199977",
-    "notation": "28",
-    "label": "Rureifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q200783",
-    "notation": "28",
-    "label": "Monschauer Heckenland"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q212520",
-    "notation": "28",
-    "label": "Nordeifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2380038",
-    "notation": "28",
-    "label": "Nordeifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q241358",
     "notation": "28",
     "label": "Nordeifel"
   },
@@ -625,39 +215,9 @@
     "label": "Voreifel"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q4068",
+    "qid": "http://www.wikidata.org/entity/Q599193",
     "notation": "28",
-    "label": "Nordeifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q47454940",
-    "notation": "28",
-    "label": "Rureifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q586",
-    "notation": "28",
-    "label": "Nordeifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q6219",
-    "notation": "28",
-    "label": "Nordeifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q6275",
-    "notation": "28",
-    "label": "Rureifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q884315",
-    "notation": "28",
-    "label": "Nordeifel"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q939872",
-    "notation": "28",
-    "label": "Nordeifel"
+    "label": "Hohes Venn"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q993449",
@@ -665,19 +225,324 @@
     "label": "Monschauer Heckenland"
   },
   {
+    "qid": "http://www.wikidata.org/entity/Q1296974",
+    "notation": "35",
+    "label": "Kirchenkreis Paderborn"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1324681",
+    "notation": "35",
+    "label": "Kirchenkreis Gütersloh"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1423799",
+    "notation": "35",
+    "label": "Kirchenkreis Herford"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1424058",
+    "notation": "35",
+    "label": "Kirchenkreis Vlotho"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1455460",
+    "notation": "35",
+    "label": "Kirchenkreis Jülich"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q15116936",
+    "notation": "35",
+    "label": "Kirchenkreis Soest"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q15450305",
+    "notation": "35",
+    "label": "Kirchenkreis Herne"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q15823609",
+    "notation": "35",
+    "label": "Kirchenkreis An Sieg und Rhein"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1743148",
+    "notation": "35",
+    "label": "Kirchenkreis Halle"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1743149",
+    "notation": "35",
+    "label": "Kirchenkreis Hattingen-Witten"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1743154",
+    "notation": "35",
+    "label": "Kirchenkreis Lübbecke"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1743158",
+    "notation": "35",
+    "label": "Kirchenkreis Minden"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1743178",
+    "notation": "35",
+    "label": "Kirchenkreis Steinfurt-Coesfeld-Borken"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q1743181",
+    "notation": "35",
+    "label": "Kirchenkreis Unna"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q17592686",
+    "notation": "35",
+    "label": "Kirchenkreis Aachen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47021505",
+    "notation": "35",
+    "label": "Kirchenkreis Bonn"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47021768",
+    "notation": "35",
+    "label": "Kirchenkreis Bad Godesberg-Voreifel"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47021915",
+    "notation": "35",
+    "label": "Kirchenkreis Essen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47022089",
+    "notation": "35",
+    "label": "Kirchenkreis Gladbach-Neuss"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47022310",
+    "notation": "35",
+    "label": "Kirchenkreis Moers"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47022415",
+    "notation": "35",
+    "label": "Kirchenkreis Lennep"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47022528",
+    "notation": "35",
+    "label": "Kirchenkreis Wesel"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47461972",
+    "notation": "35",
+    "label": "Kirchenkreis Arnsberg"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462041",
+    "notation": "35",
+    "label": "Kirchenkreis Bielefeld"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462060",
+    "notation": "35",
+    "label": "Kirchenkreis Bochum"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462077",
+    "notation": "35",
+    "label": "Kirchenkreis Dortmund"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462099",
+    "notation": "35",
+    "label": "Kirchenkreis Gelsenkirchen und Wattenscheid"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462109",
+    "notation": "35",
+    "label": "Kirchenkreis Gladbeck-Bottrop-Dorsten"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462151",
+    "notation": "35",
+    "label": "Kirchenkreis Hagen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462166",
+    "notation": "35",
+    "label": "Kirchenkreis Hamm"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462205",
+    "notation": "35",
+    "label": "Kirchenkreis Lüdenscheid"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462213",
+    "notation": "35",
+    "label": "Kirchenkreis Münster"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462234",
+    "notation": "35",
+    "label": "Kirchenkreis Recklinghausen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462240",
+    "notation": "35",
+    "label": "Kirchenkreis Schwelm"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462244",
+    "notation": "35",
+    "label": "Kirchenkreis Siegen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462263",
+    "notation": "35",
+    "label": "Kirchenkreis Tecklenburg"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q47462321",
+    "notation": "35",
+    "label": "Kirchenkreis Wittgenstein"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q11805",
+    "notation": "36",
+    "label": "Erzbistum Köln"
+  },
+  {
     "qid": "http://www.wikidata.org/entity/Q684314",
     "notation": "36",
     "label": "Bistum Aachen"
   },
   {
+    "qid": "http://www.wikidata.org/entity/Q702291",
+    "notation": "36",
+    "label": "Bistum Essen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q769380",
+    "notation": "36",
+    "label": "Bistum Münster"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q883257",
+    "notation": "36",
+    "label": "Bistum Minden"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56099734",
+    "notation": "37",
+    "label": "Dekanat Hochsauerland-Mitte"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56099854",
+    "notation": "37",
+    "label": "Dekanat Siegen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56372838",
+    "notation": "37",
+    "label": "Dekanat Ahlen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56373173",
+    "notation": "37",
+    "label": "Dekanat Beckum"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56373241",
+    "notation": "37",
+    "label": "Dekanat Warendorf"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56373671",
+    "notation": "37",
+    "label": "Dekanat Ahaus-Vreden"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56373947",
+    "notation": "37",
+    "label": "Dekanat Borken"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56374605",
+    "notation": "37",
+    "label": "Dekanat Rheine"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56374635",
+    "notation": "37",
+    "label": "Dekanat Steinfurt"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56395068",
+    "notation": "37",
+    "label": "Dekanat Lippe"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56395189",
+    "notation": "37",
+    "label": "Dekanat Dorsten"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56395213",
+    "notation": "37",
+    "label": "Dekanat Recklinghausen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56395271",
+    "notation": "37",
+    "label": "Dekanat Vechta"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56397821",
+    "notation": "37",
+    "label": "Dekanat Wormbach"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56397874",
+    "notation": "37",
+    "label": "Dekanat Bigge-Medebach"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398029",
+    "notation": "37",
+    "label": "Dekanat Sundern"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398251",
+    "notation": "37",
+    "label": "Dekanat Attendorn"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398321",
+    "notation": "37",
+    "label": "Dekanat Olpe"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398420",
+    "notation": "37",
+    "label": "Dekanat Iserlohn"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398551",
+    "notation": "37",
+    "label": "Dekanat Werl"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56402341",
+    "notation": "37",
+    "label": "Dekanat Steinheim"
+  },
+  {
     "qid": "http://www.wikidata.org/entity/Q152432",
     "notation": "52",
     "label": "Reichsabtei Kornelimünster"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2066",
-    "notation": "52",
-    "label": "Stift Essen"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q325202",
@@ -692,7 +557,7 @@
   {
     "qid": "http://www.wikidata.org/entity/Q688373",
     "notation": "52",
-    "label": "Stift Essen"
+    "label": "Kloster Werden"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1541708",
@@ -700,17 +565,7 @@
     "label": "Grafschaft Kerpen und Lommersum"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q1601287",
-    "notation": "54",
-    "label": "Grafschaft Sayn"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2805",
-    "notation": "54",
-    "label": "Grafschaft Moers"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q320095",
+    "qid": "http://www.wikidata.org/entity/Q328928",
     "notation": "54",
     "label": "Grafschaft Moers"
   },
@@ -735,6 +590,11 @@
     "label": "Grafschaft Gimborn-Neustadt"
   },
   {
+    "qid": "http://www.wikidata.org/entity/Q15130492",
+    "notation": "72",
+    "label": "Stift Corvey"
+  },
+  {
     "qid": "http://www.wikidata.org/entity/Q316174",
     "notation": "72",
     "label": "Stift Herford"
@@ -743,11 +603,6 @@
     "qid": "http://www.wikidata.org/entity/Q1020946",
     "notation": "74",
     "label": "Büren (Adelsgeschlecht)"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1095563",
-    "notation": "74",
-    "label": "Herrschaft Rheda"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q11026135",
@@ -765,64 +620,19 @@
     "label": "Grafschaft Sternberg"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q1475395",
-    "notation": "74",
-    "label": "Grafschaft Limburg"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q1541799",
     "notation": "74",
     "label": "Grafschaft Schwalenberg"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q1543933",
-    "notation": "74",
-    "label": "Grafschaft Tecklenburg"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q1614442",
     "notation": "74",
-    "label": "Grafschaft Tecklenburg"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1615095",
-    "notation": "74",
-    "label": "Herrschaft Rheda"
+    "label": "Grafschaft Steinfurt"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q165763",
     "notation": "74",
     "label": "Waldeck"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1674778",
-    "notation": "74",
-    "label": "Herrschaft Rheda"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q1918845",
-    "notation": "74",
-    "label": "Herrschaft Anholt"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q225621",
-    "notation": "74",
-    "label": "Grafschaft Rietberg"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q242810",
-    "notation": "74",
-    "label": "Grafschaft Pyrmont"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q2791950",
-    "notation": "74",
-    "label": "Herrschaft Gemen"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q314439",
-    "notation": "74",
-    "label": "Grafschaft Limburg"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q315288",
@@ -845,14 +655,19 @@
     "label": "Sayn-Wittgenstein-Hohenstein"
   },
   {
+    "qid": "http://www.wikidata.org/entity/Q3821487",
+    "notation": "74",
+    "label": "Sayn-Wittgenstein-Berleburg"
+  },
+  {
     "qid": "http://www.wikidata.org/entity/Q3821604",
     "notation": "74",
     "label": "Sayn-Wittgenstein-Wittgenstein"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q43872971",
+    "qid": "http://www.wikidata.org/entity/Q457468",
     "notation": "74",
-    "label": "Grafschaft Limburg"
+    "label": "Grafschaft Rietberg"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q477038",
@@ -865,19 +680,9 @@
     "label": "Grafschaft Sayn-Altenkirchen"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q545414",
-    "notation": "74",
-    "label": "Herrschaft Anholt"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q55721822",
     "notation": "74",
     "label": "Herrschaft Anholt"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q55888099",
-    "notation": "74",
-    "label": "Herrschaft Horstmar"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q55890544",
@@ -915,29 +720,14 @@
     "label": "Grafschaft Grönebach"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q5982",
-    "notation": "74",
-    "label": "Nassau-Siegen"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q628609",
     "notation": "74",
     "label": "Fürstentum Rheina-Wolbeck"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q6755",
-    "notation": "74",
-    "label": "Nassau-Siegen"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q736029",
     "notation": "74",
     "label": "Nassau-Siegen"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q813816",
-    "notation": "74",
-    "label": "Grafschaft Rietberg"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q825489",
@@ -960,13 +750,13 @@
     "label": "Grafschaft Tecklenburg"
   },
   {
-    "qid": "http://www.wikidata.org/entity/Q894910",
-    "notation": "74",
-    "label": "Herrschaft Gemen"
-  },
-  {
     "qid": "http://www.wikidata.org/entity/Q932656",
     "notation": "74",
     "label": "Herrschaft Rheda"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q55888099",
+    "notation": "74",
+    "label": "Herrschaft Horstmar"
   }
 ]

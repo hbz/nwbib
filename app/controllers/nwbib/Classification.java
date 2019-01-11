@@ -104,20 +104,41 @@ public class Classification {
 							broader.findValue("@id").asText());
 			}
 			if (this == SPATIAL) {
-				JsonNode wikidataJson = WikidataLocations.load();
-				Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
-						Classification.buildHierarchyWikidata(wikidataJson);
-				String n9 = "http://purl.org/lobid/nwbib-spatial#n9";
-				String euregio = "http://purl.org/lobid/nwbib-spatial#n91";
-				List<JsonNode> n9Sub = subClasses.get(n9).stream()
-						.filter(json -> json.get("value").textValue().equals(euregio))
-						.collect(Collectors.toList());
-				n9Sub.addAll(topAndSub.getLeft());
-				subClasses.put(n9, n9Sub);
-				subClasses.putAll(topAndSub.getRight());
+				addN90s(subClasses);
+				addNonN90s(subClasses);
 			}
 			Collections.sort(topClasses, comparator);
 			return Pair.of(topClasses, subClasses);
+		}
+
+		private static void addN90s(Map<String, List<JsonNode>> subClasses) {
+			JsonNode wikidataJson = WikidataLocations.load();
+			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
+					Classification.buildHierarchyWikidata(wikidataJson);
+			String n9 = "http://purl.org/lobid/nwbib-spatial#n9";
+			String euregio = "http://purl.org/lobid/nwbib-spatial#n91";
+			List<JsonNode> n9Sub = subClasses.get(n9).stream()
+					.filter(json -> json.get("value").textValue().equals(euregio))
+					.collect(Collectors.toList());
+			n9Sub.addAll(topAndSub.getLeft());
+			subClasses.put(n9, n9Sub);
+			subClasses.putAll(topAndSub.getRight());
+		}
+
+		private static void addNonN90s(Map<String, List<JsonNode>> subClasses) {
+			WikidataLocations.non90sJson((JsonNode json) -> {
+				json.elements().forEachRemaining(e -> {
+					String key = "http://purl.org/lobid/nwbib-spatial#n"
+							+ e.get("notation").textValue();
+					List<JsonNode> list = subClasses.get(key);
+					list = list == null ? new ArrayList<>() : list;
+					list.add(Json.toJson(ImmutableMap.of(//
+							"value", e.get("qid"), //
+							"label", e.get("label"), //
+							"gnd", "")));
+					subClasses.put(key, list);
+				});
+			});
 		}
 
 		/**

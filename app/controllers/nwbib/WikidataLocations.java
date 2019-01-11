@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.elasticsearch.common.lang3.tuple.Pair;
@@ -47,6 +48,13 @@ public class WikidataLocations {
 			String label = item.get("itemLabel").get("value").textValue();
 			WIKIDATA_LABELS.put(id, label);
 		});
+		non90sJson((JsonNode json) -> {
+			json.elements().forEachRemaining(e -> {
+				WIKIDATA_LABELS.put(e.get("qid").textValue(),
+						e.get("label").textValue());
+			});
+		});
+
 	}
 
 	/**
@@ -54,7 +62,18 @@ public class WikidataLocations {
 	 * @return The Wikidata label for the URI
 	 */
 	public static String label(String uri) {
-		return WIKIDATA_LABELS.get(uri);
+		String label = WIKIDATA_LABELS.get(uri);
+		return label == null ? uri : label;
+	}
+
+	static void non90sJson(Consumer<JsonNode> c) {
+		try (FileInputStream stream = new FileInputStream(
+				Play.application().getFile("conf/non-90s-qids.json"))) {
+			JsonNode json = Json.parse(stream);
+			c.accept(json);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
