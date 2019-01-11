@@ -136,6 +136,7 @@ public class Classification {
 							"value", e.get("qid"), //
 							"label", e.get("label"), //
 							"gnd", "")));
+					Collections.sort(list, comparator);
 					subClasses.put(key, list);
 				});
 			});
