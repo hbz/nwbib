@@ -5,9 +5,14 @@
 @import play.api.libs.json.Json
 @import play.api.libs.json.JsValue
 @import com.fasterxml.jackson.databind.JsonNode
+@import controllers.nwbib.Lobid
 
 @labelPlain(label: String) = @{
     if(label.matches("^[\\d].+")) { label.split(" ").tail.mkString(" ") } else { label }
+}
+
+@label(json: JsValue) = {
+    @if(!placeholder.contains("Register") && t=="Raumsystematik"){@labelPlain((json\"label").as[String])} else {@((json\"label").as[String])}
 }
 
 @ul(classes: Option[Seq[JsValue]], id: String) = {
@@ -15,25 +20,30 @@
         <ul id="@id">
         <script>$('#root').hide()</script>
         @for(json <- classes.getOrElse(Seq())){
-            @defining((json\"value").as[String]) { value =>
-            <li>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@labelPlain((json\"label").as[String])</b> } else {
-                <a href="@{t match {
+            @defining(((json\"value").as[String], (json\"hits").asOpt[scala.Long].getOrElse(0L))) { case (value, hits) =>
+            @if(hits>0||t!="Raumsystematik"||(subs!=null&&subs.containsKey(value))){
+              <li>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@labelPlain((json\"label").as[String])</b> } else {
+                @if(hits>0||t!="Raumsystematik"){
+                  <a href="@{t match {
                     case "Zeitschriften" => value
                     case "Wikidata" => value
                     case "Raumsystematik" => nwbib.routes.Application.search(nwbibspatial=value)
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
                     case _ => value
-                 }}">@if(!placeholder.contains("Register") && t=="Raumsystematik"){@labelPlain((json\"label").as[String])} else {@((json\"label").as[String])}</a>}
-                @if(t=="Wikidata"){
+                 }}">@label(json)</a>@if(t=="Raumsystematik"){ (@hits)}
+                } else { @label(json) }
+              }
+              @if(t=="Wikidata"){
                     @Html(controllers.nwbib.WikidataLocations.searchLink(value))
                     @for(gnd <- (json\"gnd").asOpt[String]; if !gnd.isEmpty){
                         <a title='Verknüpften GND-Eintrag anzeigen' href='http://lobid.org/gnd/@gnd'><small><span class="label label-info">gnd</span></small></a>
                     }
-                }
-                @if(subs != null && subs.get(value) != null){
-                    @ul(Some(subs.get(value).map((node: JsonNode) => Json.parse(node.toString)).toSeq),"")
-                }
-            </li>
+              }
+              @if(subs != null && subs.get(value) != null){
+                  @ul(Some(subs.get(value).map((node: JsonNode) => Json.parse(node.toString)).toSeq),"")
+              }
+              </li>
+              }
             }
         }
         </ul>

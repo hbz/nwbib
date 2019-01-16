@@ -135,7 +135,9 @@ public class Classification {
 					list.add(Json.toJson(ImmutableMap.of(//
 							"value", e.get("qid"), //
 							"label", e.get("label"), //
-							"gnd", "")));
+							"gnd", "", //
+							"hits",
+							Lobid.getTotalHitsNwbibspatial(e.get("qid").textValue()))));
 					Collections.sort(list, comparator);
 					subClasses.put(key, list);
 				});
@@ -304,22 +306,23 @@ public class Classification {
 					? label + String.format(" (bis %s)", dissolution) : label;
 			String nrw = "http://www.wikidata.org/entity/Q1198";
 			String topLevelLabelPrefix = "Regierungsbezirk";
+			long hits = Lobid.getTotalHitsNwbibspatial(id);
 			if (id.equals(nrw)) {
 				topClasses.add(
 						Json.toJson(ImmutableMap.of("value", id, "label", "Sonstige")));
 			} else if (broaderId.equals(nrw)
 					&& label.startsWith(topLevelLabelPrefix)) {
-				topClasses.add(Json
-						.toJson(ImmutableMap.of("value", id, "label", label, "gnd", gnd)));
+				topClasses.add(Json.toJson(ImmutableMap.of("value", id, "label", label,
+						"gnd", gnd, "hits", hits)));
 			}
-			if (isItem(json, broaderId)
+			if (hits > 0 && isItem(json, broaderId)
 					&& (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
 							|| (broaderId.equals(nrw)))) {
 				if (!subClasses.containsKey(broaderId))
 					subClasses.put(broaderId, new ArrayList<JsonNode>());
 				List<JsonNode> sub = subClasses.get(broaderId);
-				sub.add(Json
-						.toJson(ImmutableMap.of("value", id, "label", label, "gnd", gnd)));
+				sub.add(Json.toJson(ImmutableMap.of("value", id, "label", label, "gnd",
+						gnd, "hits", hits)));
 				Collections.sort(sub, comparator);
 			}
 		});
@@ -380,9 +383,10 @@ public class Classification {
 		final JsonNode label = json.findValue(Property.LABEL.value);
 		if (label != null) {
 			String id = hit.getId();
-			ImmutableMap<String, String> map = ImmutableMap.of("value", id, "label",
+			ImmutableMap<String, ?> map = ImmutableMap.of("value", id, "label",
 					(style == Label.PLAIN ? "" : shortId(id) + " ")
-							+ label.findValue("@value").asText());
+							+ label.findValue("@value").asText(),
+					"hits", Lobid.getTotalHitsNwbibspatial(id));
 			result.add(Json.toJson(map));
 		}
 	}

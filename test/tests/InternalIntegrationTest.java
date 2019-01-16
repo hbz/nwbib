@@ -95,4 +95,16 @@ public class InternalIntegrationTest {
 		});
 	}
 
+	@Test
+	public void sizeRequestNwbibspatial() {
+		running(testServer(3333), () -> {
+			Long hits = Lobid
+					.getTotalHitsNwbibspatial("http://purl.org/lobid/nwbib-spatial#n18");
+			assertThat(hits).as("hits for n18").isGreaterThan(0);
+			hits = Lobid
+					.getTotalHitsNwbibspatial("http://www.wikidata.org/entity/Q2133651");
+			assertThat(hits).as("hits for Q2133651").isGreaterThan(0);
+		});
+	}
+
 }

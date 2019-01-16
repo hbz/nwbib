@@ -47,6 +47,8 @@ public class Lobid {
 	/** Timeout for API calls in milliseconds. */
 	public static final int API_TIMEOUT = 50000;
 
+	private static Map<String, Long> WIKIDATA_COUNT = new HashMap<>();
+
 	/**
 	 * @param id The resource ID
 	 * @return The resource JSON content
@@ -137,7 +139,7 @@ public class Lobid {
 				&& requestHolder.getQueryParameters().get("word") == null) {
 			requestHolder.setQueryParameter("word", "*");
 		}
-		Logger.info("Request URL {}, query params {} ", requestHolder.getUrl(),
+		Logger.debug("Request URL {}, query params {} ", requestHolder.getUrl(),
 				requestHolder.getQueryParameters());
 		return requestHolder;
 	}
@@ -172,7 +174,7 @@ public class Lobid {
 								Application.CONFIG.getString("nwbib.filter"))
 						.setQueryParameter("aggregations", "topic");
 		//@formatter:on
-		Logger.info("Request URL {}, query params {} ", request.getUrl(),
+		Logger.debug("Request URL {}, query params {} ", request.getUrl(),
 				request.getQueryParameters());
 		return request;
 	}
@@ -197,6 +199,30 @@ public class Lobid {
 			Cache.set(cacheKey, total, Application.ONE_HOUR);
 			return total;
 		});
+	}
+
+	/**
+	 * @param value The nwbibspatial URI
+	 * @return The number of hits for the given value in an nwbibspatial query
+	 */
+	public static long getTotalHitsNwbibspatial(String value) {
+		if (WIKIDATA_COUNT.isEmpty()) {
+			initWikidataCounts();
+		}
+		return isWikidata(value) ? WIKIDATA_COUNT.getOrDefault(value, 0L)
+				: Lobid.request("", "", "", "", "", "", "", "", value, "", 0, 1, "", "",
+						"", "", "", "", "").get().map((WSResponse response) -> {
+							return getTotalResults(response.asJson());
+						}).get(Lobid.API_TIMEOUT);
+	}
+
+	private static void initWikidataCounts() {
+		getFacets("", "", "", "", "", "", "", "", "", "", "", "spatial.id", "", "",
+				"", "", "").get(Lobid.API_TIMEOUT).get("aggregation").get("spatial.id")
+						.elements().forEachRemaining((JsonNode node) -> {
+							WIKIDATA_COUNT.put(node.get("key").textValue(),
+									node.get("doc_count").longValue());
+						});
 	}
 
 	/**
@@ -441,7 +467,7 @@ public class Lobid {
 
 		String url = request.getUrl();
 		Map<String, Collection<String>> parameters = request.getQueryParameters();
-		Logger.info("Facets request URL {}, query params {} ", url, parameters);
+		Logger.debug("Facets request URL {}, query params {} ", url, parameters);
 		return request.get().map((WSResponse response) -> {
 			if (response.getStatus() == Http.Status.OK) {
 				return response.asJson();
