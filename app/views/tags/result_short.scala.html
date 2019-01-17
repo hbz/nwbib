@@ -41,7 +41,7 @@
     @optional(doc, "title", "", "<Kein Titel>")
     @optional(doc, "otherTitleInformation", " | ", "")
     @optional(doc, "edition", " | ", "")</a></td>
-  <td style="text-align: right"> @((doc \\ "agent").map(_ \ "label").map(_.as[String]).mkString("; ")) </td>
+  <td style="text-align: right"> @((doc \\ "agent").map(_ \ "label").map(_.asOpt[String].getOrElse("")).mkString("; ")) </td>
   <td style="text-align: right"> @optional(doc, "startDate", "", "").split("[,;]")(0) </td>
   <td style="text-align: right"> @tags.star_button(id) </td>
 </tr>
