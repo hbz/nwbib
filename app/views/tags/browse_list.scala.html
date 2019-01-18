@@ -24,7 +24,6 @@
              normalized = entryLabel.replaceAll("ß", "ss") + entryLabel.replaceAll("ss", "ß");
              value = (json\"value").as[String];
              hits = (json\"hits").asOpt[scala.Long].getOrElse(0L)) {
-            @if(hits>0||t!="Raumsystematik"||(subs!=null&&subs.containsKey(value))){
               <li>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@labelPlain((json\"label").as[String])</b> } else {
                 @if(hits>0||t!="Raumsystematik"){
                   <a href="@{t match {
@@ -46,7 +45,6 @@
                   @ul(Some(subs.get(value).map((node: JsonNode) => Json.parse(node.toString)).toSeq),"")
               }
               </li>
-            }
         }
         </ul>
     }

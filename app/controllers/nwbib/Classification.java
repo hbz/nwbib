@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -108,7 +109,7 @@ public class Classification {
 				addNonN90s(subClasses);
 			}
 			Collections.sort(topClasses, comparator);
-			return Pair.of(topClasses, subClasses);
+			return Pair.of(topClasses, removeZeroHits(subClasses));
 		}
 
 		private static void addN90s(Map<String, List<JsonNode>> subClasses) {
@@ -142,6 +143,31 @@ public class Classification {
 					subClasses.put(key, list);
 				});
 			});
+		}
+
+		private static Map<String, List<JsonNode>> removeZeroHits(
+				Map<String, List<JsonNode>> subClasses) {
+			Map<String, List<JsonNode>> newSubClasses = new HashMap<>();
+			for (Entry<String, List<JsonNode>> entry : subClasses.entrySet()) {
+				List<JsonNode> newList = new ArrayList<>();
+				for (JsonNode value : entry.getValue()) {
+					if (value.get("hits").longValue() > 0L
+							|| isIntermediateNode(value, subClasses)) {
+						newList.add(value);
+					}
+				}
+				if (!newList.isEmpty()) {
+					newSubClasses.put(entry.getKey(), newList);
+				}
+			}
+			return newSubClasses;
+		}
+
+		private static boolean isIntermediateNode(JsonNode json,
+				Map<String, List<JsonNode>> subClasses) {
+			String value = json.get("value").textValue();
+			return subClasses.containsKey(value) && subClasses.get(value).stream()
+					.filter(sub -> sub.get("hits").longValue() > 0L).count() > 0;
 		}
 
 		/**
@@ -315,7 +341,7 @@ public class Classification {
 				topClasses.add(Json.toJson(ImmutableMap.of("value", id, "label", label,
 						"gnd", gnd, "hits", hits)));
 			}
-			if (hits > 0 && isItem(json, broaderId)
+			if (isItem(json, broaderId)
 					&& (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
 							|| (broaderId.equals(nrw)))) {
 				if (!subClasses.containsKey(broaderId))
