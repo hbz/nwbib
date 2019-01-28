@@ -7,8 +7,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.elasticsearch.common.lang3.tuple.Pair;
@@ -16,7 +19,6 @@ import org.elasticsearch.common.lang3.tuple.Pair;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 
 import play.Logger;
 import play.Play;
@@ -36,6 +38,42 @@ public class WikidataLocations {
 
 	private static final int ONE_DAY = 60 * 60 * 24;
 	private static int requestCounter;
+
+	private static final Map<String, String> WIKIDATA_LABELS = new HashMap<>();
+
+	static {
+		load().elements().forEachRemaining(item -> {
+			String id = item.get("item").get("value").textValue();
+			String label = item.get("itemLabel").get("value").textValue();
+			WIKIDATA_LABELS.put(id, label);
+		});
+		non90sJson((JsonNode json) -> {
+			json.elements().forEachRemaining(e -> {
+				WIKIDATA_LABELS.put(e.get("qid").textValue(),
+						e.get("label").textValue());
+			});
+		});
+
+	}
+
+	/**
+	 * @param uri The Wikidata URI
+	 * @return The Wikidata label for the URI
+	 */
+	public static String label(String uri) {
+		String label = WIKIDATA_LABELS.get(uri);
+		return label == null ? uri : label;
+	}
+
+	static void non90sJson(Consumer<JsonNode> c) {
+		try (FileInputStream stream = new FileInputStream(
+				Play.application().getFile("conf/non-90s-qids.json"))) {
+			JsonNode json = Json.parse(stream);
+			c.accept(json);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * @return The Wikidata locations as JSON
@@ -120,47 +158,17 @@ public class WikidataLocations {
 				String baseUrl = "http://lobid.org/resources/search";
 				String q = String.format("spatial.id:\"%s\"", id);
 				String fullUrl = baseUrl + "?q=" + q;
-				Pair<String, Long> coverageAndHits = coverageAndHits(baseUrl, q);
+				Pair<String, Long> labelAndHits =
+						Pair.of(label(id), Lobid.getTotalHitsNwbibspatial(id));
 				String html = String.format(
 						"<a title='Nach Titeln suchen | %s' href='%s'><span class='glyphicon glyphicon-search'></span></a> %s",
-						coverageAndHits.getLeft(), fullUrl, coverageAndHits.getRight());
-				return coverageAndHits.getRight() > 0L ? html : "";
+						labelAndHits.getLeft(), fullUrl, labelAndHits.getRight());
+				return labelAndHits.getRight() > 0L ? html : "";
 			}, cacheDuration);
 		} catch (Exception e) {
 			Logger.error("Could not query for " + id, e);
 			return "";
 		}
-	}
-
-	private static Pair<String, Long> coverageAndHits(String baseUrl, String q) {
-		try {
-			WSResponse response = WS.url(baseUrl).setQueryParameter("q", q)
-					.setQueryParameter("format", "json").execute().get(1000);
-			if (response.getStatus() == Http.Status.OK) {
-				JsonNode json = response.asJson();
-				requestCounter++;
-				long hits = json.get("totalItems").longValue();
-				String coverage = collectCoverageValues(json.findValues("coverage"));
-				if (requestCounter == 1 || requestCounter % 500 == 0) {
-					Logger.debug("Request {}", requestCounter);
-				}
-				Logger.trace("{}: {} -> {} hits, coverage: {}", requestCounter, q, hits,
-						coverage);
-				return Pair.of(coverage, hits);
-			}
-			Logger.error("Response not OK, status: {}: {}", response.getStatusText(),
-					response.getBody());
-		} catch (Exception x) {
-			Logger.error("Error for q={}: {}", q, x.getMessage());
-		}
-		return Pair.of("", 0L);
-	}
-
-	private static String collectCoverageValues(List<JsonNode> coverageNodes) {
-		return coverageNodes.stream()
-				.flatMap((JsonNode cs) -> Lists.newArrayList(cs.elements()).stream())
-				.map(c -> c.textValue().replace("<", "&lt;").replace(">", "&gt;"))
-				.distinct().collect(Collectors.joining(", "));
 	}
 
 }

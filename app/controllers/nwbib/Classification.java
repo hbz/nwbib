@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -103,8 +104,71 @@ public class Classification {
 					addAsSubClass(subClasses, hit, json,
 							broader.findValue("@id").asText());
 			}
+			if (this == SPATIAL) {
+				addN90s(subClasses);
+				addNonN90s(subClasses);
+			}
 			Collections.sort(topClasses, comparator);
-			return Pair.of(topClasses, subClasses);
+			return Pair.of(topClasses, removeZeroHits(subClasses));
+		}
+
+		private static void addN90s(Map<String, List<JsonNode>> subClasses) {
+			JsonNode wikidataJson = WikidataLocations.load();
+			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
+					Classification.buildHierarchyWikidata(wikidataJson);
+			String n9 = "http://purl.org/lobid/nwbib-spatial#n9";
+			String euregio = "http://purl.org/lobid/nwbib-spatial#n91";
+			List<JsonNode> n9Sub = new ArrayList<>();
+			n9Sub.addAll(topAndSub.getLeft());
+			n9Sub.add(subClasses.get(n9).stream()
+					.filter(json -> json.get("value").textValue().equals(euregio))
+					.iterator().next());
+			subClasses.put(n9, n9Sub);
+			subClasses.putAll(topAndSub.getRight());
+		}
+
+		private static void addNonN90s(Map<String, List<JsonNode>> subClasses) {
+			WikidataLocations.non90sJson((JsonNode json) -> {
+				json.elements().forEachRemaining(e -> {
+					String key = "http://purl.org/lobid/nwbib-spatial#n"
+							+ e.get("notation").textValue();
+					List<JsonNode> list = subClasses.get(key);
+					list = list == null ? new ArrayList<>() : list;
+					list.add(Json.toJson(ImmutableMap.of(//
+							"value", e.get("qid"), //
+							"label", e.get("label"), //
+							"gnd", "", //
+							"hits",
+							Lobid.getTotalHitsNwbibspatial(e.get("qid").textValue()))));
+					Collections.sort(list, comparator);
+					subClasses.put(key, list);
+				});
+			});
+		}
+
+		private static Map<String, List<JsonNode>> removeZeroHits(
+				Map<String, List<JsonNode>> subClasses) {
+			Map<String, List<JsonNode>> newSubClasses = new HashMap<>();
+			for (Entry<String, List<JsonNode>> entry : subClasses.entrySet()) {
+				List<JsonNode> newList = new ArrayList<>();
+				for (JsonNode value : entry.getValue()) {
+					if (value.get("hits").longValue() > 0L
+							|| isIntermediateNode(value, subClasses)) {
+						newList.add(value);
+					}
+				}
+				if (!newList.isEmpty()) {
+					newSubClasses.put(entry.getKey(), newList);
+				}
+			}
+			return newSubClasses;
+		}
+
+		private static boolean isIntermediateNode(JsonNode json,
+				Map<String, List<JsonNode>> subClasses) {
+			String value = json.get("value").textValue();
+			return subClasses.containsKey(value) && subClasses.get(value).stream()
+					.filter(sub -> sub.get("hits").longValue() > 0L).count() > 0;
 		}
 
 		/**
@@ -144,7 +208,8 @@ public class Classification {
 	private static Client client;
 	private static Node node;
 
-	static Comparator<JsonNode> comparator =
+	/** Compare German strings */
+	public static Comparator<JsonNode> comparator =
 			(JsonNode o1, JsonNode o2) -> Collator.getInstance(Locale.GERMAN)
 					.compare(labelText(o1), labelText(o2));
 
@@ -231,7 +296,22 @@ public class Classification {
 	}
 
 	private static String labelText(JsonNode json) {
-		return json.get("label").asText();
+		String label = json.get("label").asText();
+		if (label.contains("Stadtbezirk")) {
+			List<Pair<String, String>> roman = Arrays.asList(Pair.of("I", "a"),
+					Pair.of("II", "b"), Pair.of("III", "c"), Pair.of("IV", "d"),
+					Pair.of("V", "e"), Pair.of("VI", "f"), Pair.of("VII", "g"),
+					Pair.of("VIII", "h"), Pair.of("IX", "i"), Pair.of("X", "j"));
+			Collections.sort(roman, // replace longest first
+					(p1, p2) -> Integer.valueOf(p1.getLeft().length())
+							.compareTo(Integer.valueOf(p2.getLeft().length())));
+			for (int i = 10; i > 0; i--) { // start from end
+				label = label //
+						.replace(String.valueOf(i), "" + (char) ('a' + i)) // arabic 10 to 1
+						.replace(roman.get(i - 1).getLeft(), roman.get(i - 1).getRight());
+			}
+		}
+		return label;
 	}
 
 	// Prototype, see https://github.com/hbz/nwbib/issues/392
@@ -253,13 +333,14 @@ public class Classification {
 					? label + String.format(" (bis %s)", dissolution) : label;
 			String nrw = "http://www.wikidata.org/entity/Q1198";
 			String topLevelLabelPrefix = "Regierungsbezirk";
+			long hits = Lobid.getTotalHitsNwbibspatial(id);
 			if (id.equals(nrw)) {
 				topClasses.add(
 						Json.toJson(ImmutableMap.of("value", id, "label", "Sonstige")));
 			} else if (broaderId.equals(nrw)
 					&& label.startsWith(topLevelLabelPrefix)) {
-				topClasses.add(Json
-						.toJson(ImmutableMap.of("value", id, "label", label, "gnd", gnd)));
+				topClasses.add(Json.toJson(ImmutableMap.of("value", id, "label", label,
+						"gnd", gnd, "hits", hits)));
 			}
 			if (isItem(json, broaderId)
 					&& (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
@@ -267,8 +348,8 @@ public class Classification {
 				if (!subClasses.containsKey(broaderId))
 					subClasses.put(broaderId, new ArrayList<JsonNode>());
 				List<JsonNode> sub = subClasses.get(broaderId);
-				sub.add(Json
-						.toJson(ImmutableMap.of("value", id, "label", label, "gnd", gnd)));
+				sub.add(Json.toJson(ImmutableMap.of("value", id, "label", label, "gnd",
+						gnd, "hits", hits)));
 				Collections.sort(sub, comparator);
 			}
 		});
@@ -329,9 +410,10 @@ public class Classification {
 		final JsonNode label = json.findValue(Property.LABEL.value);
 		if (label != null) {
 			String id = hit.getId();
-			ImmutableMap<String, String> map = ImmutableMap.of("value", id, "label",
+			ImmutableMap<String, ?> map = ImmutableMap.of("value", id, "label",
 					(style == Label.PLAIN ? "" : shortId(id) + " ")
-							+ label.findValue("@value").asText());
+							+ label.findValue("@value").asText(),
+					"hits", Lobid.getTotalHitsNwbibspatial(id));
 			result.add(Json.toJson(map));
 		}
 	}

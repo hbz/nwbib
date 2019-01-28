@@ -42,6 +42,10 @@ input#owner {
 	width: 100%;
 }
 
+ul {
+	margin-bottom: 25px;
+}
+
 ul#root {
 	padding-left: 0;
 }
