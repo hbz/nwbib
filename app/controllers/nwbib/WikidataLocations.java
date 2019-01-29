@@ -159,7 +159,7 @@ public class WikidataLocations {
 				String q = String.format("spatial.id:\"%s\"", id);
 				String fullUrl = baseUrl + "?q=" + q;
 				Pair<String, Long> labelAndHits =
-						Pair.of(label(id), Lobid.getTotalHitsNwbibspatial(id));
+						Pair.of(label(id), Lobid.getTotalHitsNwbibClassification(id));
 				String html = String.format(
 						"<a title='Nach Titeln suchen | %s' href='%s'><span class='glyphicon glyphicon-search'></span></a> %s",
 						labelAndHits.getLeft(), fullUrl, labelAndHits.getRight());

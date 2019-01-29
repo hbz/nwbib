@@ -139,7 +139,7 @@ public class Classification {
 							"label", e.get("label"), //
 							"gnd", "", //
 							"hits",
-							Lobid.getTotalHitsNwbibspatial(e.get("qid").textValue()))));
+							Lobid.getTotalHitsNwbibClassification(e.get("qid").textValue()))));
 					Collections.sort(list, comparator);
 					subClasses.put(key, list);
 				});
@@ -333,7 +333,7 @@ public class Classification {
 					? label + String.format(" (bis %s)", dissolution) : label;
 			String nrw = "http://www.wikidata.org/entity/Q1198";
 			String topLevelLabelPrefix = "Regierungsbezirk";
-			long hits = Lobid.getTotalHitsNwbibspatial(id);
+			long hits = Lobid.getTotalHitsNwbibClassification(id);
 			if (id.equals(nrw)) {
 				topClasses.add(
 						Json.toJson(ImmutableMap.of("value", id, "label", "Sonstige")));
@@ -413,7 +413,7 @@ public class Classification {
 			ImmutableMap<String, ?> map = ImmutableMap.of("value", id, "label",
 					(style == Label.PLAIN ? "" : shortId(id) + " ")
 							+ label.findValue("@value").asText(),
-					"hits", Lobid.getTotalHitsNwbibspatial(id));
+					"hits", Lobid.getTotalHitsNwbibClassification(id));
 			result.add(Json.toJson(map));
 		}
 	}
