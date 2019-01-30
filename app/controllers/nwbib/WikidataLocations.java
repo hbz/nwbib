@@ -161,8 +161,8 @@ public class WikidataLocations {
 				Pair<String, Long> labelAndHits =
 						Pair.of(label(id), Lobid.getTotalHitsNwbibClassification(id));
 				String html = String.format(
-						"<a title='Nach Titeln suchen | %s' href='%s'><span class='glyphicon glyphicon-search'></span></a> %s",
-						labelAndHits.getLeft(), fullUrl, labelAndHits.getRight());
+						"<a title='Nach Titeln suchen | %s' href='%s'><span class='glyphicon glyphicon-search'></span></a> ",
+						labelAndHits.getLeft(), fullUrl);
 				return labelAndHits.getRight() > 0L ? html : "";
 			}, cacheDuration);
 		} catch (Exception e) {
