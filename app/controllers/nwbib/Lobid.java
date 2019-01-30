@@ -47,7 +47,7 @@ public class Lobid {
 	/** Timeout for API calls in milliseconds. */
 	public static final int API_TIMEOUT = 50000;
 
-	private static Map<String, Long> WIKIDATA_COUNT = new HashMap<>();
+	private static Map<String, Long> AGGREGATION_COUNT = new HashMap<>();
 
 	/**
 	 * @param id The resource ID
@@ -202,25 +202,30 @@ public class Lobid {
 	}
 
 	/**
-	 * @param value The nwbibspatial URI
-	 * @return The number of hits for the given value in an nwbibspatial query
+	 * @param value The nwbib classification URI
+	 * @return The number of hits for the given value in an nwbib query
 	 */
-	public static long getTotalHitsNwbibspatial(String value) {
-		if (WIKIDATA_COUNT.isEmpty()) {
-			initWikidataCounts();
+	public static long getTotalHitsNwbibClassification(String value) {
+		if (AGGREGATION_COUNT.isEmpty()) {
+			initAggregation("spatial.id");
+			initAggregation("subject.id");
 		}
-		return isWikidata(value) ? WIKIDATA_COUNT.getOrDefault(value, 0L)
-				: Lobid.request("", "", "", "", "", "", "", "", value, "", 0, 1, "", "",
-						"", "", "", "", "").get().map((WSResponse response) -> {
-							return getTotalResults(response.asJson());
-						}).get(Lobid.API_TIMEOUT);
+		return (AGGREGATION_COUNT.containsKey(value) || isWikidata(value))
+				? AGGREGATION_COUNT.getOrDefault(value, 0L) : lobidRequest(value);
 	}
 
-	private static void initWikidataCounts() {
-		getFacets("", "", "", "", "", "", "", "", "", "", "", "spatial.id", "", "",
-				"", "", "").get(Lobid.API_TIMEOUT).get("aggregation").get("spatial.id")
-						.elements().forEachRemaining((JsonNode node) -> {
-							WIKIDATA_COUNT.put(node.get("key").textValue(),
+	private static Long lobidRequest(String value) {
+		return request("", "", "", "", "", "", "", "", value, "", 0, 1, "", "", "",
+				"", "", "", "").get().map((WSResponse response) -> {
+					return getTotalResults(response.asJson());
+				}).get(Lobid.API_TIMEOUT);
+	}
+
+	private static void initAggregation(String field) {
+		getFacets("", "", "", "", "", "", "", "", "", "", "", field, "", "", "", "",
+				"").get(Lobid.API_TIMEOUT).get("aggregation").get(field).elements()
+						.forEachRemaining((JsonNode node) -> {
+							AGGREGATION_COUNT.put(node.get("key").textValue(),
 									node.get("doc_count").longValue());
 						});
 	}
