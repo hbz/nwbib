@@ -7,12 +7,8 @@
 @import com.fasterxml.jackson.databind.JsonNode
 @import controllers.nwbib.Lobid
 
-@labelPlain(label: String) = @{
-    if(label.matches("^[\\d].+")) { label.split(" ").tail.mkString(" ") } else { label }
-}
-
 @label(json: JsValue) = @{
-    if(!placeholder.contains("Register") && t=="Raumsystematik"){labelPlain((json\"label").as[String])} else {((json\"label").as[String])}
+    (json\"label").as[String]
 }
 
 @ul(classes: Option[Seq[JsValue]], id: String) = {

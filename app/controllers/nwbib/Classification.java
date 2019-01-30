@@ -411,7 +411,8 @@ public class Classification {
 		if (label != null) {
 			String id = hit.getId();
 			ImmutableMap<String, ?> map = ImmutableMap.of("value", id, "label",
-					(style == Label.PLAIN ? "" : shortId(id) + " ")
+					(style == Label.PLAIN ? ""
+							: "<span class='notation'>" + shortId(id) + "</span>" + " ")
 							+ label.findValue("@value").asText(),
 					"hits", Lobid.getTotalHitsNwbibClassification(id));
 			result.add(Json.toJson(map));

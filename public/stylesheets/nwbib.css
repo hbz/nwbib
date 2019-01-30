@@ -299,3 +299,10 @@ li .dropdown-header{
 h5 {
 	font-size: larger;
 }
+
+.notation {
+	color: #777777;
+	text-align: center;
+	display: inline-block;
+	min-width: 3ex;
+}
