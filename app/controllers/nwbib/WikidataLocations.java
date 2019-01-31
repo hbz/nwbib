@@ -14,8 +14,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.elasticsearch.common.lang3.tuple.Pair;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -147,28 +145,6 @@ public class WikidataLocations {
 			});
 		}
 		return promise;
-	}
-
-	// Prototype, see https://github.com/hbz/nwbib/issues/392
-	@SuppressWarnings("javadoc")
-	public static String searchLink(String id) {
-		try {
-			int cacheDuration = Integer.MAX_VALUE;
-			return Cache.getOrElse("spatialQuery." + id, () -> {
-				String baseUrl = "http://lobid.org/resources/search";
-				String q = String.format("spatial.id:\"%s\"", id);
-				String fullUrl = baseUrl + "?q=" + q;
-				Pair<String, Long> labelAndHits =
-						Pair.of(label(id), Lobid.getTotalHitsNwbibClassification(id));
-				String html = String.format(
-						"<a title='Nach Titeln suchen | %s' href='%s'><span class='glyphicon glyphicon-search'></span></a> ",
-						labelAndHits.getLeft(), fullUrl);
-				return labelAndHits.getRight() > 0L ? html : "";
-			}, cacheDuration);
-		} catch (Exception e) {
-			Logger.error("Could not query for " + id, e);
-			return "";
-		}
 	}
 
 }

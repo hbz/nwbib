@@ -19,20 +19,27 @@
              entryLabel = label(json);
              normalized = entryLabel.replaceAll("ß", "ss") + entryLabel.replaceAll("ss", "ß");
              value = (json\"value").as[String];
-             hits = (json\"hits").asOpt[scala.Long].getOrElse(0L)) {
-              <li>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@Html(entryLabel)</b> } else {
+             hits = (json\"hits").asOpt[scala.Long].getOrElse(0L);
+             anchor = value.split("[/#]").last) {
+              <li id='@anchor'>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@Html(entryLabel)</b> } else {
                 @if(hits>0 || t=="Zeitschriften"){
-                  <a href="@{t match {
+                  <a onclick="$('#nwbibQueryHidden').val(''); $('#nwbibQueryHidden').change();" href="@{t match {
                     case "Zeitschriften" => value
                     case "Wikidata" => value
+                    case "Raumsystematik" => "#"+anchor
+                    case "Sachsystematik" => "#"+anchor
+                    case _ => value
+                 }}">@Html(entryLabel)</a> @if(hits>0){
+                 (<a href="@{t match {
+                    case "Wikidata" => nwbib.routes.Application.search(q=s"""spatial.id:"$value"""")
                     case "Raumsystematik" => nwbib.routes.Application.search(nwbibspatial=value)
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
                     case _ => value
-                 }}">@Html(entryLabel)</a> @if(hits>0){(@hits)}
+                 }}">@hits</a>)
+                 }
                 } else { @Html(entryLabel) } <div style="display: none">@normalized</div>
               }
               @if(t=="Wikidata"){
-                    @Html(controllers.nwbib.WikidataLocations.searchLink(value))
                     @for(gnd <- (json\"gnd").asOpt[String]; if !gnd.isEmpty){
                         <a title='Verknüpften GND-Eintrag anzeigen' href='http://lobid.org/gnd/@gnd'><small><span class="label label-info">gnd</span></small></a>
                     }
@@ -47,7 +54,10 @@
 }
 
 <dl>
-    <dt></dt><dd><input placeholder="@placeholder" type="text" id="nwbibQuery" class="form-control" onchange="if(this.value!=''){$('#expandAll').click()}else{$('#collapseAll').click()};"/></dd>
+    <dt></dt><dd>
+      <input placeholder="@placeholder" type="text" id="nwbibQuery" class="form-control" onchange="if(this.value!=''){$('#expandAll').click()}else{$('#collapseAll').click()};"/>
+      <input type="hidden" id="nwbibQueryHidden" onchange="$('#expandAll').click();"/>
+    </dd>
     @if(subs!=null && !subs.values.isEmpty){
     <dt></dt><dd><a href="#" id="collapseAll">alle einklappen</a> | <a href="#" id="expandAll">alle ausklappen</a></dd>
     }
@@ -65,6 +75,7 @@
     <script type="text/javascript">
         $(function() {
             $('#nwbibQuery').treeListFilter('#root', 200);
+            $('#nwbibQueryHidden').treeListFilter('#root', 200);
             $('#root').fileTreeView('#expandAll', '#collapseAll', 'folder', @if(subs==null||subs.size()==0){false}else{true});
             $('#collapseAll').click();
             $('#root').show()
