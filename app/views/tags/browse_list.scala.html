@@ -14,7 +14,27 @@
 @ul(classes: Option[Seq[JsValue]], id: String) = {
     @if(!classes.isEmpty){
         <ul id="@id">
-        <script>$('#root').hide()</script>
+        <script>
+            $('#root').hide();
+            function expand(node) {
+                $('#root').find('a').css('background-color', 'white');
+                node.find('ul').first().show();
+                toggleState(node.find('div.treeItemIcon').first(), true);
+                node.find('a').first().css("background-color", "#E7E7E7");
+                node.parents('ul:not(#root)').each(function() {
+                    $(this).show();
+                    toggleState($(this).parent().find('div.treeItemIcon').first(), true);
+                });
+            }
+            function toggleState(node, expanded) {
+                var isCollapsed = $(node).hasClass('treeFolderCollapsed');
+                if (expanded || (expanded === undefined && isCollapsed)) {
+                    $(node).removeClass('treeFolderCollapsed');
+                } else {
+                    $(node).addClass('treeFolderCollapsed');
+                }
+            }
+        </script>
         @for(json <- classes.getOrElse(Seq());
              entryLabel = label(json);
              normalized = entryLabel.replaceAll("ß", "ss") + entryLabel.replaceAll("ss", "ß");
@@ -22,8 +42,7 @@
              hits = (json\"hits").asOpt[scala.Long].getOrElse(0L);
              anchor = value.split("[/#]").last) {
               <li id='@anchor'>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@Html(entryLabel)</b> } else {
-                @if(hits>0 || t=="Zeitschriften"){
-                  <a onclick="$('#nwbibQueryHidden').val(''); $('#nwbibQueryHidden').change();" href="@{t match {
+                  <a onclick="$('#nwbibQueryHidden').val(''); $('#nwbibQueryHidden').change(); $('#collapseAll').click(); expand($('#@anchor'));" href="@{t match {
                     case "Zeitschriften" => value
                     case "Wikidata" => value
                     case "Raumsystematik" => "#"+anchor
@@ -37,7 +56,7 @@
                     case _ => value
                  }}">@hits</a>)
                  }
-                } else { @Html(entryLabel) } <div style="display: none">@normalized</div>
+                <div style="display: none">@normalized</div>
               }
               @if(t=="Wikidata"){
                     @for(gnd <- (json\"gnd").asOpt[String]; if !gnd.isEmpty){
@@ -78,7 +97,11 @@
             $('#nwbibQueryHidden').treeListFilter('#root', 200);
             $('#root').fileTreeView('#expandAll', '#collapseAll', 'folder', @if(subs==null||subs.size()==0){false}else{true});
             $('#collapseAll').click();
-            $('#root').show()
+            $('#root').show();
+            var fragment = window.location.hash;
+            if(fragment) {
+                expand($(fragment));
+            }
         });
     </script>
 }
