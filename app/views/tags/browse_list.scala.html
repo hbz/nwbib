@@ -14,25 +14,51 @@
 @ul(classes: Option[Seq[JsValue]], id: String) = {
     @if(!classes.isEmpty){
         <ul id="@id">
-        <script>$('#root').hide()</script>
+        <script>
+            $('#root').hide();
+            function expand(node) {
+                $('#root').find('a').css('background-color', 'white');
+                node.find('ul').first().show();
+                toggleState(node.find('div.treeItemIcon').first(), true);
+                node.find('a').first().css("background-color", "#E7E7E7");
+                node.parents('ul:not(#root)').each(function() {
+                    $(this).show();
+                    toggleState($(this).parent().find('div.treeItemIcon').first(), true);
+                });
+            }
+            function toggleState(node, expanded) {
+                var isCollapsed = $(node).hasClass('treeFolderCollapsed');
+                if (expanded || (expanded === undefined && isCollapsed)) {
+                    $(node).removeClass('treeFolderCollapsed');
+                } else {
+                    $(node).addClass('treeFolderCollapsed');
+                }
+            }
+        </script>
         @for(json <- classes.getOrElse(Seq());
              entryLabel = label(json);
              normalized = entryLabel.replaceAll("ß", "ss") + entryLabel.replaceAll("ss", "ß");
              value = (json\"value").as[String];
-             hits = (json\"hits").asOpt[scala.Long].getOrElse(0L)) {
-              <li>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@Html(entryLabel)</b> } else {
-                @if(hits>0 || t=="Zeitschriften"){
-                  <a href="@{t match {
+             hits = (json\"hits").asOpt[scala.Long].getOrElse(0L);
+             anchor = value.split("[/#]").last) {
+              <li id='@anchor'>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@Html(entryLabel)</b> } else {
+                  <a onclick="$('#nwbibQueryHidden').val(''); $('#nwbibQueryHidden').change(); $('#collapseAll').click(); expand($('#@anchor'));" href="@{t match {
                     case "Zeitschriften" => value
                     case "Wikidata" => value
+                    case "Raumsystematik" => "#"+anchor
+                    case "Sachsystematik" => "#"+anchor
+                    case _ => value
+                 }}">@Html(entryLabel)</a> @if(hits>0){
+                 (<a href="@{t match {
+                    case "Wikidata" => nwbib.routes.Application.search(q=s"""spatial.id:"$value"""")
                     case "Raumsystematik" => nwbib.routes.Application.search(nwbibspatial=value)
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
                     case _ => value
-                 }}">@Html(entryLabel)</a> @if(hits>0){(@hits)}
-                } else { @Html(entryLabel) } <div style="display: none">@normalized</div>
+                 }}">@hits</a>)
+                 }
+                <div style="display: none">@normalized</div>
               }
               @if(t=="Wikidata"){
-                    @Html(controllers.nwbib.WikidataLocations.searchLink(value))
                     @for(gnd <- (json\"gnd").asOpt[String]; if !gnd.isEmpty){
                         <a title='Verknüpften GND-Eintrag anzeigen' href='http://lobid.org/gnd/@gnd'><small><span class="label label-info">gnd</span></small></a>
                     }
@@ -47,7 +73,10 @@
 }
 
 <dl>
-    <dt></dt><dd><input placeholder="@placeholder" type="text" id="nwbibQuery" class="form-control" onchange="if(this.value!=''){$('#expandAll').click()}else{$('#collapseAll').click()};"/></dd>
+    <dt></dt><dd>
+      <input placeholder="@placeholder" type="text" id="nwbibQuery" class="form-control" onchange="if(this.value!=''){$('#expandAll').click()}else{$('#collapseAll').click()};"/>
+      <input type="hidden" id="nwbibQueryHidden" onchange="$('#expandAll').click();"/>
+    </dd>
     @if(subs!=null && !subs.values.isEmpty){
     <dt></dt><dd><a href="#" id="collapseAll">alle einklappen</a> | <a href="#" id="expandAll">alle ausklappen</a></dd>
     }
@@ -65,9 +94,14 @@
     <script type="text/javascript">
         $(function() {
             $('#nwbibQuery').treeListFilter('#root', 200);
+            $('#nwbibQueryHidden').treeListFilter('#root', 200);
             $('#root').fileTreeView('#expandAll', '#collapseAll', 'folder', @if(subs==null||subs.size()==0){false}else{true});
             $('#collapseAll').click();
-            $('#root').show()
+            $('#root').show();
+            var fragment = window.location.hash;
+            if(fragment) {
+                expand($(fragment));
+            }
         });
     </script>
 }

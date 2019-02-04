@@ -6,5 +6,5 @@
 
 @main("NWBib - " + placeholder.replace("filtern","").trim) {
     @tags.browse_list(classification, null, t, placeholder)
-    <p><a href="@nwbib.routes.Application.classification(t)"><span class="octicon octicon-list-ordered"></span> Systematik</a></p>
+    <p><a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatial()}else{@nwbib.routes.Application.subjects()}"><span class="octicon octicon-list-ordered"></span> Systematik</a></p>
 }
