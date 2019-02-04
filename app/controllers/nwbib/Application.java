@@ -369,6 +369,24 @@ public class Application extends Controller {
 		return result;
 	}
 
+	/**
+	 * @param t The data type: classification or register
+	 * @return Classification or register for "Raumsystematik"
+	 */
+	public static Result spatial(String t) {
+		String data = "Raumsystematik";
+		return t.equals("classification") ? classification(data) : register(data);
+	}
+
+	/**
+	 * @param t The data type: classification or register
+	 * @return Classification data for "Sachsystematik"
+	 */
+	public static Result subjects(String t) {
+		String data = "Sachsystematik";
+		return t.equals("classification") ? classification(data) : register(data);
+	}
+
 	// Prototype, see https://github.com/hbz/nwbib/issues/392
 	private static Result classificationResultWikidata(JsonNode json, String t,
 			String placeholder) {

@@ -17,6 +17,6 @@
             <span class="glyphicon glyphicon-repeat"></span></a>
         </p>
     } else {
-        <p><a href="@nwbib.routes.Application.register(t)"><span class="glyphicon glyphicon-sort-by-alphabet"></span> A-Z Register</a></p>
+        <p><a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatial("register")}else{@nwbib.routes.Application.subjects("register")}"><span class="glyphicon glyphicon-sort-by-alphabet"></span> A-Z Register</a></p>
     }
 }

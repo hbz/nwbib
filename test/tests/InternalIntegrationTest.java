@@ -69,8 +69,7 @@ public class InternalIntegrationTest {
 					"", "", "", "", from, size, 0L, "", "", "", "", "", "", "");
 			assertThat(html.contentType()).isEqualTo("text/html");
 			String text = Helpers.contentAsString(html);
-			assertThat(text).contains("NWBib").contains("buch")
-					.contains("Sachsystematik").contains("Raumsystematik");
+			assertThat(text).contains("NWBib").contains("buch");
 		});
 	}
 
