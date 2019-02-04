@@ -285,32 +285,6 @@ public class Application extends Controller {
 	}
 
 	/**
-	 * @param q The query
-	 * @param callback The JSONP callback
-	 * @param t The type filter ("Raumsystematik" or "Sachsystematik")
-	 * @return Subject data for the given query
-	 */
-	public static Promise<Result> subject(final String q, final String callback,
-			final String t) {
-		String cacheId = String.format("%s.%s.%s.%s", "subject", q, callback, t);
-		@SuppressWarnings("unchecked")
-		Promise<Result> cachedResult = (Promise<Result>) Cache.get(cacheId);
-		if (cachedResult != null)
-			return cachedResult;
-		Logger.debug("Not cached: {}, will cache for one day", cacheId);
-		Promise<JsonNode> jsonPromise =
-				Promise.promise(() -> Classification.ids(q, t));
-		Promise<Result> result;
-		if (!callback.isEmpty())
-			result = jsonPromise.map((JsonNode json) -> ok(
-					String.format("%s(%s)", callback, Json.stringify(json))));
-		else
-			result = jsonPromise.map((JsonNode json) -> ok(json));
-		cacheOnRedeem(cacheId, result, ONE_DAY);
-		return result;
-	}
-
-	/**
 	 * @param t The register type ("Raumsystematik" or "Sachsystematik")
 	 * @return The alphabetical register for the given classification type
 	 */
