@@ -8,20 +8,20 @@
 
 @labels(uri: String) = {
 	@if(Lobid.isWikidata(uri)) {
-		<a href='@uri'>@uri.split("/").last</a> @WikidataLocations.label(uri)
+		<a href='@nwbib.routes.Application.spatial()#@uri.split("/").last'>@uri.split("/").last @WikidataLocations.label(uri)</a>
 	} else {
-		@Classification.shortId(uri) @Lobid.facetLabel(Seq(uri),"","")
+		<a href='@if(uri.contains("spatial")){@nwbib.routes.Application.spatial()}else{@nwbib.routes.Application.subjects()}#@(uri.split("#")(1))'>@Classification.shortId(uri) @Lobid.facetLabel(Seq(uri),"","")</a>
 	}
 }
 
 @if(!nwbibsubject.isEmpty && !nwbibsubject.contains(",") && Seq(nwbibspatial, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
-		<i><a href="@nwbib.routes.Application.register("Sachsystematik")">Sachgebiete</a> / 
-		<a href="@nwbib.routes.Application.classification("Sachsystematik")">Sachsystematik</a> / 
-		@labels(nwbibsubject)</i>
+		<a href="@nwbib.routes.Application.subjects("register")">Sachgebiete</a> / 
+		<a href="@nwbib.routes.Application.subjects()">Sachsystematik</a> / 
+		@labels(nwbibsubject)
 } else {
 	@if(!nwbibspatial.isEmpty && !nwbibspatial.contains(",") && Seq(nwbibsubject, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
-		<i><a href="@nwbib.routes.Application.register("Raumsystematik")">Regionen</a> / 
-		<a href="@nwbib.routes.Application.classification("Raumsystematik")">Raumsystematik</a> / 
-		@labels(nwbibspatial)</i>
+		<a href="@nwbib.routes.Application.spatial("register")">Regionen</a> / 
+		<a href="@nwbib.routes.Application.subjects()">Raumsystematik</a> / 
+		@labels(nwbibspatial)
 	}
 }
