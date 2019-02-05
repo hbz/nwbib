@@ -4,7 +4,7 @@
 @import controllers.nwbib.Classification
 @import controllers.nwbib.WikidataLocations
 
-@(nwbibsubject: String, nwbibspatial: String, person:String, name:String, subject:String, id:String, publisher:String, issued:String, medium: String, owner: String, t: String, location: String, word: String, corporation: String, raw: String)
+@(nwbibsubject: String, nwbibspatial: String, person:String="", name:String="", subject:String="", id:String="", publisher:String="", issued:String="", medium: String="", owner: String="", t: String="", location: String="", word: String="", corporation: String="", raw: String="")
 
 @labels(uri: String) = {
 	@if(Lobid.isWikidata(uri)) {
@@ -15,13 +15,13 @@
 }
 
 @if(!nwbibsubject.isEmpty && !nwbibsubject.contains(",") && Seq(nwbibspatial, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
-		in <i><a href="@nwbib.routes.Application.register("Sachsystematik")">Sachgebiete</a> / 
+		<i><a href="@nwbib.routes.Application.register("Sachsystematik")">Sachgebiete</a> / 
 		<a href="@nwbib.routes.Application.classification("Sachsystematik")">Sachsystematik</a> / 
-		@labels(nwbibsubject)</i>&mdash;
+		@labels(nwbibsubject)</i>
 } else {
 	@if(!nwbibspatial.isEmpty && !nwbibspatial.contains(",") && Seq(nwbibsubject, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
-		in <i><a href="@nwbib.routes.Application.register("Raumsystematik")">Regionen</a> / 
+		<i><a href="@nwbib.routes.Application.register("Raumsystematik")">Regionen</a> / 
 		<a href="@nwbib.routes.Application.classification("Raumsystematik")">Raumsystematik</a> / 
-		@labels(nwbibspatial)</i>&mdash;
+		@labels(nwbibspatial)</i>
 	}
 }

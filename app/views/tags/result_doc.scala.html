@@ -162,8 +162,10 @@
         if sourceId == source;
         subjectId <- (subject \ "id").asOpt[String];
         if !(doc\"spatial").asOpt[JsValue].isDefined || !Seq(10, 12, 14, 24, 28, 35, 36, 37, 52, 54, 72, 74, 96, 97).find((i: Int) => subjectId.endsWith("#n"+i));
-        subjectLabel <- (subject \ "label").asOpt[String]) {
-      <a href='@nwbib.routes.Application.search()?@searchParam=@subjectId.replace("#", "%23")'>@subjectLabel (@(subjectId.split("#").last.substring(1)))</a><br/>
+        subjectLabel <- (subject \ "label").asOpt[String];
+        notation = subjectId.split("#").last.substring(1)) {
+      @breadcrumb(if(searchParam == "nwbibsubject"){subjectId}else{""},if(searchParam == "nwbibspatial"){subjectId}else{""})
+      | <a href='@nwbib.routes.Application.search()?@searchParam=@subjectId.replace("#", "%23")' title='Nach weiteren Titeln zu @subjectLabel (@notation) suchen'><span class='glyphicon glyphicon-search'></span></a><br/>
     }
 }
 
@@ -173,13 +175,14 @@
         <tr>
           <td>Raumsystematik</td>
           <td>
-          @for(v <- vs) {
+          @for(v <- vs; id = (v\"id").asOpt[String].getOrElse("--")) {
+              @breadcrumb("",id) 
               @if(spatial.isDefined){
-                  <a href='@nwbib.routes.Application.search()?nwbibspatial=@((v\"id").asOpt[String].getOrElse("--"))'>
-                    @((v\"label").asOpt[String].getOrElse("--")) (@((v\"id").asOpt[String].getOrElse("--").split("/").last))
+                   | <a href='@nwbib.routes.Application.search()?nwbibspatial=@((v\"id").asOpt[String].getOrElse("--"))' title='Nach weiteren Titeln zu @((v\"label").asOpt[String].getOrElse("--")) (@(id.split("/").last)) suchen'>
+                  <span class='glyphicon glyphicon-search'></span>
                   </a>
               } else {
-                  <a href='@nwbib.routes.Application.search()?q=coverage:"@(v.as[String])"'>@(v.as[String])</a>
+                   | <a href='@nwbib.routes.Application.search()?q=coverage:"@(v.as[String])"' title='Nach weiteren Titeln zu @(v.as[String]) suchen'> | <span class='glyphicon glyphicon-search'></span></a>
               }
               <br/>
           }
