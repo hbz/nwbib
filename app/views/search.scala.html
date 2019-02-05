@@ -60,20 +60,6 @@
 	}
 }
 
-@nwbibBreadcrumb() = {
-	@if(!nwbibsubject.isEmpty && !nwbibsubject.contains(",") && Seq(nwbibspatial, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
-			in <i><a href="@nwbib.routes.Application.register("Sachsystematik")">Sachgebiete</a> / 
-			<a href="@nwbib.routes.Application.classification("Sachsystematik")">Sachsystematik</a> / 
-			@labels(nwbibsubject)</i>&mdash;
-	} else {
-		@if(!nwbibspatial.isEmpty && !nwbibspatial.contains(",") && Seq(nwbibsubject, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
-			in <i><a href="@nwbib.routes.Application.register("Raumsystematik")">Regionen</a> / 
-			<a href="@nwbib.routes.Application.classification("Raumsystematik")">Raumsystematik</a> / 
-			@labels(nwbibspatial)</i>&mdash;
-		}
-	}
-}
-
 @main("NWBib - Ergebnisliste") {
     @if(Seq(person, name, subject, id, publisher, issued, word, corporation).exists(!_.isEmpty)){
       @tags.search_advanced("Suche aktualisieren", q, person, name, subject, nwbibspatial, nwbibsubject, id, publisher, issued, sortParam, word=word, corporation=corporation)
@@ -110,7 +96,7 @@
                     <div class="col-md-10">
                      @allHits @if(!raw.isEmpty && !raw.contains(Lobid.escapeUri(Application.COVERAGE_FIELD.replace(".raw","")))){
                       @defining(String.format(Application.CONFIG.getString("indexUrlFormat"), raw.substring(raw.lastIndexOf("/")+1))) { lobidUrl =>
-                       @labelRaw in: <a href="@(lobidUrl.replaceAll("://[^/]+/resources/","://nwbib.de/").split("\\\\")(0))">@Html(Lobid.resourceLabel(lobidUrl))</a>}}else{Treffer}@nwbibBreadcrumb()
+                       @labelRaw in: <a href="@(lobidUrl.replaceAll("://[^/]+/resources/","://nwbib.de/").split("\\\\")(0))">@Html(Lobid.resourceLabel(lobidUrl))</a>}}else{Treffer}@breadcrumb(nwbibsubject,nwbibspatial, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw)
                        zeige @(from+1) bis @(Math.min(from+hits.size,from+size)):
                     </div>
                     <div class="col-md-1" style="text-align: right; padding-right: 4px;">
