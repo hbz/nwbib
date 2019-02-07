@@ -6,6 +6,7 @@ import static controllers.nwbib.Application.CONFIG;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Collator;
@@ -22,6 +23,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -40,14 +45,10 @@ import org.elasticsearch.search.SearchHit;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.jsonldjava.core.JsonLdError;
-import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
-import com.github.jsonldjava.jena.JenaRDFParser;
-import com.github.jsonldjava.utils.JSONUtils;
+import com.github.jsonldjava.utils.JsonUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import play.Logger;
 import play.libs.Json;
@@ -224,12 +225,19 @@ public class Classification {
 	public static List<String> toJsonLd(final URL turtleUrl) {
 		final Model model = ModelFactory.createDefaultModel();
 		try {
-			model.read(turtleUrl.openStream(), null, "TURTLE");
-			final JenaRDFParser parser = new JenaRDFParser();
-			Object json = JsonLdProcessor.fromRDF(model, new JsonLdOptions(), parser);
+			model.read(turtleUrl.openStream(), null, Lang.TURTLE.getName());
+			StringWriter stringWriter = new StringWriter();
+			RDFDataMgr.write(stringWriter, model, Lang.JSONLD);
+			Object json = JsonUtils.fromString(stringWriter.toString());
 			List<Object> list = JsonLdProcessor.expand(json);
-			return list.subList(1, list.size()).stream().map(JSONUtils::toString)
-					.collect(Collectors.toList());
+			return list.subList(1, list.size()).stream().map(obj -> {
+				try {
+					return JsonUtils.toString(obj);
+				} catch (IOException e) {
+					e.printStackTrace();
+					return obj.toString();
+				}
+			}).collect(Collectors.toList());
 		} catch (JsonLdError | IOException e) {
 			Logger.error("Could not convert to JSON-LD", e);
 		}

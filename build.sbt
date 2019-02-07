@@ -10,9 +10,10 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" % "play-test_2.11" % "2.4.11",
   "org.elasticsearch" % "elasticsearch" % "1.7.5" withSources(),
   "org.mockito" % "mockito-core" % "1.9.5",
-  "com.github.jsonld-java" % "jsonld-java" % "0.3",
-  "com.github.jsonld-java" % "jsonld-java-jena" % "0.3",
-  "org.apache.jena" % "jena-arq" % "2.9.3",
+  "com.github.jsonld-java" % "jsonld-java" % "0.5.0",
+  "org.apache.commons" % "commons-rdf-jena" % "0.5.0",
+  "org.apache.jena" % "jena-arq" % "3.0.1",
+  "org.apache.jena" % "jena-core" % "3.0.1",
   "org.easytesting" % "fest-assert" % "1.4" % "test"
 )
 
