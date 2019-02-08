@@ -20,7 +20,7 @@
                 $('#root').find('a').css('background-color', 'white');
                 node.find('ul').first().show();
                 toggleState(node.find('div.treeItemIcon').first(), true);
-                node.find('a').first().css("background-color", "#E7E7E7");
+                node.find('.notation-link').first().css("background-color", "#E7E7E7");
                 node.parents('ul:not(#root)').each(function() {
                     $(this).show();
                     toggleState($(this).parent().find('div.treeItemIcon').first(), true);
@@ -34,15 +34,38 @@
                     $(node).addClass('treeFolderCollapsed');
                 }
             }
+            function copyToClipboard(string) {
+                if (window.clipboardData && window.clipboardData.setData) {
+                    return clipboardData.setData("Text", string);
+                } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+                    var temp = document.createElement("textarea");
+                    temp.textContent = string;
+                    temp.style.position = "fixed";
+                    document.body.appendChild(temp);
+                    temp.select();
+                    try {
+                        return document.execCommand("copy");
+                    } catch (ex) {
+                        console.warn("Copy to clipboard failed.", ex);
+                        window.prompt("Kopieren: Strg+C, Enter", string);
+                    } finally {
+                        document.body.removeChild(temp);
+                    }
+                }
+            }
         </script>
         @for(json <- classes.getOrElse(Seq());
              entryLabel = label(json);
              normalized = entryLabel.replaceAll("ß", "ss") + entryLabel.replaceAll("ss", "ß");
              value = (json\"value").as[String];
              hits = (json\"hits").asOpt[scala.Long].getOrElse(0L);
-             anchor = value.split("[/#]").last) {
+             anchor = value.split("[/#]").last;
+             textToCopy = (if(anchor.startsWith("Q")){anchor}else{anchor.substring(1)}) + " " + (if(entryLabel.contains("span")){entryLabel.split("</span> ")(1)}else{entryLabel}) ) {
               <li id='@anchor'>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@Html(entryLabel)</b> } else {
-                  <a onclick="$('#nwbibQueryHidden').val(''); $('#nwbibQueryHidden').change(); $('#collapseAll').click(); expand($('#@anchor'));" href="@{t match {
+                  @if(t!="Zeitschriften"){
+                  <a title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy');return false;"><span class="octicon octicon-clippy"></span></a>
+                  }
+                  <a class="notation-link" onclick="$('#nwbibQueryHidden').val(''); $('#nwbibQueryHidden').change(); $('#collapseAll').click(); expand($('#@anchor'));" href="@{t match {
                     case "Zeitschriften" => value
                     case "Wikidata" => value
                     case "Raumsystematik" => "#"+anchor
