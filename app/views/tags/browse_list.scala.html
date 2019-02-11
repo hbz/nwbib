@@ -16,6 +16,7 @@
         <ul id="@id">
         <script>
             $('#root').hide();
+            $(function () { $('[data-toggle="tooltip"]').tooltip({placement: 'right'}) })
             function expand(node) {
                 $('#root').find('a').css('background-color', 'white');
                 node.find('ul').first().show();
@@ -34,9 +35,20 @@
                     $(node).addClass('treeFolderCollapsed');
                 }
             }
-            function copyToClipboard(string) {
+            function result(string, link, res) {
+                if(res) {
+                    link.trigger('copied', ['Kopiert: ' + string]);
+                }
+                return res;
+            }
+            function copyToClipboard(string, link) {
+                link.bind('copied', function(event, message) {
+                    $(this)
+                        .attr('title', message).tooltip('fixTitle').tooltip('show')
+                        .attr('title', 'Identifikator und Bezeichnung in die Zwischenablage kopieren').tooltip('fixTitle');
+                });
                 if (window.clipboardData && window.clipboardData.setData) {
-                    return clipboardData.setData("Text", string);
+                    return result(string, link, clipboardData.setData("Text", string));
                 } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
                     var temp = document.createElement("textarea");
                     temp.textContent = string;
@@ -44,7 +56,7 @@
                     document.body.appendChild(temp);
                     temp.select();
                     try {
-                        return document.execCommand("copy");
+                        return result(string, link, document.execCommand("copy"));
                     } catch (ex) {
                         console.warn("Copy to clipboard failed.", ex);
                         window.prompt("Kopieren: Strg+C, Enter", string);
@@ -63,7 +75,7 @@
              textToCopy = (if(anchor.startsWith("Q")){anchor}else{anchor.substring(1)}) + " " + (if(entryLabel.contains("span")){entryLabel.split("</span> ")(1)}else{entryLabel}) ) {
               <li id='@anchor'>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@Html(entryLabel)</b> } else {
                   @if(t!="Zeitschriften"){
-                  <a title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy');return false;"><span class="octicon octicon-clippy"></span></a>
+                  <a data-toggle="tooltip" title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy', $(this));return false;"><span class="octicon octicon-clippy"></span></a>
                   }
                   <a class="notation-link" onclick="$('#nwbibQueryHidden').val(''); $('#nwbibQueryHidden').change(); $('#collapseAll').click(); expand($('#@anchor'));" href="@{t match {
                     case "Zeitschriften" => value
