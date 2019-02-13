@@ -316,3 +316,10 @@ h5 {
   background: #fff;
   border: solid 1px #cccccc;
 }
+
+.copy-link a {
+  visibility:hidden;
+}
+.copy-link:hover a {
+ visibility:visible;
+}
