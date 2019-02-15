@@ -50,6 +50,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import play.Logger;
+import play.cache.Cache;
 import play.libs.Json;
 
 /**
@@ -470,6 +471,33 @@ public class Classification {
 	/** Shut down the embedded Elasticsearch classification index. */
 	public static void indexShutdown() {
 		node.close();
+	}
+
+	/**
+	 * @param uri The nwbib or nwbibspatial URI
+	 * @return The list of path segments to the given URI in its classification,
+	 *         e.g. for URI http://purl.org/lobid/nwbib#s582060:
+	 *         [http://purl.org/lobid/nwbib#s5,
+	 *         http://purl.org/lobid/nwbib#s580000,
+	 *         http://purl.org/lobid/nwbib#s582000,
+	 *         http://purl.org/lobid/nwbib#s582060]
+	 */
+	public static List<String> pathTo(String uri) {
+		Type type = uri.contains("nwbib-spatial") ? Type.SPATIAL : Type.NWBIB;
+		Pair<List<JsonNode>, Map<String, List<JsonNode>>> all = Cache.getOrElse(
+				type.toString(), () -> type.buildHierarchy(), Application.ONE_DAY);
+		String current = uri;
+		List<String> result = new ArrayList<>(Arrays.asList(current));
+		while (!all.getLeft().toString().contains(current)) {
+			for (Entry<String, List<JsonNode>> e : all.getRight().entrySet()) {
+				if (e.getValue().toString().contains(current)) {
+					current = e.getKey();
+					result.add(0, current);
+					break;
+				}
+			}
+		}
+		return result;
 	}
 
 }
