@@ -16,11 +16,12 @@
         <ul id="@id">
         <script>
             $('#root').hide();
+            $(function () { $('[data-toggle="tooltip"]').tooltip({placement: 'right'}) })
             function expand(node) {
                 $('#root').find('a').css('background-color', 'white');
                 node.find('ul').first().show();
                 toggleState(node.find('div.treeItemIcon').first(), true);
-                node.find('a').first().css("background-color", "#E7E7E7");
+                node.find('.notation-link').first().css("background-color", "#E7E7E7");
                 node.parents('ul:not(#root)').each(function() {
                     $(this).show();
                     toggleState($(this).parent().find('div.treeItemIcon').first(), true);
@@ -34,15 +35,48 @@
                     $(node).addClass('treeFolderCollapsed');
                 }
             }
+            function result(string, link, res) {
+                if(res) {
+                    link.trigger('copied', ['Kopiert: ' + string]);
+                }
+                return res;
+            }
+            function copyToClipboard(string, link) {
+                link.bind('copied', function(event, message) {
+                    $(this)
+                        .attr('title', message).tooltip('fixTitle').tooltip('show')
+                        .attr('title', 'Identifikator und Bezeichnung in die Zwischenablage kopieren').tooltip('fixTitle');
+                });
+                if (window.clipboardData && window.clipboardData.setData) {
+                    return result(string, link, clipboardData.setData("Text", string));
+                } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+                    var temp = document.createElement("textarea");
+                    temp.textContent = string;
+                    temp.style.position = "fixed";
+                    document.body.appendChild(temp);
+                    temp.select();
+                    try {
+                        return result(string, link, document.execCommand("copy"));
+                    } catch (ex) {
+                        console.warn("Copy to clipboard failed.", ex);
+                        window.prompt("Kopieren: Strg+C, Enter", string);
+                    } finally {
+                        document.body.removeChild(temp);
+                    }
+                }
+            }
         </script>
         @for(json <- classes.getOrElse(Seq());
              entryLabel = label(json);
              normalized = entryLabel.replaceAll("ß", "ss") + entryLabel.replaceAll("ss", "ß");
              value = (json\"value").as[String];
              hits = (json\"hits").asOpt[scala.Long].getOrElse(0L);
-             anchor = value.split("[/#]").last) {
+             anchor = value.split("[/#]").last;
+             textToCopy = (if(anchor.startsWith("Q")){anchor}else{anchor.substring(1)}) + " " + (if(entryLabel.contains("span")){entryLabel.split("</span> ")(1)}else{entryLabel}) ) {
               <li id='@anchor'>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@Html(entryLabel)</b> } else {
-                  <a onclick="$('#nwbibQueryHidden').val(''); $('#nwbibQueryHidden').change(); $('#collapseAll').click(); expand($('#@anchor'));" href="@{t match {
+                  @if(t!="Zeitschriften"){
+                  }
+                  <a class="notation-link" onclick="$('#nwbibQueryHidden').val(''); $('#nwbibQueryHidden').change(); $('#collapseAll').click(); expand($('#@anchor'));" href="@{t match {
                     case "Zeitschriften" => value
                     case "Wikidata" => value
                     case "Raumsystematik" => "#"+anchor
@@ -55,6 +89,7 @@
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
                     case _ => value
                  }}">@hits</a>)
+                 <span class='copy-link'><a data-toggle="tooltip" title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy', $(this));return false;"><span class="octicon octicon-clippy"></span></a></span>
                  }
                 <div style="display: none">@normalized</div>
               }
