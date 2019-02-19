@@ -483,21 +483,50 @@ public class Classification {
 	 *         http://purl.org/lobid/nwbib#s582060]
 	 */
 	public static List<String> pathTo(String uri) {
-		Type type = uri.contains("nwbib-spatial") ? Type.SPATIAL : Type.NWBIB;
-		Pair<List<JsonNode>, Map<String, List<JsonNode>>> all = Cache.getOrElse(
-				type.toString(), () -> type.buildHierarchy(), Application.ONE_DAY);
-		String current = uri;
-		List<String> result = new ArrayList<>(Arrays.asList(current));
-		while (!all.getLeft().toString().contains(current)) {
-			for (Entry<String, List<JsonNode>> e : all.getRight().entrySet()) {
-				if (e.getValue().toString().contains(current)) {
-					current = e.getKey();
-					result.add(0, current);
-					break;
-				}
-			}
+		Type type = uri.contains("nwbib-spatial") || uri.contains("wikidata")
+				? Type.SPATIAL : Type.NWBIB;
+		Map<String, List<String>> candidates = Cache.getOrElse(type.toString(),
+				() -> generateAllPaths(type.buildHierarchy()), Application.ONE_DAY);
+		return candidates.containsKey(uri) ? candidates.get(uri)
+				: Collections.emptyList();
+	}
+
+	private static Map<String, List<String>> generateAllPaths(
+			Pair<List<JsonNode>, Map<String, List<JsonNode>>> all) {
+		HashMap<String, List<String>> result = new HashMap<>();
+		List<JsonNode> top = all.getLeft();
+		Map<String, List<JsonNode>> subs = all.getRight();
+		for (JsonNode topNode : top) {
+			String topId = topNode.get("value").asText();
+			ArrayList<String> subResult = new ArrayList<>();
+			ul(subs.get(topId), subs, subResult, result, topId);
 		}
 		return result;
+	}
+
+	private static Map<String, List<String>> ul(List<JsonNode> classes,
+			Map<String, List<JsonNode>> subs, List<String> subResult,
+			Map<String, List<String>> fullResult, String current) {
+		if (!subResult.contains(current))
+			subResult.add(current);
+		for (JsonNode n : classes) {
+			String value = n.get("value").asText();
+			ArrayList<String> newSub = new ArrayList<>(subResult);
+			newSub.add(value);
+			if (subs != null && subs.get(value) != null) {
+				ul(subs.get(value), subs, newSub, fullResult, value);
+			}
+			addResult(newSub, fullResult);
+		}
+		return fullResult;
+	}
+
+	private static void addResult(List<String> subResult,
+			Map<String, List<String>> fullResult) {
+		String last = subResult.get(subResult.size() - 1);
+		if (subResult.size() > 1 && !fullResult.containsKey(last)) {
+			fullResult.put(last, new ArrayList<>(subResult));
+		}
 	}
 
 }
