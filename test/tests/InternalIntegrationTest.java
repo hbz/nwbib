@@ -175,7 +175,8 @@ public class InternalIntegrationTest {
 	public void pathToSpatialClassificationId_notFound() {
 		running(testServer(3333), () -> {
 			assertThat(Classification.pathTo("http://www.example.org"))
-					.as("path in spatial classification").isEqualTo(Arrays.asList());
+					.as("path in spatial classification")
+					.isEqualTo(Arrays.asList("http://www.example.org"));
 		});
 	}
 

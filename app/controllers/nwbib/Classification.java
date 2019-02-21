@@ -488,7 +488,7 @@ public class Classification {
 		Map<String, List<String>> candidates = Cache.getOrElse(type.toString(),
 				() -> generateAllPaths(type.buildHierarchy()), Application.ONE_DAY);
 		return candidates.containsKey(uri) ? candidates.get(uri)
-				: Collections.emptyList();
+				: Arrays.asList(uri);
 	}
 
 	private static Map<String, List<String>> generateAllPaths(
