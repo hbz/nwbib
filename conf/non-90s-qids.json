@@ -20,6 +20,11 @@
     "label": "Ostmünsterland"
   },
   {
+    "qid": "http://www.wikidata.org/entity/Q11805",
+    "notation": "36",
+    "label": "Erzbistum Köln"
+  },
+  {
     "qid": "http://www.wikidata.org/entity/Q1184019",
     "notation": "10",
     "label": "Delbrücker Land"
@@ -700,6 +705,11 @@
     "label": "Senne"
   },
   {
+    "qid": "http://www.wikidata.org/entity/Q769380",
+    "notation": "36",
+    "label": "Bistum Münster"
+  },
+  {
     "qid": "http://www.wikidata.org/entity/Q778810",
     "notation": "14",
     "label": "Ebbegebirge"
@@ -738,6 +748,11 @@
     "qid": "http://www.wikidata.org/entity/Q881030",
     "notation": "74",
     "label": "Grafschaft Tecklenburg"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q883257",
+    "notation": "36",
+    "label": "Bistum Minden"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q884315",
