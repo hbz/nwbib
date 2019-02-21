@@ -8,24 +8,17 @@
 
 @labels(uri: String) = {
 	@if(Lobid.isWikidata(uri)) {
-		<a href='@nwbib.routes.Application.spatial()#@uri.split("/").last'>@uri.split("/").last @WikidataLocations.label(uri)</a>
+		<a title='@uri.split("/").last @WikidataLocations.label(uri)' href='@nwbib.routes.Application.spatial()#@uri.split("/").last'>
+			@WikidataLocations.label(uri)
+		</a>
 	} else {
-		<a href='@if(uri.contains("spatial")){@nwbib.routes.Application.spatial()}else{@nwbib.routes.Application.subjects()}#@(uri.split("#")(1))'>@Classification.shortId(uri) @Lobid.facetLabel(Seq(uri),"","")</a>
+		<a title='@Classification.shortId(uri) @Lobid.facetLabel(Seq(uri),"","")' href='@if(uri.contains("spatial")){@nwbib.routes.Application.spatial()}else{@nwbib.routes.Application.subjects()}#@(uri.split("#")(1))'>
+			@Lobid.facetLabel(Seq(uri),"","")
+		</a>
 	}
 }
-@for(segment <- Classification.pathTo((if(!nwbibsubject.isEmpty) nwbibsubject else nwbibspatial))) {
-	@segment
-}
-@*
-@if(!nwbibsubject.isEmpty && !nwbibsubject.contains(",") && Seq(nwbibspatial, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
-		<a href="@nwbib.routes.Application.subjects("register")">Sachgebiete</a> / 
-		<a href="@nwbib.routes.Application.subjects()">Sachsystematik</a> / 
-		@labels(nwbibsubject)
-} else {
-	@if(!nwbibspatial.isEmpty && !nwbibspatial.contains(",") && Seq(nwbibsubject, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
-		<a href="@nwbib.routes.Application.spatial("register")">Regionen</a> / 
-		<a href="@nwbib.routes.Application.subjects()">Raumsystematik</a> / 
-		@labels(nwbibspatial)
+@defining(Classification.pathTo((if(!nwbibsubject.isEmpty) nwbibsubject else nwbibspatial))) { path =>
+	@for(segment <- path.slice(path.size-3, path.size).toList) {
+		@labels(segment) @if(segment != path.last) {&gt;}
 	}
 }
-*@
