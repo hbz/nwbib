@@ -425,7 +425,7 @@ public class Classification {
 	 * @return A short, human readable representation of the URI
 	 */
 	public static String shortId(String uri) {
-		return uri.split("#")[1].substring(1);
+		return uri.contains("#") ? uri.split("#")[1].substring(1) : uri;
 	}
 
 	/** Start up the embedded Elasticsearch classification index. */

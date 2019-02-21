@@ -12,7 +12,7 @@
 			@WikidataLocations.label(uri)
 		</a>
 	} else {
-		<a title='@Classification.shortId(uri) @Lobid.facetLabel(Seq(uri),"","")' href='@if(uri.contains("spatial")){@nwbib.routes.Application.spatial()}else{@nwbib.routes.Application.subjects()}#@(uri.split("#")(1))'>
+		<a title='@Classification.shortId(uri) @Lobid.facetLabel(Seq(uri),"","")' href='@if(uri.contains("spatial")){@nwbib.routes.Application.spatial()}else{@nwbib.routes.Application.subjects()}#@(if(uri.contains("#")){uri.split("#")(1)}else{uri})'>
 			@Lobid.facetLabel(Seq(uri),"","")
 		</a>
 	}
