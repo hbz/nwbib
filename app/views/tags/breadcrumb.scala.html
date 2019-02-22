@@ -1,0 +1,24 @@
+@* Copyright 2019 Fabian Steeg, hbz. Licensed under the GPLv2 *@
+
+@import controllers.nwbib.Lobid
+@import controllers.nwbib.Classification
+@import controllers.nwbib.WikidataLocations
+
+@(nwbibsubject: String, nwbibspatial: String, person:String="", name:String="", subject:String="", id:String="", publisher:String="", issued:String="", medium: String="", owner: String="", t: String="", location: String="", word: String="", corporation: String="", raw: String="")
+
+@labels(uri: String) = {
+	@if(Lobid.isWikidata(uri)) {
+		<a title='@uri.split("/").last @WikidataLocations.label(uri)' href='@nwbib.routes.Application.spatial()#@uri.split("/").last'>
+			@WikidataLocations.label(uri)
+		</a>
+	} else {
+		<a title='@Classification.shortId(uri) @Lobid.facetLabel(Seq(uri),"","")' href='@if(uri.contains("spatial")){@nwbib.routes.Application.spatial()}else{@nwbib.routes.Application.subjects()}#@(if(uri.contains("#")){uri.split("#")(1)}else{uri})'>
+			@Lobid.facetLabel(Seq(uri),"","")
+		</a>
+	}
+}
+@defining(Classification.pathTo((if(!nwbibsubject.isEmpty) nwbibsubject else nwbibspatial))) { path =>
+	@for(segment <- path.slice(path.size-3, path.size).toList) {
+		@labels(segment) @if(segment != path.last) {&gt;}
+	}
+}

@@ -84,7 +84,7 @@ public class InputStringsTest {
 			String uri = controllers.nwbib.routes.Application
 					.search(input, "", "", "", "", "", "", "", "", "", 0, 10, "", "", "",
 							false, "", "", "", "", "")
-					.toString();
+					.toString().replace("%", "");
 			Result result = Helpers.route(new RequestBuilder().uri(uri)
 					.method(Helpers.GET).path("/").bodyForm(ImmutableMap.of()));
 			// we don't expect any server errors (see
