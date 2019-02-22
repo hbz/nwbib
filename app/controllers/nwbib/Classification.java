@@ -22,6 +22,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -444,6 +445,7 @@ public class Classification {
 				.isExists()) {
 			indexData(CONFIG.getString("index.data.nwbibsubject"), Type.NWBIB);
 			indexData(CONFIG.getString("index.data.nwbibspatial"), Type.SPATIAL);
+			client.admin().indices().refresh(new RefreshRequest()).actionGet();
 		}
 	}
 
