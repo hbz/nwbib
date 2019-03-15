@@ -6,7 +6,7 @@
 
 @(nwbibsubject: String, nwbibspatial: String, person:String="", name:String="", subject:String="", id:String="", publisher:String="", issued:String="", medium: String="", owner: String="", t: String="", location: String="", word: String="", corporation: String="", raw: String="", search: Boolean = false)
 
-@labels(uri: String, i:Int = -1) = {
+@labels(uri: String) = {
 	@if(Lobid.isWikidata(uri)) {
 		<a title='@uri.split("/").last @WikidataLocations.label(uri)' href='@nwbib.routes.Application.spatial()#@uri.split("/").last'>
 			@WikidataLocations.label(uri)
@@ -29,9 +29,9 @@
 		} else {
 			@defining(Classification.pathTo((if(!nwbibsubject.isEmpty) nwbibsubject else nwbibspatial))) { path => 
 				@defining(path.takeWhile(_.contains("spatial"))) { withNotation =>
-					@labels(withNotation.last, -1) &gt;
-					@for((segment,i) <- path.zipWithIndex.filter({case (s:String,x:Int) => s.contains("spatial") || x >= path.size-2}).dropWhile(_._1.contains("spatial"))) {
-						@labels(segment, i) @if(segment != path.last) {&gt;}
+					@labels(withNotation.last) &gt;
+					@for(segment <- path.dropWhile(_.contains("spatial"))) {
+						@labels(segment) @if(segment != path.last) {&gt;}
 					}
 				}
 			}
