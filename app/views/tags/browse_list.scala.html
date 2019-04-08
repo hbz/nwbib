@@ -16,7 +16,6 @@
         <ul id="@id">
         <script>
             $('#root').hide();
-            $(function () { $('[data-toggle="tooltip"]').tooltip({placement: 'right'}) })
             function expand(node) {
                 $('#root').find('a').css('background-color', 'white');
                 node.find('ul').first().show();
@@ -89,7 +88,7 @@
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
                     case _ => value
                  }}">@hits</a>)
-                 <span class='copy-link'><a data-toggle="tooltip" title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy', $(this));return false;"><span class="octicon octicon-clippy"></span></a></span>
+                 <span class='copy-link'><a data-toggle="tooltip" data-placement="right" title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy', $(this));return false;"><span class="octicon octicon-clippy"></span></a></span>
                  }
                 <div style="display: none">@normalized</div>
               }
