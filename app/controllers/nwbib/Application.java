@@ -55,11 +55,11 @@ import views.html.browse_classification;
 import views.html.browse_register;
 import views.html.classification;
 import views.html.details;
-import views.html.help;
 import views.html.index;
 import views.html.register;
 import views.html.search;
 import views.html.stars;
+import views.html.info;
 
 /**
  * The main application controller.
@@ -119,11 +119,11 @@ public class Application extends Controller {
 	}
 
 	/**
-	 * @return The NWBib help page.
+	 * @return The NWBib info page.
 	 */
-	@Cached(key = "nwbib.help", duration = ONE_HOUR)
-	public static Result help() {
-		return ok(help.render());
+	@Cached(key = "nwbib.info", duration = ONE_HOUR)
+	public static Result info() {
+		return ok(info.render());
 	}
 
 	/**
