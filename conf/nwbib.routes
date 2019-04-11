@@ -7,7 +7,7 @@ GET    /*path/                controllers.nwbib.Application.redirect(path: Strin
 
 # Home page
 GET    /                      controllers.nwbib.Application.index(map?="kreise")
-GET    /help                  controllers.nwbib.Application.help()
+GET    /info                  controllers.nwbib.Application.info()
 GET    /advanced              controllers.nwbib.Application.advanced()
 GET    /topics                controllers.nwbib.Application.topics(q?="")
 GET    /search                controllers.nwbib.Application.search(q?="", person?="", name?="", subject?="", id?="", publisher?="", issued?="", medium ?= "", nwbibspatial ?= "", nwbibsubject ?= "", from:Int?=0, size:Int?=25, owner?="", t?="", sort ?= "newest", details:Boolean?=false, location ?= "", word?="", corporation?="", raw?="", format?="html")
