@@ -3,7 +3,6 @@ SELECT DISTINCT
 ?item
 ?itemLabel
 ?partOf
-?gnd
 ?dissolutionDate
 (group_concat(distinct ?hasPart; separator = ", ") as ?parts)
 WHERE {
@@ -47,10 +46,9 @@ WHERE {
   && ?item != wd:Q16832627 && ?item != wd:Q1113210 && ?item != wd:Q19288281 && ?item != wd:Q1662807
   && ?item != wd:Q1803134 && ?item != wd:Q1351319 ) # Herausfiltern von Altkreisen, die nicht benötigt werden
   SERVICE wikibase:label {  bd:serviceParam wikibase:language "de" }
-  OPTIONAL { ?item wdt:P227 ?gnd }
   OPTIONAL { ?item wdt:P576 ?dissolutionDate }
   OPTIONAL { ?item wdt:P150 ?hasPart . }
   OPTIONAL { ?item wdt:P131 ?partOf }
 }
 
-GROUP BY ?item ?itemLabel ?partOf ?gnd ?dissolutionDate
+GROUP BY ?item ?itemLabel ?partOf ?dissolutionDate
