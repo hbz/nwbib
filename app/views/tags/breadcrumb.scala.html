@@ -8,9 +8,11 @@
 
 @labels(uri: String) = {
 	@if(Lobid.isWikidata(uri)) {
-		<a title='@uri.split("/").last @WikidataLocations.label(uri)' href='@nwbib.routes.Application.spatial()#@uri.split("/").last'>
-			@WikidataLocations.label(uri)
+		@defining(WikidataLocations.label(uri)) { label =>
+		<a title='@uri.split("/").last @WikidataLocations.label(uri)' href='@if(label.startsWith("http")){@label}else{@nwbib.routes.Application.spatial()#@uri.split("/").last}'>
+			@label
 		</a>
+		}
 	} else {
 		<a title='@Classification.shortId(uri) @Lobid.facetLabel(Seq(uri),"","")' href='@if(uri.contains("spatial")){@nwbib.routes.Application.spatial()}else{@nwbib.routes.Application.subjects()}#@(if(uri.contains("#")){uri.split("#")(1)}else{uri})'>
 			<span style='color: #777777'>@Classification.shortId(uri)</span> @if(!uri.endsWith("#n9")){@Lobid.facetLabel(Seq(uri),"","")}
@@ -29,7 +31,7 @@
 		} else {
 			@defining(Classification.pathTo((if(!nwbibsubject.isEmpty) nwbibsubject else nwbibspatial))) { path => 
 				@defining(path.takeWhile(_.contains("spatial"))) { withNotation =>
-					@labels(withNotation.last) &gt;
+					@if(!withNotation.isEmpty){@labels(withNotation.last) &gt;}
 					@for(segment <- path.dropWhile(_.contains("spatial"))) {
 						@labels(segment) @if(segment != path.last) {&gt;}
 					}
