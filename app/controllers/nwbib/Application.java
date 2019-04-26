@@ -56,10 +56,10 @@ import views.html.browse_register;
 import views.html.classification;
 import views.html.details;
 import views.html.index;
+import views.html.info;
 import views.html.register;
 import views.html.search;
 import views.html.stars;
-import views.html.info;
 
 /**
  * The main application controller.
@@ -306,7 +306,7 @@ public class Application extends Controller {
 			String placeholder = "Register zur " + t + " filtern";
 			result = ok(browse_register.render(sorted.toString(), t, placeholder));
 		}
-		Cache.set("result." + t, result, ONE_DAY);
+		Cache.set("result." + t, result);
 		return result;
 	}
 
@@ -365,7 +365,7 @@ public class Application extends Controller {
 			}
 			result = classificationResult(t, placeholder);
 		}
-		Cache.set("classification." + t, result, ONE_DAY);
+		Cache.set("classification." + t, result);
 		return result;
 	}
 
