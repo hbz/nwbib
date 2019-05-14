@@ -675,6 +675,16 @@
     "label": "Fürstentum Rheina-Wolbeck"
   },
   {
+    "qid": "http://www.wikidata.org/entity/Q63078887",
+    "notation": "35",
+    "label": "Kirchenkreis An der Ruhr"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q63191391",
+    "notation": "28",
+    "label": "Monschauer Land"
+  },
+  {
     "qid": "http://www.wikidata.org/entity/Q684314",
     "notation": "36",
     "label": "Bistum Aachen"
@@ -773,10 +783,5 @@
     "qid": "http://www.wikidata.org/entity/Q981347",
     "notation": "24",
     "label": "Selfkant"
-  },
-  {
-    "qid": "http://www.wikidata.org/entity/Q993449",
-    "notation": "28",
-    "label": "Monschauer Heckenland"
   }
 ]
