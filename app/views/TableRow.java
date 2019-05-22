@@ -165,7 +165,7 @@ public enum TableRow {
 	public static String labelForId(String id, JsonNode doc,
 			Optional<List<String>> labelKeys) {
 		String label = "";
-		if (id.startsWith("http://purl.org/lobid/nwbib")) {
+		if (id.startsWith("http://purl.org/lobid/nwbib") || id.startsWith("https://nwbib.de/s")) {
 			label = String.format("%s (%s)", //
 					Lobid.facetLabel(Arrays.asList(id), null, null),
 					Classification.shortId(id));

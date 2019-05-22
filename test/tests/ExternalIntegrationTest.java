@@ -117,7 +117,7 @@ public class ExternalIntegrationTest {
 		running(testServer(3333), () -> {
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
 					Classification.Type.from("Sachsystematik").buildHierarchy();
-			String nwbib = "http://purl.org/lobid/nwbib#";
+			String nwbib = "https://nwbib.de/subjects#";
 			assertThat(topAndSub.getRight().get(nwbib + "s882000")).isNotNull();
 			assertThat(topAndSub.getRight().get(nwbib + "s882000").size())
 					.describedAs("s882000").isGreaterThan(1);

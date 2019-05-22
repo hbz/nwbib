@@ -236,8 +236,8 @@
    @subordinate("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
   }
 
-  @raumsystematik("http://purl.org/lobid/nwbib-spatial")
-  @sachsystematik("http://purl.org/lobid/nwbib")
+  @raumsystematik("https://nwbib.de/spatial")
+  @sachsystematik("https://nwbib.de/subjects")
 
   @subjects((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()))
 

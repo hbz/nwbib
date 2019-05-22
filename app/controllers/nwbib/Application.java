@@ -86,7 +86,7 @@ public class Application extends Controller {
 	/** The internal ES field for the coverage facet. */
 	public static final String COVERAGE_FIELD = "spatial.label.raw";
 	/** The internal ES field for subject locations. */
-	public static final String SUBJECT_LOCATION_FIELD = "spatial.geo";
+	public static final String SUBJECT_LOCATION_FIELD = "spatial.focus.geo";
 
 	/** The internal ES field for subjects. */
 	public static final String SUBJECT_FIELD = "subject.componentList.id";

@@ -149,7 +149,8 @@ public class Lobid {
 	 * @return True, if the given URI is a Wikidata URI
 	 */
 	public static boolean isWikidata(final String uri) {
-		return uri.contains("wikidata");
+		return uri.contains("wikidata")
+				|| uri.startsWith("https://nwbib.de/spatial#Q");
 	}
 
 	private static String nestedContribution(final String person, String type) {
@@ -652,11 +653,13 @@ public class Lobid {
 	}
 
 	static boolean isNwBibClass(String term) {
-		return term.startsWith("http://purl.org/lobid/nwbib#");
+		return term.startsWith("http://purl.org/lobid/nwbib#")
+				|| term.startsWith("https://nwbib.de/subjects#");
 	}
 
 	private static boolean isNwBibSpatial(String term) {
-		return term.startsWith("http://purl.org/lobid/nwbib-spatial#");
+		return term.startsWith("http://purl.org/lobid/nwbib-spatial#")
+				|| term.startsWith("https://nwbib.de/spatial#");
 	}
 
 	private static boolean isGnd(String term) {

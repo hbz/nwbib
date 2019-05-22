@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,6 +44,7 @@ public class InternalIntegrationTest {
 	}
 
 	@Test
+	@Ignore // TODO: enable with stage
 	public void testFacets() {
 		running(testServer(3333), () -> {
 			String field = Application.TYPE_FIELD;
@@ -76,6 +78,7 @@ public class InternalIntegrationTest {
 	}
 
 	@Test
+	@Ignore // TODO: enable with stage
 	public void sizeRequest() {
 		running(testServer(3333), () -> {
 			Long hits = Lobid
@@ -99,11 +102,11 @@ public class InternalIntegrationTest {
 	@Test
 	public void sizeRequestNwbibspatial() {
 		running(testServer(3333), () -> {
-			Long hits = Lobid
-					.getTotalHitsNwbibClassification("http://purl.org/lobid/nwbib-spatial#n18");
-			assertThat(hits).as("hits for n18").isGreaterThan(0);
-			hits = Lobid
-					.getTotalHitsNwbibClassification("http://www.wikidata.org/entity/Q365");
+			Long hits =
+					Lobid.getTotalHitsNwbibClassification("https://nwbib.de/spatial#N20");
+			assertThat(hits).as("hits for n20").isGreaterThan(0);
+			hits = Lobid.getTotalHitsNwbibClassification(
+					"https://nwbib.de/spatial#Q365");
 			assertThat(hits).as("hits for Q365").isGreaterThan(0);
 		});
 	}
@@ -111,63 +114,60 @@ public class InternalIntegrationTest {
 	@Test
 	public void pathToClassificationId_leaf() {
 		running(testServer(3333), () -> {
-			assertThat(Classification.pathTo("http://purl.org/lobid/nwbib#s582060"))
+			assertThat(Classification.pathTo("https://nwbib.de/subjects#N582060"))
 					.as("path in classification")
 					.isEqualTo(Arrays.asList(//
-							"http://purl.org/lobid/nwbib#s5",
-							"http://purl.org/lobid/nwbib#s580000",
-							"http://purl.org/lobid/nwbib#s582000",
-							"http://purl.org/lobid/nwbib#s582060"));
+							"https://nwbib.de/subjects#N5",
+							"https://nwbib.de/subjects#N580000",
+							"https://nwbib.de/subjects#N582000",
+							"https://nwbib.de/subjects#N582060"));
 		});
 	}
 
 	@Test
 	public void pathToClassificationId_inner() {
 		running(testServer(3333), () -> {
-			assertThat(Classification.pathTo("http://purl.org/lobid/nwbib#s582050"))
+			assertThat(Classification.pathTo("https://nwbib.de/subjects#N582050"))
 					.as("path in classification")
 					.isEqualTo(Arrays.asList(//
-							"http://purl.org/lobid/nwbib#s5",
-							"http://purl.org/lobid/nwbib#s580000",
-							"http://purl.org/lobid/nwbib#s582000",
-							"http://purl.org/lobid/nwbib#s582050"));
+							"https://nwbib.de/subjects#N5",
+							"https://nwbib.de/subjects#N580000",
+							"https://nwbib.de/subjects#N582000",
+							"https://nwbib.de/subjects#N582050"));
 		});
 	}
 
 	@Test
 	public void pathToClassificationId_last() {
 		running(testServer(3333), () -> {
-			assertThat(Classification.pathTo("http://purl.org/lobid/nwbib#s582070"))
+			assertThat(Classification.pathTo("https://nwbib.de/subjects#N582070"))
 					.as("path in classification")
 					.isEqualTo(Arrays.asList(//
-							"http://purl.org/lobid/nwbib#s5",
-							"http://purl.org/lobid/nwbib#s580000",
-							"http://purl.org/lobid/nwbib#s582000",
-							"http://purl.org/lobid/nwbib#s582070"));
+							"https://nwbib.de/subjects#N5",
+							"https://nwbib.de/subjects#N580000",
+							"https://nwbib.de/subjects#N582000",
+							"https://nwbib.de/subjects#N582070"));
 		});
 	}
 
 	@Test
 	public void pathToSpatialClassificationId() {
 		running(testServer(3333), () -> {
-			assertThat(
-					Classification.pathTo("http://purl.org/lobid/nwbib-spatial#n54"))
-							.as("path in spatial classification")
-							.isEqualTo(Arrays.asList(//
-									"http://purl.org/lobid/nwbib-spatial#n4-7",
-									"http://purl.org/lobid/nwbib-spatial#n54"));
+			assertThat(Classification.pathTo("https://nwbib.de/spatial#N54"))
+					.as("path in spatial classification").isEqualTo(Arrays.asList(//
+							"https://nwbib.de/spatial#N4-7", "https://nwbib.de/spatial#N54"));
 		});
 	}
 
 	@Test
 	public void pathToSpatialClassificationQId() {
 		running(testServer(3333), () -> {
-			assertThat(Classification.pathTo("http://www.wikidata.org/entity/Q365"))
+			assertThat(Classification.pathTo("https://nwbib.de/spatial#Q365"))
 					.as("path in spatial classification")
 					.isEqualTo(Arrays.asList(//
-							"http://purl.org/lobid/nwbib-spatial#n9",
-							"http://www.wikidata.org/entity/Q7927",
-							"http://www.wikidata.org/entity/Q365"));
+							"https://nwbib.de/spatial#N9", //
+							"https://nwbib.de/spatial#Q7927", //
+							"https://nwbib.de/spatial#Q365"));
 		});
 	}
 
