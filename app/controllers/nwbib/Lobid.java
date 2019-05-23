@@ -397,7 +397,8 @@ public class Lobid {
 		String type =
 				uri.contains("spatial") ? Classification.Type.SPATIAL.elasticsearchType
 						: Classification.Type.NWBIB.elasticsearchType;
-		String label = Classification.label(uri, type);
+		String label =
+				Classification.label(Classification.toPurlNamespace(uri), type);
 		label = HtmlEscapers.htmlEscaper().escape(label);
 		label = label.trim().isEmpty() ? uri : label;
 		Cache.set(cacheKey, label, Application.ONE_DAY);
@@ -487,10 +488,10 @@ public class Lobid {
 
 	private static WSRequest setUpNwbibspatial(String nwbibspatial,
 			WSRequest request) {
-		return request.setQueryParameter(
-				isWikidata(nwbibspatial) ? "word" : "subject", //
-				isWikidata(nwbibspatial) ? "spatial.id:\"" + nwbibspatial + "\""
-						: nwbibspatial);
+		String query = Arrays.asList(nwbibspatial.replace(",AND", "").split(","))
+				.stream().map(id -> "spatial.id:\"" + id + "\"")
+				.collect(Collectors.joining(" AND "));
+		return request.setQueryParameter("word", query);
 	}
 
 	private static String preprocess(final String q) {
@@ -541,7 +542,7 @@ public class Lobid {
 	 */
 	public static String withoutUris(String queryValues) {
 		return Arrays.asList(queryValues.split(",")).stream()
-				.filter(s -> !s.startsWith("http://") && !s.matches("AND|OR"))
+				.filter(s -> !s.startsWith("http") && !s.matches("AND|OR"))
 				.collect(Collectors.joining(","));
 	}
 
@@ -659,7 +660,7 @@ public class Lobid {
 
 	private static boolean isNwBibSpatial(String term) {
 		return term.startsWith("http://purl.org/lobid/nwbib-spatial#")
-				|| term.startsWith("https://nwbib.de/spatial#");
+				|| term.startsWith("https://nwbib.de/spatial#N");
 	}
 
 	private static boolean isGnd(String term) {

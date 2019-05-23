@@ -426,7 +426,7 @@ public class Classification {
 		}
 	}
 
-	private static String toNwbibNamespace(String id) {
+	static String toNwbibNamespace(String id) {
 		return id //
 				.replace("http://purl.org/lobid/nwbib-spatial#n",
 						"https://nwbib.de/spatial#N")
@@ -434,6 +434,14 @@ public class Classification {
 						"https://nwbib.de/subjects#N")
 				.replace("http://www.wikidata.org/entity/Q",
 						"https://nwbib.de/spatial#Q");
+	}
+
+	static String toPurlNamespace(String id) {
+		return id //
+				.replace("https://nwbib.de/spatial#N",
+						"http://purl.org/lobid/nwbib-spatial#n")
+				.replace("https://nwbib.de/subjects#N",
+						"http://purl.org/lobid/nwbib#s");
 	}
 
 	/**

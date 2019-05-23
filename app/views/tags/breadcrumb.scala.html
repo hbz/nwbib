@@ -9,7 +9,7 @@
 @labels(uri: String) = {
 	@if(Lobid.isWikidata(uri)) {
 		@defining(WikidataLocations.label(uri)) { label =>
-		<a title='@uri.split("/").last @WikidataLocations.label(uri)' href='@if(label.startsWith("http")){@label}else{@nwbib.routes.Application.spatial()#@uri.split("/").last}'>
+		<a title='@uri.split("#").last @WikidataLocations.label(uri)' href='@if(label.startsWith("http")){@label}else{@nwbib.routes.Application.spatial()#@uri.split("#").last}'>
 			@label
 		</a>
 		}
@@ -26,13 +26,13 @@
 } else {
 	@if(!nwbibspatial.isEmpty && !nwbibspatial.contains(",") && Seq(nwbibsubject, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
 		@if(search){in <a href="@nwbib.routes.Application.spatial()"> Regionen</a> &gt;}
-		@if(!nwbibspatial.isEmpty && !nwbibspatial.startsWith("http://www.wikidata.org/entity/")) {
+		@if(!nwbibspatial.isEmpty && !nwbibspatial.startsWith("https://nwbib.de/spatial#Q")) {
 			@labels(nwbibspatial)
 		} else {
 			@defining(Classification.pathTo((if(!nwbibsubject.isEmpty) nwbibsubject else nwbibspatial))) { path => 
-				@defining(path.takeWhile(_.contains("spatial"))) { withNotation =>
+				@defining(path.takeWhile(_.contains("spatial#N"))) { withNotation =>
 					@if(!withNotation.isEmpty){@labels(withNotation.last) &gt;}
-					@for(segment <- path.dropWhile(_.contains("spatial"))) {
+					@for(segment <- path.dropWhile(_.contains("spatial#N"))) {
 						@labels(segment) @if(segment != path.last) {&gt;}
 					}
 				}

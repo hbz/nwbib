@@ -161,7 +161,7 @@
         sourceId <- (subject \ "source" \ "id").asOpt[String];
         if sourceId == source;
         subjectId <- (subject \ "id").asOpt[String];
-        if !(doc\"spatial").asOpt[JsValue].isDefined || !Seq(10, 12, 14, 24, 28, 35, 36, 37, 52, 54, 72, 74, 96, 97).find((i: Int) => subjectId.endsWith("#n"+i));
+        if !(doc\"spatial").asOpt[JsValue].isDefined || !Seq(10, 12, 14, 24, 28, 35, 36, 37, 52, 54, 72, 74, 96, 97).find((i: Int) => subjectId.endsWith("#N"+i));
         subjectLabel <- (subject \ "label").asOpt[String];
         notation = subjectId.split("#").last.substring(1)) {
       @breadcrumb(if(searchParam == "nwbibsubject"){subjectId}else{""},if(searchParam == "nwbibspatial"){subjectId}else{""})
@@ -175,10 +175,10 @@
         <tr>
           <td>Raumsystematik</td>
           <td>
-          @for(v <- vs; id = (v\"id").asOpt[String].getOrElse("--")) {
+          @for(v <- vs; id = (v\"id").asOpt[String].getOrElse("--"); if(!Seq(96, 97).find((i: Int) => id.endsWith("#N"+i)))) {
               @breadcrumb("",id) 
               @if(spatial.isDefined){
-                   | <a href='@nwbib.routes.Application.search()?nwbibspatial=@((v\"id").asOpt[String].getOrElse("--"))' title='Nach weiteren Titeln zu @((v\"label").asOpt[String].getOrElse("--")) (@(id.split("/").last)) suchen'>
+                   | <a href='@nwbib.routes.Application.search()?nwbibspatial=@((v\"id").asOpt[String].getOrElse("--").replace("#", "%23"))' title='Nach weiteren Titeln zu @((v\"label").asOpt[String].getOrElse("--")) (@(id.split("#").last)) suchen'>
                   <span class='glyphicon glyphicon-search'></span>
                   </a>
               } else {

@@ -35,7 +35,6 @@ import play.mvc.Http;
 public class WikidataLocations {
 
 	private static final int ONE_DAY = 60 * 60 * 24;
-	private static int requestCounter;
 
 	private static final Map<String, String> WIKIDATA_LABELS = new HashMap<>();
 
@@ -43,11 +42,12 @@ public class WikidataLocations {
 		load().elements().forEachRemaining(item -> {
 			String id = item.get("item").get("value").textValue();
 			String label = item.get("itemLabel").get("value").textValue();
-			WIKIDATA_LABELS.put(id, label);
+			WIKIDATA_LABELS.put(Classification.toNwbibNamespace(id), label);
 		});
 		non90sJson((JsonNode json) -> {
 			json.elements().forEachRemaining(e -> {
-				WIKIDATA_LABELS.put(e.get("qid").textValue(),
+				WIKIDATA_LABELS.put(
+						Classification.toNwbibNamespace(e.get("qid").textValue()),
 						e.get("label").textValue());
 			});
 		});
@@ -77,7 +77,6 @@ public class WikidataLocations {
 	 * @return The Wikidata locations as JSON
 	 */
 	public static JsonNode load() {
-		requestCounter = 0;
 		try {
 			File jsonFile = wikidataFile();
 			if (!jsonFile.exists()) {
