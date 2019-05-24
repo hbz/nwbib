@@ -111,10 +111,7 @@ public class Classification {
 				addNonN90s(subClasses);
 			}
 			Collections.sort(topClasses, comparator);
-			return Pair.of(topClasses, // removeZeroHits( // TODO: enable with stage
-					subClasses
-			// )
-			);
+			return Pair.of(topClasses, removeZeroHits(subClasses));
 		}
 
 		private static void addN90s(Map<String, List<JsonNode>> subClasses) {
@@ -151,7 +148,6 @@ public class Classification {
 			});
 		}
 
-		@SuppressWarnings("unused") // TODO: enable with stage
 		private static Map<String, List<JsonNode>> removeZeroHits(
 				Map<String, List<JsonNode>> subClasses) {
 			Map<String, List<JsonNode>> newSubClasses = new HashMap<>();
