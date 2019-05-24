@@ -104,10 +104,7 @@ public class Lobid {
 		if (!raw.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("q",
 					q + (q.isEmpty() ? "" : " AND ") + raw);
-		if (!q.trim().isEmpty())
-			requestHolder = requestHolder.setQueryParameter("word", q);
-		else if (!word.isEmpty())
-			requestHolder = requestHolder.setQueryParameter("word", word);
+		requestHolder = setupWordParameter(q, nwbibspatial, word, requestHolder);
 		if (!name.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("name", name);
 		if (!subject.trim().isEmpty())
@@ -120,8 +117,6 @@ public class Lobid {
 			requestHolder = requestHolder.setQueryParameter("issued", issued);
 		if (!medium.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("medium", medium);
-		if (!nwbibspatial.trim().isEmpty())
-			requestHolder = setUpNwbibspatial(nwbibspatial, requestHolder);
 		if (!nwbibsubject.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("subject", nwbibsubject);
 		if (!owner.isEmpty())
@@ -141,6 +136,24 @@ public class Lobid {
 		}
 		Logger.debug("Request URL {}, query params {} ", requestHolder.getUrl(),
 				requestHolder.getQueryParameters());
+		return requestHolder;
+	}
+
+	private static WSRequest setupWordParameter(final String q,
+			final String nwbibspatial, String word, WSRequest requestHolder) {
+		if (!q.trim().isEmpty() && nwbibspatial.isEmpty())
+			return requestHolder.setQueryParameter("word", preprocess(q));
+		else if (!q.trim().isEmpty() && !nwbibspatial.isEmpty())
+			return requestHolder.setQueryParameter("word",
+					preprocess(q) + " AND " + setUpNwbibspatial(nwbibspatial));
+		else if (!word.isEmpty() && nwbibspatial.isEmpty())
+			return requestHolder.setQueryParameter("word", preprocess(word));
+		else if (!word.isEmpty() && !nwbibspatial.trim().isEmpty()) {
+			return requestHolder.setQueryParameter("word",
+					preprocess(word) + " AND " + setUpNwbibspatial(nwbibspatial));
+		} else if (!nwbibspatial.trim().isEmpty())
+			return requestHolder.setQueryParameter("word",
+					setUpNwbibspatial(nwbibspatial));
 		return requestHolder;
 	}
 
@@ -451,22 +464,15 @@ public class Lobid {
 		else if (!corporation.isEmpty())
 			request = request.setQueryParameter("agent", corporation);
 
-		if (!nwbibspatial.isEmpty()) {
-			request = setUpNwbibspatial(nwbibspatial, request);
-		} else if (!nwbibsubject.isEmpty())
+		if (!nwbibsubject.isEmpty())
 			request = request.setQueryParameter("subject", nwbibsubject);
-
-		if (!q.isEmpty())
-			request = request.setQueryParameter("word", preprocess(q));
-		else if (!word.isEmpty())
-			request = request.setQueryParameter("word", preprocess(word));
 
 		if (!raw.isEmpty()
 				&& !raw.contains(Lobid.escapeUri(Application.COVERAGE_FIELD)))
 			request = request.setQueryParameter("q", raw);
-		else if (request.getQueryParameters().get("q") == null) {
-			request.setQueryParameter("word", q);
-		}
+
+		request = setupWordParameter(q, nwbibspatial, word, request);
+
 		if (!field.equals(Application.ITEM_FIELD))
 			request = request.setQueryParameter("owner", owner);
 		if (!field.startsWith("http"))
@@ -486,12 +492,11 @@ public class Lobid {
 		});
 	}
 
-	private static WSRequest setUpNwbibspatial(String nwbibspatial,
-			WSRequest request) {
+	private static String setUpNwbibspatial(String nwbibspatial) {
 		String query = Arrays.asList(nwbibspatial.replace(",AND", "").split(","))
 				.stream().map(id -> "spatial.id:\"" + id + "\"")
 				.collect(Collectors.joining(" AND "));
-		return request.setQueryParameter("word", query);
+		return query;
 	}
 
 	private static String preprocess(final String q) {
