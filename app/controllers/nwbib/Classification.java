@@ -61,6 +61,8 @@ import play.libs.Json;
  */
 public class Classification {
 
+	private static final String NWBIB_SUBJECTS = "https://nwbib.de/subjects#";
+	private static final String NWBIB_SPATIAL = "https://nwbib.de/spatial#";
 	private static final String INDEX = "nwbib";
 
 	/**
@@ -118,8 +120,8 @@ public class Classification {
 			JsonNode wikidataJson = WikidataLocations.load();
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
 					Classification.buildHierarchyWikidata(wikidataJson);
-			String n9 = "https://nwbib.de/spatial#N9";
-			String euregio = "https://nwbib.de/spatial#N91";
+			String n9 = NWBIB_SPATIAL + "N9";
+			String euregio = NWBIB_SPATIAL + "N91";
 			List<JsonNode> n9Sub = new ArrayList<>();
 			n9Sub.addAll(topAndSub.getLeft());
 			n9Sub.add(subClasses.get(n9).stream()
@@ -132,8 +134,7 @@ public class Classification {
 		private static void addNonN90s(Map<String, List<JsonNode>> subClasses) {
 			WikidataLocations.non90sJson((JsonNode json) -> {
 				json.elements().forEachRemaining(e -> {
-					String key =
-							"https://nwbib.de/spatial#N" + e.get("notation").textValue();
+					String key = NWBIB_SPATIAL + "N" + e.get("notation").textValue();
 					List<JsonNode> list = subClasses.get(key);
 					list = list == null ? new ArrayList<>() : list;
 					list.add(Json.toJson(ImmutableMap.of(//
@@ -369,8 +370,8 @@ public class Classification {
 	private static Map<String, List<JsonNode>> removeDuplicates(
 			Map<String, List<JsonNode>> subClasses) {
 		List<String> ids = new ArrayList<>(subClasses.keySet());
-		Collections.sort(ids, Comparator.comparingInt(s -> Integer
-				.parseInt(s.substring("https://nwbib.de/spatial#Q".length()))));
+		Collections.sort(ids, Comparator.comparingInt(
+				s -> Integer.parseInt(s.substring((NWBIB_SPATIAL + "Q").length()))));
 		for (int i = 0; i < ids.size(); i++) {
 			String key = ids.get(i);
 			final int j = i + 1;
@@ -424,20 +425,15 @@ public class Classification {
 
 	static String toNwbibNamespace(String id) {
 		return id //
-				.replace("http://purl.org/lobid/nwbib-spatial#n",
-						"https://nwbib.de/spatial#N")
-				.replace("http://purl.org/lobid/nwbib#s", //
-						"https://nwbib.de/subjects#N")
-				.replace("http://www.wikidata.org/entity/Q",
-						"https://nwbib.de/spatial#Q");
+				.replace("http://purl.org/lobid/nwbib-spatial#n", NWBIB_SPATIAL + "N")
+				.replace("http://purl.org/lobid/nwbib#s", NWBIB_SUBJECTS + "N")
+				.replace("http://www.wikidata.org/entity/Q", NWBIB_SPATIAL + "Q");
 	}
 
 	static String toPurlNamespace(String id) {
 		return id //
-				.replace("https://nwbib.de/spatial#N",
-						"http://purl.org/lobid/nwbib-spatial#n")
-				.replace("https://nwbib.de/subjects#N",
-						"http://purl.org/lobid/nwbib#s");
+				.replace(NWBIB_SPATIAL + "N", "http://purl.org/lobid/nwbib-spatial#n")
+				.replace(NWBIB_SUBJECTS + "N", "http://purl.org/lobid/nwbib#s");
 	}
 
 	/**
