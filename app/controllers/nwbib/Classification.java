@@ -61,6 +61,8 @@ import play.libs.Json;
  */
 public class Classification {
 
+	private static final String NWBIB_SUBJECTS = "https://nwbib.de/subjects#";
+	private static final String NWBIB_SPATIAL = "https://nwbib.de/spatial#";
 	private static final String INDEX = "nwbib";
 
 	/**
@@ -104,7 +106,7 @@ public class Classification {
 					topClasses.addAll(valueAndLabelWithNotation(hit, json));
 				else
 					addAsSubClass(subClasses, hit, json,
-							broader.findValue("@id").asText());
+							toNwbibNamespace(broader.findValue("@id").asText()));
 			}
 			if (this == SPATIAL) {
 				addN90s(subClasses);
@@ -118,8 +120,8 @@ public class Classification {
 			JsonNode wikidataJson = WikidataLocations.load();
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
 					Classification.buildHierarchyWikidata(wikidataJson);
-			String n9 = "http://purl.org/lobid/nwbib-spatial#n9";
-			String euregio = "http://purl.org/lobid/nwbib-spatial#n91";
+			String n9 = NWBIB_SPATIAL + "N9";
+			String euregio = NWBIB_SPATIAL + "N91";
 			List<JsonNode> n9Sub = new ArrayList<>();
 			n9Sub.addAll(topAndSub.getLeft());
 			n9Sub.add(subClasses.get(n9).stream()
@@ -132,16 +134,15 @@ public class Classification {
 		private static void addNonN90s(Map<String, List<JsonNode>> subClasses) {
 			WikidataLocations.non90sJson((JsonNode json) -> {
 				json.elements().forEachRemaining(e -> {
-					String key = "http://purl.org/lobid/nwbib-spatial#n"
-							+ e.get("notation").textValue();
+					String key = NWBIB_SPATIAL + "N" + e.get("notation").textValue();
 					List<JsonNode> list = subClasses.get(key);
 					list = list == null ? new ArrayList<>() : list;
 					list.add(Json.toJson(ImmutableMap.of(//
-							"value", e.get("qid"), //
+							"value", toNwbibNamespace(e.get("qid").textValue()), //
 							"label", e.get("label"), //
 							"gnd", "", //
-							"hits",
-							Lobid.getTotalHitsNwbibClassification(e.get("qid").textValue()))));
+							"hits", Lobid.getTotalHitsNwbibClassification(
+									toNwbibNamespace(e.get("qid").textValue())))));
 					Collections.sort(list, comparator);
 					subClasses.put(key, list);
 				});
@@ -335,23 +336,24 @@ public class Classification {
 					? label + String.format(" (bis %s)", dissolution) : label;
 			String nrw = "http://www.wikidata.org/entity/Q1198";
 			String topLevelLabelPrefix = "Regierungsbezirk";
-			long hits = Lobid.getTotalHitsNwbibClassification(id);
+			long hits = Lobid.getTotalHitsNwbibClassification(toNwbibNamespace(id));
 			if (id.equals(nrw)) {
-				topClasses.add(
-						Json.toJson(ImmutableMap.of("value", id, "label", "Sonstige")));
+				topClasses.add(Json.toJson(ImmutableMap.of("value",
+						toNwbibNamespace(id), "label", "Sonstige")));
 			} else if (broaderId.equals(nrw)
 					&& label.startsWith(topLevelLabelPrefix)) {
-				topClasses.add(Json.toJson(ImmutableMap.of("value", id, "label", label,
-						"gnd", gnd, "hits", hits)));
+				topClasses.add(Json.toJson(ImmutableMap.of("value",
+						toNwbibNamespace(id), "label", label, "gnd", gnd, "hits", hits)));
 			}
 			if (isItem(json, broaderId)
 					&& (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
 							|| (broaderId.equals(nrw)))) {
-				if (!subClasses.containsKey(broaderId))
-					subClasses.put(broaderId, new ArrayList<JsonNode>());
-				List<JsonNode> sub = subClasses.get(broaderId);
-				sub.add(Json.toJson(ImmutableMap.of("value", id, "label", label, "gnd",
-						gnd, "hits", hits)));
+				if (!subClasses.containsKey(toNwbibNamespace(broaderId)))
+					subClasses.put(toNwbibNamespace(broaderId),
+							new ArrayList<JsonNode>());
+				List<JsonNode> sub = subClasses.get(toNwbibNamespace(broaderId));
+				sub.add(Json.toJson(ImmutableMap.of("value", toNwbibNamespace(id),
+						"label", label, "gnd", gnd, "hits", hits)));
 				Collections.sort(sub, comparator);
 			}
 		});
@@ -368,8 +370,8 @@ public class Classification {
 	private static Map<String, List<JsonNode>> removeDuplicates(
 			Map<String, List<JsonNode>> subClasses) {
 		List<String> ids = new ArrayList<>(subClasses.keySet());
-		Collections.sort(ids, Comparator.comparingInt(s -> Integer
-				.parseInt(s.substring("http://www.wikidata.org/entity/Q".length()))));
+		Collections.sort(ids, Comparator.comparingInt(
+				s -> Integer.parseInt(s.substring((NWBIB_SPATIAL + "Q").length()))));
 		for (int i = 0; i < ids.size(); i++) {
 			String key = ids.get(i);
 			final int j = i + 1;
@@ -411,7 +413,7 @@ public class Classification {
 			Label style, List<JsonNode> result) {
 		final JsonNode label = json.findValue(Property.LABEL.value);
 		if (label != null) {
-			String id = hit.getId();
+			String id = toNwbibNamespace(hit.getId());
 			ImmutableMap<String, ?> map = ImmutableMap.of("value", id, "label",
 					(style == Label.PLAIN ? ""
 							: "<span class='notation'>" + shortId(id) + "</span>" + " ")
@@ -419,6 +421,19 @@ public class Classification {
 					"hits", Lobid.getTotalHitsNwbibClassification(id));
 			result.add(Json.toJson(map));
 		}
+	}
+
+	static String toNwbibNamespace(String id) {
+		return id //
+				.replace("http://purl.org/lobid/nwbib-spatial#n", NWBIB_SPATIAL + "N")
+				.replace("http://purl.org/lobid/nwbib#s", NWBIB_SUBJECTS + "N")
+				.replace("http://www.wikidata.org/entity/Q", NWBIB_SPATIAL + "Q");
+	}
+
+	static String toPurlNamespace(String id) {
+		return id //
+				.replace(NWBIB_SPATIAL + "N", "http://purl.org/lobid/nwbib-spatial#n")
+				.replace(NWBIB_SUBJECTS + "N", "http://purl.org/lobid/nwbib#s");
 	}
 
 	/**
@@ -478,14 +493,13 @@ public class Classification {
 	/**
 	 * @param uri The nwbib or nwbibspatial URI
 	 * @return The list of path segments to the given URI in its classification,
-	 *         e.g. for URI http://purl.org/lobid/nwbib#s582060:
-	 *         [http://purl.org/lobid/nwbib#s5,
-	 *         http://purl.org/lobid/nwbib#s580000,
-	 *         http://purl.org/lobid/nwbib#s582000,
-	 *         http://purl.org/lobid/nwbib#s582060]
+	 *         e.g. for URI https://nwbib.de/subjects#N582060:
+	 *         [https://nwbib.de/subjects#N5, https://nwbib.de/subjects#N580000,
+	 *         https://nwbib.de/subjects#N582000,
+	 *         https://nwbib.de/subjects#N582060]
 	 */
 	public static List<String> pathTo(String uri) {
-		Type type = uri.contains("nwbib-spatial") || uri.contains("wikidata")
+		Type type = uri.contains("spatial") || uri.contains("wikidata")
 				? Type.SPATIAL : Type.NWBIB;
 		Map<String, List<String>> candidates = Cache.getOrElse(type.toString(),
 				() -> generateAllPaths(type.buildHierarchy()), Application.ONE_DAY);
@@ -499,7 +513,7 @@ public class Classification {
 		List<JsonNode> top = all.getLeft();
 		Map<String, List<JsonNode>> subs = all.getRight();
 		for (JsonNode topNode : top) {
-			String topId = topNode.get("value").asText();
+			String topId = toNwbibNamespace(topNode.get("value").asText());
 			ArrayList<String> subResult = new ArrayList<>();
 			ul(subs.get(topId), subs, subResult, result, topId);
 		}

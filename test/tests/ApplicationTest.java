@@ -28,21 +28,20 @@ public class ApplicationTest {
 
 	@Test
 	public void shortClassificationId() {
-		assertThat(Classification.shortId("http://purl.org/lobid/nwbib#s58206"))
+		assertThat(Classification.shortId("https://nwbib.de/subjects#N58206"))
 				.as("short classification").isEqualTo("58206");
 	}
 
 	@Test
 	public void shortSpatialClassificationId() {
-		assertThat(
-				Classification.shortId("http://purl.org/lobid/nwbib-spatial#n58"))
-						.as("short spatial classification").isEqualTo("58");
+		assertThat(Classification.shortId("https://nwbib.de/spatial#N58"))
+				.as("short spatial classification").isEqualTo("58");
 	}
 
 	@Test
 	public void classificationLabelNotAvailable() {
-		assertThat(Classification.label("http://purl.org/lobid/nwbib-spatial#n58",
-				"no-type")).as("empty label").isEqualTo("");
+		assertThat(Classification.label("https://nwbib.de/spatial#N58", "no-type"))
+				.as("empty label").isEqualTo("");
 	}
 
 	@Test

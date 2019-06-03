@@ -80,13 +80,13 @@ public class Application extends Controller {
 	public static final String ITEM_FIELD = "owner";
 
 	/** The internal ES field for the NWBib subject facet. */
-	public static final String NWBIB_SUBJECT_FIELD = "subject.id<nwbib#";
+	public static final String NWBIB_SUBJECT_FIELD = "subject.id<subjects#";
 	/** The internal ES field for the NWBib spatial facet. */
-	public static final String NWBIB_SPATIAL_FIELD = "subject.id<nwbib-spatial#";
+	public static final String NWBIB_SPATIAL_FIELD = "spatial.id<spatial#";
 	/** The internal ES field for the coverage facet. */
 	public static final String COVERAGE_FIELD = "spatial.label.raw";
 	/** The internal ES field for subject locations. */
-	public static final String SUBJECT_LOCATION_FIELD = "spatial.geo";
+	public static final String SUBJECT_LOCATION_FIELD = "spatial.focus.geo";
 
 	/** The internal ES field for subjects. */
 	public static final String SUBJECT_FIELD = "subject.componentList.id";
@@ -548,8 +548,8 @@ public class Application extends Controller {
 			JsonNode json = pair.getLeft();
 			String label = pair.getRight();
 			int count = json.get("doc_count").asInt();
-			return (!label.contains("http") || label.contains("nwbib")) && label
-					.length() > String.format(labelTemplate, "", "", count).length();
+			return (!label.contains("http")) && label.length() > String
+					.format(labelTemplate, "", "", count).length();
 		};
 
 		Collator collator = Collator.getInstance(Locale.GERMAN);
