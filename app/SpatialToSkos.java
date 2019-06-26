@@ -35,8 +35,7 @@ import controllers.nwbib.Lobid;
  */
 public class SpatialToSkos {
 
-	private static final String NWBIB_SPATIAL =
-			"http://purl.org/lobid/nwbib-spatial";
+	private static final String NWBIB_SPATIAL = "https://nwbib.de/spatial";
 	private static final String NWBIB_SPATIAL_NAMESPACE = NWBIB_SPATIAL + "#";
 
 	/**
@@ -108,14 +107,9 @@ public class SpatialToSkos {
 			sub.getValue().forEach(entry -> {
 				try {
 					String superSubject = sub.getKey();
-					boolean superWiki = Lobid.isWikidata(superSubject);
 					Resource resource = addInSchemePrefLabelAndNotation(model, entry)
-							.addProperty(SKOS.broader,
-									model.createResource(superWiki
-											? NWBIB_SPATIAL_NAMESPACE
-													+ superSubject.split("entity/")[1].trim()
-											: superSubject));
-					if (superWiki) {
+							.addProperty(SKOS.broader, model.createResource(superSubject));
+					if (Lobid.isWikidata(superSubject)) {
 						resource.addProperty(FOAF.focus,
 								model.createResource(entry.get("value").asText()));
 					}
@@ -132,9 +126,7 @@ public class SpatialToSkos {
 		String subject = top.get("value").asText();
 		String label = top.get("label").asText();
 		boolean wiki = Lobid.isWikidata(subject);
-		label = wiki ? label : label.split("</span>")[1].trim();
-		String notation =
-				(wiki ? subject.split("entity/") : subject.split("#"))[1].trim();
+		String notation = subject.split("#")[1].trim();
 		return model
 				.createResource(wiki ? NWBIB_SPATIAL_NAMESPACE + notation : subject,
 						SKOS.Concept)//
