@@ -4,8 +4,13 @@
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -38,6 +43,52 @@ public class SpatialToSkos {
 	private static final String NWBIB_SPATIAL = "https://nwbib.de/spatial";
 	private static final String NWBIB_SPATIAL_NAMESPACE = NWBIB_SPATIAL + "#";
 
+	// Temporary: also write a CSV file for Wikidata batch import,
+	// see https://github.com/hbz/nwbib/issues/469
+	static PrintWriter pw;
+	static {
+		try {
+			pw = new PrintWriter(new File("conf/qid-p6814.csv"),
+					StandardCharsets.UTF_8.name());
+			pw.println("qid,P6814");
+			pw.println("Q1198,N01");
+			pw.println("Q152243,N03");
+			pw.println("Q8614,N04");
+			pw.println("Q462011,N10");
+			pw.println("Q72931,N12");
+			pw.println("Q2036208,N13");
+			pw.println("Q4194,N14");
+			pw.println("Q580471,N16");
+			pw.println("Q881875,N18");
+			pw.println("Q151993,N20");
+			pw.println("Q153464,N22");
+			pw.println("Q445609,N24");
+			pw.println("Q152356,N28");
+			pw.println("Q1380992,N32");
+			pw.println("Q1381014,N33");
+			pw.println("Q1413205,N34");
+			pw.println("Q7904317,N42");
+			pw.println("Q836937,N44");
+			pw.println("Q641138,N45");
+			pw.println("Q249428,N46");
+			pw.println("Q152420,N47");
+			pw.println("Q708742,N48");
+			pw.println("Q698162,N57");
+			pw.println("Q657241,N62");
+			pw.println("Q649192,N63");
+			pw.println("Q650645,N64");
+			pw.println("Q697254,N65");
+			pw.println("Q514557,N66");
+			pw.println("Q700198,N68");
+			pw.println("Q573290,N69");
+			pw.println("Q835382,N70");
+			pw.println("Q153943,N76");
+			pw.println("Q829718,N77");
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Write a SKOS turtle file for nwbib-spatial to the conf/ folder
 	 * 
@@ -53,6 +104,7 @@ public class SpatialToSkos {
 			addTopLevelConcepts(model, topAndSub.getLeft(), scheme);
 			addHierarchy(model, topAndSub.getRight());
 			write(model);
+			pw.close();
 		});
 	}
 
@@ -127,6 +179,9 @@ public class SpatialToSkos {
 		String label = top.get("label").asText();
 		boolean wiki = Lobid.isWikidata(subject);
 		String notation = subject.split("#")[1].trim();
+		if (wiki) {
+			pw.println(notation + "," + notation);
+		}
 		return model
 				.createResource(wiki ? NWBIB_SPATIAL_NAMESPACE + notation : subject,
 						SKOS.Concept)//
