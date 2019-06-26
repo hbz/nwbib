@@ -55,8 +55,8 @@ import views.html.browse_classification;
 import views.html.browse_register;
 import views.html.classification;
 import views.html.details;
-import views.html.help;
 import views.html.index;
+import views.html.info;
 import views.html.register;
 import views.html.search;
 import views.html.stars;
@@ -80,13 +80,13 @@ public class Application extends Controller {
 	public static final String ITEM_FIELD = "owner";
 
 	/** The internal ES field for the NWBib subject facet. */
-	public static final String NWBIB_SUBJECT_FIELD = "subject.id<nwbib#";
+	public static final String NWBIB_SUBJECT_FIELD = "subject.id<subjects#";
 	/** The internal ES field for the NWBib spatial facet. */
-	public static final String NWBIB_SPATIAL_FIELD = "subject.id<nwbib-spatial#";
+	public static final String NWBIB_SPATIAL_FIELD = "spatial.id<spatial#";
 	/** The internal ES field for the coverage facet. */
 	public static final String COVERAGE_FIELD = "spatial.label.raw";
 	/** The internal ES field for subject locations. */
-	public static final String SUBJECT_LOCATION_FIELD = "spatial.geo";
+	public static final String SUBJECT_LOCATION_FIELD = "spatial.focus.geo";
 
 	/** The internal ES field for subjects. */
 	public static final String SUBJECT_FIELD = "subject.componentList.id";
@@ -119,11 +119,11 @@ public class Application extends Controller {
 	}
 
 	/**
-	 * @return The NWBib help page.
+	 * @return The NWBib info page.
 	 */
-	@Cached(key = "nwbib.help", duration = ONE_HOUR)
-	public static Result help() {
-		return ok(help.render());
+	@Cached(key = "nwbib.info", duration = ONE_HOUR)
+	public static Result info() {
+		return ok(info.render());
 	}
 
 	/**
@@ -306,7 +306,7 @@ public class Application extends Controller {
 			String placeholder = "Register zur " + t + " filtern";
 			result = ok(browse_register.render(sorted.toString(), t, placeholder));
 		}
-		Cache.set("result." + t, result, ONE_DAY);
+		Cache.set("result." + t, result);
 		return result;
 	}
 
@@ -365,7 +365,7 @@ public class Application extends Controller {
 			}
 			result = classificationResult(t, placeholder);
 		}
-		Cache.set("classification." + t, result, ONE_DAY);
+		Cache.set("classification." + t, result);
 		return result;
 	}
 
@@ -548,8 +548,8 @@ public class Application extends Controller {
 			JsonNode json = pair.getLeft();
 			String label = pair.getRight();
 			int count = json.get("doc_count").asInt();
-			return (!label.contains("http") || label.contains("nwbib")) && label
-					.length() > String.format(labelTemplate, "", "", count).length();
+			return (!label.contains("http")) && label.length() > String
+					.format(labelTemplate, "", "", count).length();
 		};
 
 		Collator collator = Collator.getInstance(Locale.GERMAN);

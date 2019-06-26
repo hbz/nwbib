@@ -134,7 +134,7 @@
          label <- (component \ "label").asOpt[String];
          id = (component \ "id").asOpt[String]) {
       <span style="white-space: nowrap;"><a title="Nach weiteren Titeln zu '@label' suchen" href='@nwbib.routes.Application.search(subject=id.getOrElse("\""+label+"\""))'/>@label</a></span>
-      <a title="Nach Themen mit '@label' suchen" href='@nwbib.routes.Application.topics(q=label)'><span class='octicon octicon-ellipsis'></span></a>
+      <a title="Nach Themen mit '@label' suchen" href='@nwbib.routes.Application.topics(q=label.replace(":","\\:"))'><span class='octicon octicon-ellipsis'></span></a>
       @if(components.last == component) {
         @for(topic <- (subject\"label").asOpt[String]; hits = Lobid.getTotalHits("subject.label.raw", topic.trim, CONFIG.getString("nwbib.filter")).get(Lobid.API_TIMEOUT); if hits > 1){
           | <a href='@nwbib.routes.Application.search(q="subject.label.raw:\""+topic.trim+"\"")' title="Alle @hits Titel zum Thema '@topic.trim' anzeigen"><span class='badge progress-bar-success'>@hits</span></a>
@@ -161,9 +161,11 @@
         sourceId <- (subject \ "source" \ "id").asOpt[String];
         if sourceId == source;
         subjectId <- (subject \ "id").asOpt[String];
-        if !(doc\"spatial").asOpt[JsValue].isDefined || !Seq(10, 12, 14, 24, 28, 35, 36, 37, 52, 54, 72, 74, 96, 97).find((i: Int) => subjectId.endsWith("#n"+i));
-        subjectLabel <- (subject \ "label").asOpt[String]) {
-      <a href='@nwbib.routes.Application.search()?@searchParam=@subjectId.replace("#", "%23")'>@subjectLabel (@(subjectId.split("#").last.substring(1)))</a><br/>
+        if !(doc\"spatial").asOpt[JsValue].isDefined || !Seq(10, 12, 14, 24, 28, 35, 36, 37, 52, 54, 72, 74, 96, 97).find((i: Int) => subjectId.endsWith("#N"+i));
+        subjectLabel <- (subject \ "label").asOpt[String];
+        notation = subjectId.split("#").last.substring(1)) {
+      @breadcrumb(if(searchParam == "nwbibsubject"){subjectId}else{""},if(searchParam == "nwbibspatial"){subjectId}else{""})
+      | <a href='@nwbib.routes.Application.search()?@searchParam=@subjectId.replace("#", "%23")' title='Nach weiteren Titeln zu @subjectLabel (@notation) suchen'><span class='glyphicon glyphicon-search'></span></a><br/>
     }
 }
 
@@ -173,13 +175,14 @@
         <tr>
           <td>Raumsystematik</td>
           <td>
-          @for(v <- vs) {
+          @for(v <- vs; id = (v\"id").asOpt[String].getOrElse("--"); if(!Seq(96, 97).find((i: Int) => id.endsWith("#N"+i)))) {
+              @breadcrumb("",id) 
               @if(spatial.isDefined){
-                  <a href='@nwbib.routes.Application.search()?nwbibspatial=@((v\"id").asOpt[String].getOrElse("--"))'>
-                    @((v\"label").asOpt[String].getOrElse("--")) (@((v\"id").asOpt[String].getOrElse("--").split("/").last))
+                   | <a href='@nwbib.routes.Application.search()?nwbibspatial=@((v\"id").asOpt[String].getOrElse("--").replace("#", "%23"))' title='Nach weiteren Titeln zu @((v\"label").asOpt[String].getOrElse("--")) (@(id.split("#").last)) suchen'>
+                  <span class='glyphicon glyphicon-search'></span>
                   </a>
               } else {
-                  <a href='@nwbib.routes.Application.search()?q=coverage:"@(v.as[String])"'>@(v.as[String])</a>
+                   | <a href='@nwbib.routes.Application.search()?q=coverage:"@(v.as[String])"' title='Nach weiteren Titeln zu @(v.as[String]) suchen'> | <span class='glyphicon glyphicon-search'></span></a>
               }
               <br/>
           }
@@ -233,8 +236,8 @@
    @subordinate("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
   }
 
-  @raumsystematik("http://purl.org/lobid/nwbib-spatial")
-  @sachsystematik("http://purl.org/lobid/nwbib")
+  @raumsystematik("https://nwbib.de/spatial")
+  @sachsystematik("https://nwbib.de/subjects")
 
   @subjects((doc \ "subject").asOpt[Seq[JsValue]].getOrElse(Seq()))
 

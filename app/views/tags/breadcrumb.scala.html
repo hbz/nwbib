@@ -1,0 +1,42 @@
+@* Copyright 2019 Fabian Steeg, hbz. Licensed under the GPLv2 *@
+
+@import controllers.nwbib.Lobid
+@import controllers.nwbib.Classification
+@import controllers.nwbib.WikidataLocations
+
+@(nwbibsubject: String, nwbibspatial: String, person:String="", name:String="", subject:String="", id:String="", publisher:String="", issued:String="", medium: String="", owner: String="", t: String="", location: String="", word: String="", corporation: String="", raw: String="", search: Boolean = false)
+
+@labels(uri: String) = {
+	@if(Lobid.isWikidata(uri)) {
+		@defining(WikidataLocations.label(uri)) { label =>
+		<a title='@uri.split("#").last @WikidataLocations.label(uri)' href='@if(label.startsWith("http")){@label}else{@nwbib.routes.Application.spatial()#@uri.split("#").last}'>
+			@label
+		</a>
+		}
+	} else {
+		<a title='@Classification.shortId(uri) @Lobid.facetLabel(Seq(uri),"","")' href='@if(uri.contains("spatial")){@nwbib.routes.Application.spatial()}else{@nwbib.routes.Application.subjects()}#@(if(uri.contains("#")){"N"+uri.split("#")(1).substring(1)}else{uri})'>
+			<span style='color: #777777'>@Classification.shortId(uri)</span> @if(!uri.endsWith("#n9")){@Lobid.facetLabel(Seq(uri),"","")}
+		</a>
+	}
+}
+
+@if(!nwbibsubject.isEmpty && !nwbibsubject.contains(",") && Seq(nwbibspatial, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
+	@if(search){in <a href="@nwbib.routes.Application.subjects()"> Sachgebiete</a> &gt;}
+	@labels(nwbibsubject)
+} else {
+	@if(!nwbibspatial.isEmpty && !nwbibspatial.contains(",") && Seq(nwbibsubject, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
+		@if(search){in <a href="@nwbib.routes.Application.spatial()"> Regionen</a> &gt;}
+		@if(!nwbibspatial.isEmpty && !nwbibspatial.startsWith("https://nwbib.de/spatial#Q")) {
+			@labels(nwbibspatial)
+		} else {
+			@defining(Classification.pathTo((if(!nwbibsubject.isEmpty) nwbibsubject else nwbibspatial))) { path => 
+				@defining(path.takeWhile(_.contains("spatial#N"))) { withNotation =>
+					@if(!withNotation.isEmpty){@labels(withNotation.last) &gt;}
+					@for(segment <- path.dropWhile(_.contains("spatial#N"))) {
+						@labels(segment) @if(segment != path.last) {&gt;}
+					}
+				}
+			}
+		}
+	}
+}

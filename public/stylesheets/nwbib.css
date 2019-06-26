@@ -306,3 +306,20 @@ h5 {
 	display: inline-block;
 	min-width: 3ex;
 }
+
+.tooltip.right .tooltip-arrow {
+  border-right-color: #fff;
+}
+
+.tooltip-inner {
+  color: #000;
+  background: #fff;
+  border: solid 1px #cccccc;
+}
+
+.copy-link a {
+  visibility:hidden;
+}
+.copy-link:hover a {
+ visibility:visible;
+}

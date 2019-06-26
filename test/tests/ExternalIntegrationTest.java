@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -54,28 +55,13 @@ public class ExternalIntegrationTest {
 			Promise<JsonNode> jsonPromise = Lobid.getFacets("köln", "", "", "", "",
 					"", "", "", "", "", "", field, "", "", "", "", "");
 			JsonNode facets = jsonPromise.get(Lobid.API_TIMEOUT);
-			assertThat(facets.findValues("term").stream().map(e -> e.asText())
-					.collect(Collectors.toList())).contains(
-							"http://purl.org/dc/terms/BibliographicResource",
-							"http://purl.org/ontology/bibo/Article",
-							"http://purl.org/ontology/bibo/Book",
-							"http://purl.org/ontology/bibo/Journal",
-							"http://purl.org/ontology/bibo/MultiVolumeBook",
-							"http://purl.org/ontology/bibo/Thesis",
-							"http://purl.org/lobid/lv#Miscellaneous",
-							"http://purl.org/ontology/bibo/Proceedings",
-							"http://purl.org/lobid/lv#EditedVolume",
-							"http://purl.org/lobid/lv#Biography",
-							"http://purl.org/lobid/lv#Festschrift",
-							"http://purl.org/ontology/bibo/Newspaper",
-							"http://purl.org/lobid/lv#Bibliography",
-							"http://purl.org/ontology/bibo/Series",
-							"http://purl.org/lobid/lv#OfficialPublication",
-							"http://purl.org/ontology/bibo/ReferenceSource",
-							"http://purl.org/ontology/mo/PublishedScore",
-							"http://purl.org/lobid/lv#Legislation",
-							"http://purl.org/ontology/bibo/Image",
-							"http://purl.org/library/Game");
+			assertThat(facets.findValues("key").stream().map(e -> e.asText())
+					.collect(Collectors.toList())).contains("BibliographicResource",
+							"Article", "Book", "Periodical", "MultiVolumeBook", "Thesis",
+							"Miscellaneous", "Proceedings", "EditedVolume", "Biography",
+							"Festschrift", "Newspaper", "Bibliography", "Series",
+							"OfficialPublication", "ReferenceSource", "PublishedScore",
+							"Legislation", "Image", "Game");
 			assertThat(facets.findValues("count").stream().map(e -> e.intValue())
 					.collect(Collectors.toList())).excludes(0);
 		});
@@ -92,7 +78,7 @@ public class ExternalIntegrationTest {
 			assertThat(html.contentType()).isEqualTo("text/html");
 			String text = Helpers.contentAsString(html);
 			assertThat(text).contains("NWBib").contains("buch")
-					.contains("Sachsystematik").contains("Raumsystematik");
+					.contains("Sachgebiete").contains("Regionen");
 		});
 	}
 
@@ -118,6 +104,7 @@ public class ExternalIntegrationTest {
 	}
 
 	@Test
+	@Ignore // https://wdq.wmflabs.org/api is gone
 	public void reverseGeoLookup() {
 		running(testServer(3333), () -> {
 			assertEquals("Menden (Sauerland)",
@@ -130,7 +117,7 @@ public class ExternalIntegrationTest {
 		running(testServer(3333), () -> {
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
 					Classification.Type.from("Sachsystematik").buildHierarchy();
-			String nwbib = "http://purl.org/lobid/nwbib#";
+			String nwbib = "https://nwbib.de/subjects#";
 			assertThat(topAndSub.getRight().get(nwbib + "s882000")).isNotNull();
 			assertThat(topAndSub.getRight().get(nwbib + "s882000").size())
 					.describedAs("s882000").isGreaterThan(1);

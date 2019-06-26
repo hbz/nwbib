@@ -83,7 +83,7 @@ var markers = new L.MarkerClusterGroup({
     }
 });
 
-var facetFieldName = '@urlEncode("spatial.geo")';
+var facetFieldName = '@urlEncode("spatial.focus.geo")';
 var queryParams = '&q=@urlEncode(q)&person=@urlEncode(person)&name=@urlEncode(name)'+
 '&subject=@urlEncode(subject)&id=@urlEncode(id)&publisher=@urlEncode(publisher)&issued=@urlEncode(issued)'+
 '&medium=@urlEncode(medium)&nwbibspatial=@urlEncode(nwbibspatial)&nwbibsubject=@urlEncode(nwbibsubject)'+
