@@ -20,5 +20,5 @@ dist
 /conf/wikidata.json
 *log*.gz
 conf/nwbib-spatial.ttl
-conf/qid-p6814.csv
+conf/qid-p6814*.csv
 conf/qid-query.csv

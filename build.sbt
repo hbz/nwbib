@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   "org.mockito" % "mockito-core" % "1.9.5",
   "com.github.jsonld-java" % "jsonld-java" % "0.5.0",
   "org.apache.commons" % "commons-rdf-jena" % "0.5.0",
+  "org.apache.commons" % "commons-csv" % "1.6",
   "org.apache.jena" % "jena-arq" % "3.0.1",
   "org.apache.jena" % "jena-core" % "3.0.1",
   "org.easytesting" % "fest-assert" % "1.4" % "test"

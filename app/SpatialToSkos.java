@@ -6,20 +6,21 @@ import static play.test.Helpers.testServer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -49,7 +50,7 @@ public class SpatialToSkos {
 
 	// Temporary: also write a CSV file for Wikidata batch import, but without
 	// items already imported, see https://github.com/hbz/nwbib/issues/469
-	static List<String> done;
+	static List<String> done = new ArrayList<>();
 	static List<String> toDo = new ArrayList<>();
 	static {
 		try {
@@ -59,12 +60,14 @@ public class SpatialToSkos {
 			 * SERVICE wikibase:label { bd:serviceParam wikibase:language
 			 * "[AUTO_LANGUAGE],de". } }
 			 */
-			done = Files.readAllLines(Paths.get("conf/qid-query.csv"));
-			done = done.subList(1, done.size()).stream().map(s -> {
-				String[] vals = s.split(",");
-				return vals[0].substring("http://www.wikidata.org/entity/".length())
-						+ ",\"\"\"\"" + vals[2] + "\"";
-			}).collect(Collectors.toList());
+			try (Reader in = new FileReader("conf/qid-query.csv")) {
+				for (CSVRecord record : CSVFormat.DEFAULT.withFirstRecordAsHeader()
+						.parse(in)) {
+					done.add(record.get("item")
+							.substring("http://www.wikidata.org/entity/".length())
+							+ ",\"\"\"\"" + record.get("nwbibId") + "\"");
+				}
+			}
 			toDo.add("Q1198,\"\"\"\"N01\"");
 			toDo.add("Q152243,\"\"\"\"N03\"");
 			toDo.add("Q8614,\"\"\"\"N04\"");
@@ -118,11 +121,21 @@ public class SpatialToSkos {
 			addTopLevelConcepts(model, topAndSub.getLeft(), scheme);
 			addHierarchy(model, topAndSub.getRight());
 			write(model);
-			try (PrintWriter pw = new PrintWriter(new File("conf/qid-p6814.csv"),
-					StandardCharsets.UTF_8.name())) {
-				toDo.removeAll(done);
-				pw.println("qid,P6814");
-				toDo.forEach(pw::println);
+			try (
+					PrintWriter pw1 =
+							new PrintWriter(new File("conf/qid-p6814-missing-in-wiki.csv"),
+									StandardCharsets.UTF_8.name());
+					PrintWriter pw2 =
+							new PrintWriter(new File("conf/qid-p6814-missing-in-nwbib.csv"),
+									StandardCharsets.UTF_8.name())) {
+				ArrayList<String> toDoCopy = new ArrayList<>(toDo);
+				ArrayList<String> doneCopy = new ArrayList<>(done);
+				toDoCopy.removeAll(done);
+				doneCopy.removeAll(toDo);
+				pw1.println("qid,P6814");
+				pw2.println("qid,P6814");
+				toDoCopy.forEach(pw1::println);
+				doneCopy.forEach(pw2::println);
 			} catch (FileNotFoundException | UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
