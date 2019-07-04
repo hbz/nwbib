@@ -5,7 +5,7 @@ SELECT DISTINCT
 ?dissolutionDate
 ?ags
 ?ks
-(group_concat(distinct ?partOf; separator = ", ") as ?locatedIn)
+(group_concat(distinct ?partOf; separator = ", ") as ?partOf)
 (group_concat(distinct ?hasPart; separator = ", ") as ?parts)
 WHERE {
   ?item wdt:P6814 ?nwbibId.

@@ -210,19 +210,24 @@ public class SpatialToSkos {
 	private static Resource addInSchemePrefLabelAndNotation(Model model,
 			JsonNode top) {
 		String subject = top.get("value").asText();
-		String label = top.get("label").asText();
+		String label = top.get("label").asText()
+				.replaceAll("<span class='notation'>([^<]+)</span>", "").trim();
 		boolean wiki = Lobid.isWikidata(subject);
-		String notation = subject.split("#")[1].trim();
+		String id = subject.split("#")[1].trim();
+		JsonNode notation = top.get("notation");
 		if (wiki) {
-			toDo.add(notation + ",\"\"\"\"" + notation + "\"");
+			toDo.add(id + ",\"\"\"\"" + id + "\"");
 		}
-		return model
-				.createResource(wiki ? NWBIB_SPATIAL_NAMESPACE + notation : subject,
+		Resource result = model
+				.createResource(wiki ? NWBIB_SPATIAL_NAMESPACE + id : subject,
 						SKOS.Concept)//
 				.addProperty(SKOS.inScheme, //
 						model.createResource(NWBIB_SPATIAL))
-				.addProperty(SKOS.prefLabel, label, "de")//
-				.addProperty(SKOS.notation, notation);
+				.addProperty(SKOS.prefLabel, label, "de");
+		if (notation != null && !notation.asText().isEmpty()) {
+			result.addProperty(SKOS.notation, notation.asText());
+		}
+		return result;
 	}
 
 	private static void write(Model model) {
