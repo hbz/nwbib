@@ -16,7 +16,7 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1123895",
-    "notation": "10",
+    "notation": "Q1700",
     "label": "Ostmünsterland"
   },
   {
@@ -46,12 +46,12 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1296974",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Paderborn"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1324681",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Gütersloh"
   },
   {
@@ -66,12 +66,12 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1423799",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Herford"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1424058",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Vlotho"
   },
   {
@@ -86,7 +86,7 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1455460",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis Jülich"
   },
   {
@@ -96,7 +96,7 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q15116936",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Soest"
   },
   {
@@ -121,12 +121,12 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q15450305",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Herne"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q15823609",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis An Sieg und Rhein"
   },
   {
@@ -146,37 +146,37 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1743148",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Halle"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1743149",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Hattingen-Witten"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1743154",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Lübbecke"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1743158",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Minden"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1743178",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Steinfurt-Coesfeld-Borken"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1743181",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Unna"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q1746460",
-    "notation": "10",
+    "notation": "Q1700",
     "label": "Westmünsterland"
   },
   {
@@ -186,7 +186,7 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q17592686",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis Aachen"
   },
   {
@@ -316,37 +316,37 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47021505",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis Bonn"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47021768",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis Bad Godesberg-Voreifel"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47021915",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis Essen"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47022089",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis Gladbach-Neuss"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47022310",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis Moers"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47022415",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis Lennep"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47022528",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis Wesel"
   },
   {
@@ -376,77 +376,77 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47461972",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Arnsberg"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462041",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Bielefeld"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462060",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Bochum"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462077",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Dortmund"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462099",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Gelsenkirchen und Wattenscheid"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462109",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Gladbeck-Bottrop-Dorsten"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462151",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Hagen"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462166",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Hamm"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462205",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Lüdenscheid"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462213",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Münster"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462234",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Recklinghausen"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462240",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Schwelm"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462244",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Siegen"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462263",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Tecklenburg"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q47462321",
-    "notation": "35",
+    "notation": "33",
     "label": "Kirchenkreis Wittgenstein"
   },
   {
@@ -511,12 +511,12 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q56033157",
-    "notation": "10",
+    "notation": "Q1700",
     "label": "Nordmünsterland"
   },
   {
     "qid": "http://www.wikidata.org/entity/Q56033167",
-    "notation": "10",
+    "notation": "Q1700",
     "label": "Südmünsterland"
   },
   {
@@ -676,7 +676,7 @@
   },
   {
     "qid": "http://www.wikidata.org/entity/Q63078887",
-    "notation": "35",
+    "notation": "32",
     "label": "Kirchenkreis An der Ruhr"
   },
   {
@@ -782,6 +782,11 @@
   {
     "qid": "http://www.wikidata.org/entity/Q981347",
     "notation": "24",
+    "label": "Selfkant"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q31312912",
+    "notation": "Q109773",
     "label": "Selfkant"
   }
 ]
