@@ -8,7 +8,7 @@ SELECT DISTINCT
 ?ks
 (group_concat(distinct ?hasPart; separator = ", ") as ?parts)
 WHERE {
-  ?wikidataURI wdt:P6814 ?nwbibId.
+  ?item wdt:P6814 ?nwbibId.
   FILTER (?item != wd:Q1787449 && ?item != wd:Q16500124 && ?item != wd:Q1465811 && ?item != wd:Q1787449
   && ?item != wd:Q16832627 && ?item != wd:Q1113210 && ?item != wd:Q19288281 && ?item != wd:Q1662807
   && ?item != wd:Q1803134 && ?item != wd:Q1351319 ) # Herausfiltern von Altkreisen, die nicht benötigt werden
