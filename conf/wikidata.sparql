@@ -1,17 +1,14 @@
-# Get administrative areas in North Rhine-Westphalia with German labels
+# Get entries with NWBib-ID plus label, dissolution data, hasPart/isPartOf information and ags/ks
 SELECT DISTINCT
 ?item
 ?itemLabel
-?partOf
 ?dissolutionDate
 ?ags
 ?ks
+(group_concat(distinct ?partOf; separator = ", ") as ?locatedIn)
 (group_concat(distinct ?hasPart; separator = ", ") as ?parts)
 WHERE {
   ?item wdt:P6814 ?nwbibId.
-  FILTER (?item != wd:Q1787449 && ?item != wd:Q16500124 && ?item != wd:Q1465811 && ?item != wd:Q1787449
-  && ?item != wd:Q16832627 && ?item != wd:Q1113210 && ?item != wd:Q19288281 && ?item != wd:Q1662807
-  && ?item != wd:Q1803134 && ?item != wd:Q1351319 ) # Herausfiltern von Altkreisen, die nicht benötigt werden
   SERVICE wikibase:label {  bd:serviceParam wikibase:language "de" }
   OPTIONAL { ?item wdt:P576 ?dissolutionDate }
   OPTIONAL { ?item wdt:P150 ?hasPart . }
@@ -20,4 +17,4 @@ WHERE {
   OPTIONAL { ?item wdt:P440 ?ks }
 }
 
-GROUP BY ?item ?itemLabel ?partOf ?dissolutionDate ?ags ?ks
+GROUP BY ?item ?itemLabel ?dissolutionDate ?ags ?ks
