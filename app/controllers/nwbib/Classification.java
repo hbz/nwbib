@@ -140,7 +140,10 @@ public class Classification {
 		private static void addNonN90s(Map<String, List<JsonNode>> subClasses) {
 			WikidataLocations.non90sJson((JsonNode json) -> {
 				json.elements().forEachRemaining(e -> {
-					String key = NWBIB_SPATIAL + "N" + e.get("notation").textValue();
+					String notationTextValue = e.get("notation").textValue();
+					String key =
+							NWBIB_SPATIAL + (notationTextValue.startsWith("Q") ? "" : "N")
+									+ notationTextValue;
 					List<JsonNode> list = subClasses.get(key);
 					list = list == null ? new ArrayList<>() : list;
 					list.add(Json.toJson(ImmutableMap.of(//
