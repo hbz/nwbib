@@ -110,8 +110,8 @@ public class Classification {
 							toNwbibNamespace(broader.findValue("@id").asText()));
 			}
 			if (this == SPATIAL) {
-				addN90s(subClasses);
 				addNonN90s(subClasses);
+				addN90s(subClasses);
 			}
 			Collections.sort(topClasses, comparator);
 			return Pair.of(topClasses, removeZeroHits(subClasses));
@@ -129,7 +129,12 @@ public class Classification {
 					.filter(json -> json.get("value").textValue().equals(euregio))
 					.iterator().next());
 			subClasses.put(n9, n9Sub);
-			subClasses.putAll(topAndSub.getRight());
+			Map<String, List<JsonNode>> right = topAndSub.getRight();
+			for (Entry<String, List<JsonNode>> e : right.entrySet()) {
+				if (!e.getValue().stream().anyMatch(n -> subClasses.values().stream()
+						.flatMap(List::stream).collect(Collectors.toList()).contains(n)))
+					subClasses.put(e.getKey(), e.getValue());
+			}
 		}
 
 		private static void addNonN90s(Map<String, List<JsonNode>> subClasses) {
