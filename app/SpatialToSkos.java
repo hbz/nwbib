@@ -197,7 +197,9 @@ public class SpatialToSkos {
 							.addProperty(SKOS.broader, model.createResource(superSubject));
 					if (Lobid.isWikidata(superSubject)) {
 						resource.addProperty(FOAF.focus,
-								model.createResource(entry.get("value").asText()));
+								model.createResource(
+										entry.get("value").asText().replace(NWBIB_SPATIAL_NAMESPACE,
+												"http://www.wikidata.org/entity/")));
 					}
 				} catch (Exception e) {
 					System.err.println("Error processing: " + entry);
