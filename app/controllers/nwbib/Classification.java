@@ -429,6 +429,14 @@ public class Classification {
 		Collections.sort(list, comparator);
 	}
 
+	private static String focus(JsonNode json) {
+		String focusUri = "http://xmlns.com/foaf/0.1/focus";
+		if (json.has(focusUri)) {
+			return json.get(focusUri).iterator().next().get("@id").asText();
+		}
+		return "";
+	}
+
 	private static List<JsonNode> valueAndLabelWithNotation(SearchHit hit,
 			JsonNode json) {
 		List<JsonNode> result = new ArrayList<>();
@@ -441,13 +449,16 @@ public class Classification {
 		final JsonNode label = json.findValue(Property.LABEL.value);
 		if (label != null) {
 			String id = toNwbibNamespace(hit.getId());
-			ImmutableMap<String, ?> map = ImmutableMap.of("value", id, "label",
+			ImmutableMap<String, ?> map = ImmutableMap.of(//
+					"value", id, //
+					"label",
 					(style == Label.PLAIN ? ""
 							: "<span class='notation'>" + notation(json, id) + "</span>"
 									+ " ")
-							+ label.findValue("@value").asText(),
-					"hits", Lobid.getTotalHitsNwbibClassification(id), "notation",
-					notation(json, id));
+							+ label.findValue("@value").asText(), //
+					"hits", Lobid.getTotalHitsNwbibClassification(id), //
+					"notation", notation(json, id), //
+					"focus", focus(json));
 			result.add(Json.toJson(map));
 		}
 	}

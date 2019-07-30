@@ -195,18 +195,28 @@ public class SpatialToSkos {
 					String superSubject = sub.getKey();
 					Resource resource = addInSchemePrefLabelAndNotation(model, entry)
 							.addProperty(SKOS.broader, model.createResource(superSubject));
-					if (Lobid.isWikidata(superSubject)) {
-						resource.addProperty(FOAF.focus,
-								model.createResource(
-										entry.get("value").asText().replace(NWBIB_SPATIAL_NAMESPACE,
-												"http://www.wikidata.org/entity/")));
-					}
+					addFocus(model, entry, superSubject, resource);
 				} catch (Exception e) {
 					System.err.println("Error processing: " + entry);
 					e.printStackTrace();
 				}
 			});
 		});
+	}
+
+	private static void addFocus(Model model, JsonNode entry, String superSubject,
+			Resource resource) {
+		// use original focus info from old SKOS file:
+		if (entry.has("focus")) {
+			resource.addProperty(FOAF.focus,
+					model.createResource(entry.get("focus").asText()));
+		}
+		// use the hierarchy structure to set focus:
+		if (Lobid.isWikidata(superSubject)) {
+			resource.addProperty(FOAF.focus,
+					model.createResource(entry.get("value").asText().replace(
+							NWBIB_SPATIAL_NAMESPACE, "http://www.wikidata.org/entity/")));
+		}
 	}
 
 	private static Resource addInSchemePrefLabelAndNotation(Model model,
