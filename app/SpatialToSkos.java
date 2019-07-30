@@ -226,6 +226,9 @@ public class SpatialToSkos {
 				.replaceAll("<span class='notation'>([^<]+)</span>", "").trim();
 		boolean wiki = Lobid.isWikidata(subject);
 		String id = subject.split("#")[1].trim();
+		if (id.equalsIgnoreCase("n35"))
+			throw new IllegalArgumentException(
+					"Skipping n35 (temp. workaround, expected)");
 		JsonNode notation = top.get("notation");
 		if (wiki) {
 			toDo.add(id + ",\"\"\"\"" + id + "\"");
