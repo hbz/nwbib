@@ -472,7 +472,6 @@ public class Classification {
 
 	static String toPurlNamespace(String id) {
 		return id //
-				.replace(NWBIB_SPATIAL + "N", "http://purl.org/lobid/nwbib-spatial#n")
 				.replace(NWBIB_SUBJECTS + "N", "http://purl.org/lobid/nwbib#s");
 	}
 
