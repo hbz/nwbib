@@ -109,7 +109,7 @@ public class Classification {
 					addAsSubClass(subClasses, hit, json,
 							toNwbibNamespace(broader.findValue("@id").asText()));
 			}
-			if (this == SPATIAL) {
+			if (this == SPATIAL && CONFIG.getBoolean("index.nwbibspatial.enrich")) {
 				addNonN90s(subClasses);
 				addN90s(subClasses);
 			}
