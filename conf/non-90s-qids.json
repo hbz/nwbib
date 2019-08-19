@@ -788,5 +788,125 @@
     "qid": "http://www.wikidata.org/entity/Q31312912",
     "notation": "Q109773",
     "label": "Lippischer Wald"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56373671",
+    "notation": "Q769380",
+    "label": "Dekanat Ahaus-Vreden"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56372838",
+    "notation": "Q769380",
+    "label": "Dekanat Ahlen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398251",
+    "notation": "Q253765",
+    "label": "Dekanat Attendorn"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56373173",
+    "notation": "Q769380",
+    "label": "Dekanat Beckum"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56397874",
+    "notation": "Q253765",
+    "label": "Dekanat Bigge-Medebach"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56373947",
+    "notation": "Q769380",
+    "label": "Dekanat Borken"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56395189",
+    "notation": "Q769380",
+    "label": "Dekanat Dorsten"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398420",
+    "notation": "Q253765",
+    "label": "Dekanat Iserlohn"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56395068",
+    "notation": "Q769380",
+    "label": "Dekanat Lippe"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56397628",
+    "notation": "Q253765",
+    "label": "Dekanat Meschede"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398321",
+    "notation": "Q253765",
+    "label": "Dekanat Olpe"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56395213",
+    "notation": "Q769380",
+    "label": "Dekanat Recklinghausen"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56374605",
+    "notation": "Q769380",
+    "label": "Dekanat Rheine"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56374635",
+    "notation": "Q769380",
+    "label": "Dekanat Steinfurt"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56402341",
+    "notation": "Q253765",
+    "label": "Dekanat Steinheim"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398029",
+    "notation": "Q253765",
+    "label": "Dekanat Sundern"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56395271",
+    "notation": "Q769380",
+    "label": "Dekanat Vechta"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56373241",
+    "notation": "Q769380",
+    "label": "Dekanat Warendorf"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398551",
+    "notation": "Q253765",
+    "label": "Dekanat Werl"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56397821",
+    "notation": "Q253765",
+    "label": "Dekanat Wormbach"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56398585",
+    "notation": "Q702291",
+    "label": "Dekanat Wattenscheid"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56099483",
+    "notation": "Q253765",
+    "label": "Dekanat Dortmund"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56099734",
+    "notation": "Q253765",
+    "label": "Dekanat Hochsauerland-Mitte"
+  },
+  {
+    "qid": "http://www.wikidata.org/entity/Q56099854",
+    "notation": "Q253765",
+    "label": "Dekanat Siegen"
   }
 ]
