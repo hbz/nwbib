@@ -206,16 +206,18 @@ public class SpatialToSkos {
 
 	private static void addFocus(Model model, JsonNode entry, String superSubject,
 			Resource resource) {
+		String focus;
 		// use original focus info from old SKOS file:
-		if (entry.has("focus")) {
-			resource.addProperty(FOAF.focus,
-					model.createResource(entry.get("focus").asText()));
+		if (entry.has("focus")
+				&& !(focus = entry.get("focus").asText().trim()).isEmpty()) {
+			resource.addProperty(FOAF.focus, model.createResource(focus));
 		}
 		// use the hierarchy structure to set focus:
-		if (Lobid.isWikidata(superSubject)) {
+		else if (Lobid.isWikidata(superSubject)
+				&& !(focus = entry.get("value").asText().trim()).isEmpty()) {
 			resource.addProperty(FOAF.focus,
-					model.createResource(entry.get("value").asText().replace(
-							NWBIB_SPATIAL_NAMESPACE, "http://www.wikidata.org/entity/")));
+					model.createResource(focus.replace(NWBIB_SPATIAL_NAMESPACE,
+							"http://www.wikidata.org/entity/")));
 		}
 	}
 
@@ -223,12 +225,12 @@ public class SpatialToSkos {
 			JsonNode top) {
 		String subject = top.get("value").asText();
 		String label = top.get("label").asText()
-				.replaceAll("<span class='notation'>([^<]+)</span>", "").trim();
+				.replaceAll("<span class='notation'>([^<]*)</span>", "").trim();
 		boolean wiki = Lobid.isWikidata(subject);
 		String id = subject.split("#")[1].trim();
-		if (id.equalsIgnoreCase("n35"))
+		if (id.equalsIgnoreCase("n35") || id.equalsIgnoreCase("n37"))
 			throw new IllegalArgumentException(
-					"Skipping n35 (temp. workaround, expected)");
+					"Skipping n35/n37 (temp. workaround, expected)");
 		JsonNode notation = top.get("notation");
 		if (wiki) {
 			toDo.add(id + ",\"\"\"\"" + id + "\"");
