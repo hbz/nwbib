@@ -6,6 +6,7 @@ import static controllers.nwbib.Application.CONFIG;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Collator;
@@ -22,6 +23,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -41,14 +46,10 @@ import org.elasticsearch.search.SearchHit;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.jsonldjava.core.JsonLdError;
-import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
-import com.github.jsonldjava.jena.JenaRDFParser;
-import com.github.jsonldjava.utils.JSONUtils;
+import com.github.jsonldjava.utils.JsonUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import play.Logger;
 import play.cache.Cache;
@@ -108,9 +109,9 @@ public class Classification {
 					addAsSubClass(subClasses, hit, json,
 							toNwbibNamespace(broader.findValue("@id").asText()));
 			}
-			if (this == SPATIAL) {
-				addN90s(subClasses);
+			if (this == SPATIAL && CONFIG.getBoolean("index.nwbibspatial.enrich")) {
 				addNonN90s(subClasses);
+				addN90s(subClasses);
 			}
 			Collections.sort(topClasses, comparator);
 			return Pair.of(topClasses, removeZeroHits(subClasses));
@@ -128,13 +129,21 @@ public class Classification {
 					.filter(json -> json.get("value").textValue().equals(euregio))
 					.iterator().next());
 			subClasses.put(n9, n9Sub);
-			subClasses.putAll(topAndSub.getRight());
+			Map<String, List<JsonNode>> right = topAndSub.getRight();
+			for (Entry<String, List<JsonNode>> e : right.entrySet()) {
+				if (!e.getValue().stream().anyMatch(n -> subClasses.values().stream()
+						.flatMap(List::stream).collect(Collectors.toList()).contains(n)))
+					subClasses.put(e.getKey(), e.getValue());
+			}
 		}
 
 		private static void addNonN90s(Map<String, List<JsonNode>> subClasses) {
 			WikidataLocations.non90sJson((JsonNode json) -> {
 				json.elements().forEachRemaining(e -> {
-					String key = NWBIB_SPATIAL + "N" + e.get("notation").textValue();
+					String notationTextValue = e.get("notation").textValue();
+					String key =
+							NWBIB_SPATIAL + (notationTextValue.startsWith("Q") ? "" : "N")
+									+ notationTextValue;
 					List<JsonNode> list = subClasses.get(key);
 					list = list == null ? new ArrayList<>() : list;
 					list.add(Json.toJson(ImmutableMap.of(//
@@ -155,7 +164,7 @@ public class Classification {
 			for (Entry<String, List<JsonNode>> entry : subClasses.entrySet()) {
 				List<JsonNode> newList = new ArrayList<>();
 				for (JsonNode value : entry.getValue()) {
-					if (value.get("hits").longValue() > 0L
+					if (value.has("hits") && value.get("hits").longValue() > 0L
 							|| isIntermediateNode(value, subClasses)) {
 						newList.add(value);
 					}
@@ -227,12 +236,19 @@ public class Classification {
 	public static List<String> toJsonLd(final URL turtleUrl) {
 		final Model model = ModelFactory.createDefaultModel();
 		try {
-			model.read(turtleUrl.openStream(), null, "TURTLE");
-			final JenaRDFParser parser = new JenaRDFParser();
-			Object json = JsonLdProcessor.fromRDF(model, new JsonLdOptions(), parser);
+			model.read(turtleUrl.openStream(), null, Lang.TURTLE.getName());
+			StringWriter stringWriter = new StringWriter();
+			RDFDataMgr.write(stringWriter, model, Lang.JSONLD);
+			Object json = JsonUtils.fromString(stringWriter.toString());
 			List<Object> list = JsonLdProcessor.expand(json);
-			return list.subList(1, list.size()).stream().map(JSONUtils::toString)
-					.collect(Collectors.toList());
+			return list.subList(1, list.size()).stream().map(obj -> {
+				try {
+					return JsonUtils.toString(obj);
+				} catch (IOException e) {
+					e.printStackTrace();
+					return obj.toString();
+				}
+			}).collect(Collectors.toList());
 		} catch (JsonLdError | IOException e) {
 			Logger.error("Could not convert to JSON-LD", e);
 		}
@@ -333,17 +349,20 @@ public class Classification {
 					? item.get("dissolutionDate").get("value").textValue().split("-")[0]
 					: "";
 			label = !dissolution.isEmpty()
-					? label + String.format(" (bis %s)", dissolution) : label;
+					? label + String.format(" (bis %s)", dissolution)
+					: label;
 			String nrw = "http://www.wikidata.org/entity/Q1198";
 			String topLevelLabelPrefix = "Regierungsbezirk";
-			long hits = Lobid.getTotalHitsNwbibClassification(toNwbibNamespace(id));
+			String nwbibNamespaceId = toNwbibNamespace(id);
+			String notation = notation(item, nwbibNamespaceId);
+			long hits = Lobid.getTotalHitsNwbibClassification(nwbibNamespaceId);
 			if (id.equals(nrw)) {
-				topClasses.add(Json.toJson(ImmutableMap.of("value",
-						toNwbibNamespace(id), "label", "Sonstige")));
+				topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
+						"label", "Sonstige", "notation", notation)));
 			} else if (broaderId.equals(nrw)
 					&& label.startsWith(topLevelLabelPrefix)) {
-				topClasses.add(Json.toJson(ImmutableMap.of("value",
-						toNwbibNamespace(id), "label", label, "gnd", gnd, "hits", hits)));
+				topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
+						"label", label, "gnd", gnd, "hits", hits, "notation", notation)));
 			}
 			if (isItem(json, broaderId)
 					&& (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
@@ -352,13 +371,21 @@ public class Classification {
 					subClasses.put(toNwbibNamespace(broaderId),
 							new ArrayList<JsonNode>());
 				List<JsonNode> sub = subClasses.get(toNwbibNamespace(broaderId));
-				sub.add(Json.toJson(ImmutableMap.of("value", toNwbibNamespace(id),
-						"label", label, "gnd", gnd, "hits", hits)));
+				sub.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId, "label",
+						label, "gnd", gnd, "hits", hits, "notation", notation)));
 				Collections.sort(sub, comparator);
 			}
 		});
 		Collections.sort(topClasses, comparator);
 		return Pair.of(topClasses, removeDuplicates(subClasses));
+	}
+
+	private static String notation(JsonNode item, String nwbibNamespaceId) {
+		String idSuffix = nwbibNamespaceId.split("#")[1];
+		String notation = idSuffix.startsWith("N") ? idSuffix.substring(1)
+				: (item.has("ags") ? item.get("ags").get("value").textValue()
+						: (item.has("ks") ? item.get("ks").get("value").textValue() : ""));
+		return notation;
 	}
 
 	private static boolean isItem(JsonNode json, String broaderId) {
@@ -402,6 +429,14 @@ public class Classification {
 		Collections.sort(list, comparator);
 	}
 
+	private static String focus(JsonNode json) {
+		String focusUri = "http://xmlns.com/foaf/0.1/focus";
+		if (json.has(focusUri)) {
+			return json.get(focusUri).iterator().next().get("@id").asText();
+		}
+		return "";
+	}
+
 	private static List<JsonNode> valueAndLabelWithNotation(SearchHit hit,
 			JsonNode json) {
 		List<JsonNode> result = new ArrayList<>();
@@ -414,11 +449,16 @@ public class Classification {
 		final JsonNode label = json.findValue(Property.LABEL.value);
 		if (label != null) {
 			String id = toNwbibNamespace(hit.getId());
-			ImmutableMap<String, ?> map = ImmutableMap.of("value", id, "label",
+			ImmutableMap<String, ?> map = ImmutableMap.of(//
+					"value", id, //
+					"label",
 					(style == Label.PLAIN ? ""
-							: "<span class='notation'>" + shortId(id) + "</span>" + " ")
-							+ label.findValue("@value").asText(),
-					"hits", Lobid.getTotalHitsNwbibClassification(id));
+							: "<span class='notation'>" + notation(json, id) + "</span>"
+									+ " ")
+							+ label.findValue("@value").asText(), //
+					"hits", Lobid.getTotalHitsNwbibClassification(id), //
+					"notation", notation(json, id), //
+					"focus", focus(json));
 			result.add(Json.toJson(map));
 		}
 	}
@@ -432,7 +472,6 @@ public class Classification {
 
 	static String toPurlNamespace(String id) {
 		return id //
-				.replace(NWBIB_SPATIAL + "N", "http://purl.org/lobid/nwbib-spatial#n")
 				.replace(NWBIB_SUBJECTS + "N", "http://purl.org/lobid/nwbib#s");
 	}
 
@@ -448,8 +487,11 @@ public class Classification {
 	public static void indexStartup() {
 		Settings clientSettings = ImmutableSettings.settingsBuilder()
 				.put("path.home", new File(".").getAbsolutePath())
-                .put("http.port", play.Play.application().isTest() ? "8855" : CONFIG.getString("index.es.port.http"))
-				.put("transport.tcp.port", play.Play.application().isTest() ? "8856" : CONFIG.getString("index.es.port.tcp"))
+				.put("http.port",
+						play.Play.application().isTest() ? "8855"
+								: CONFIG.getString("index.es.port.http"))
+				.put("transport.tcp.port", play.Play.application().isTest() ? "8856"
+						: CONFIG.getString("index.es.port.tcp"))
 				.build();
 		node =
 				NodeBuilder.nodeBuilder().settings(clientSettings).local(true).node();
@@ -499,8 +541,9 @@ public class Classification {
 	 *         https://nwbib.de/subjects#N582060]
 	 */
 	public static List<String> pathTo(String uri) {
-		Type type = uri.contains("spatial") || uri.contains("wikidata")
-				? Type.SPATIAL : Type.NWBIB;
+		Type type =
+				uri.contains("spatial") || uri.contains("wikidata") ? Type.SPATIAL
+						: Type.NWBIB;
 		Map<String, List<String>> candidates = Cache.getOrElse(type.toString(),
 				() -> generateAllPaths(type.buildHierarchy()), Application.ONE_DAY);
 		return candidates.containsKey(uri) ? candidates.get(uri)

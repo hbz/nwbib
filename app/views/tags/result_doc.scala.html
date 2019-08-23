@@ -175,7 +175,7 @@
         <tr>
           <td>Raumsystematik</td>
           <td>
-          @for(v <- vs; id = (v\"id").asOpt[String].getOrElse("--"); if(!Seq(96, 97).find((i: Int) => id.endsWith("#N"+i)))) {
+          @for(v <- vs; id = (v\"id").asOpt[String].getOrElse("--"); if(!Seq(35, 37, 96, 97).find((i: Int) => id.endsWith("#N"+i)))) {
               @breadcrumb("",id) 
               @if(spatial.isDefined){
                    | <a href='@nwbib.routes.Application.search()?nwbibspatial=@((v\"id").asOpt[String].getOrElse("--").replace("#", "%23"))' title='Nach weiteren Titeln zu @((v\"label").asOpt[String].getOrElse("--")) (@(id.split("#").last)) suchen'>
