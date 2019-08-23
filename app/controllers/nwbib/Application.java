@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ import play.libs.ws.WSResponse;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.Results;
 import views.html.browse_classification;
 import views.html.browse_register;
 import views.html.classification;
@@ -370,21 +372,67 @@ public class Application extends Controller {
 	}
 
 	/**
-	 * @param t The data type: classification or register
-	 * @return Classification or register for "Raumsystematik"
+	 * @param t The register type ("Raumsystematik" or "Sachsystematik")
+	 * @return Classification data for the given type
 	 */
-	public static Result spatial(String t) {
-		String data = "Raumsystematik";
-		return t.equals("classification") ? classification(data) : register(data);
+	public static Result download(final String t) {
+		Result cachedResult = (Result) Cache.get("download." + t);
+		if (cachedResult != null)
+			return cachedResult;
+		Result result = null;
+		if (t.isEmpty()) {
+			Results.badRequest("Bad request: empty t");
+		} else {
+			if (Classification.Type.from(t) == null) {
+				Logger.error("Failed to get data for classification type: " + t);
+				return internalServerError(
+						browse_classification.render(null, null, t, ""));
+			}
+			response().setContentType("application/x-download");
+			String filename =
+					t.equals("Raumsystematik") ? "nwbib-spatial.ttl" : "nwbib.ttl";
+			response().setHeader("Content-disposition",
+					"attachment; filename=" + filename);
+			try {
+				return ok(new URL(CONFIG
+						.getString(t.equals("Raumsystematik") ? "index.data.nwbibspatial"
+								: "index.data.nwbibsubject")).openStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+				return internalServerError(e.getMessage());
+			}
+		}
+		Cache.set("download." + t, result);
+		return result;
 	}
 
 	/**
-	 * @param t The data type: classification or register
+	 * @param t The data type: classification, register, or download
+	 * @return Classification data for "Raumsystematik"
+	 */
+	public static Result spatial(String t) {
+		return classificationResponse(t, "Raumsystematik");
+	}
+
+	/**
+	 * @param t The data type: classification, register, or download
 	 * @return Classification data for "Sachsystematik"
 	 */
 	public static Result subjects(String t) {
-		String data = "Sachsystematik";
-		return t.equals("classification") ? classification(data) : register(data);
+		return classificationResponse(t, "Sachsystematik");
+	}
+
+	private static Result classificationResponse(String t, String data) {
+		switch (t) {
+		case "classification":
+			return classification(data);
+		case "register":
+			return register(data);
+		case "download":
+			return download(data);
+		default:
+			return Results.badRequest("Bad request: t=" + t + " unsupported");
+		}
 	}
 
 	// Prototype, see https://github.com/hbz/nwbib/issues/392
