@@ -5,6 +5,7 @@ SELECT DISTINCT
 ?dissolutionDate
 ?ags
 ?ks
+?bistum
 (group_concat(distinct ?partOf; separator = ", ") as ?partOf)
 (group_concat(distinct ?hasPart; separator = ", ") as ?parts)
 WHERE {
@@ -13,8 +14,9 @@ WHERE {
   OPTIONAL { ?item wdt:P576 ?dissolutionDate }
   OPTIONAL { ?item wdt:P150 ?hasPart . }
   OPTIONAL { ?item wdt:P131 ?partOf }
+  OPTIONAL { ?item wdt:P708 ?bistum }
   OPTIONAL { ?item wdt:P439 ?ags }
   OPTIONAL { ?item wdt:P440 ?ks }
 }
 
-GROUP BY ?item ?itemLabel ?dissolutionDate ?ags ?ks
+GROUP BY ?item ?itemLabel ?dissolutionDate ?ags ?ks ?bistum

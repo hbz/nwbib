@@ -15,10 +15,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -339,10 +341,21 @@ public class Classification {
 			JsonNode json) {
 		List<JsonNode> topClasses = new ArrayList<>();
 		Map<String, List<JsonNode>> subClasses = new HashMap<>();
+		Set<String> itemIds = new HashSet<>();
+		json.elements().forEachRemaining(item -> {
+			itemIds.add(item.get("item").get("value").textValue());
+		});
 		json.elements().forEachRemaining(item -> {
 			String id = item.get("item").get("value").textValue();
 			String label = item.get("itemLabel").get("value").textValue();
-			String broaderId = item.get("partOf").get("value").textValue();
+			String[] broaderIds =
+					item.get("partOf").get("value").textValue().split(", ");
+			String lastBroaderId = broaderIds[broaderIds.length - 1];
+			String broaderId =
+					itemIds.contains(lastBroaderId) ? lastBroaderId : broaderIds[0];
+			if (broaderId.isEmpty() && item.has("bistum")) {
+				broaderId = item.get("bistum").get("value").textValue();
+			}
 			String gnd =
 					item.has("gnd") ? item.get("gnd").get("value").textValue() : "";
 			String dissolution = item.has("dissolutionDate")
