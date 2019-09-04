@@ -348,11 +348,11 @@ public class Classification {
 		json.elements().forEachRemaining(item -> {
 			String id = item.get("item").get("value").textValue();
 			String label = item.get("itemLabel").get("value").textValue();
-			String[] broaderIds =
-					item.get("partOf").get("value").textValue().split(", ");
-			String lastBroaderId = broaderIds[broaderIds.length - 1];
+			List<String> broaderIds = Arrays
+					.asList(item.get("partOf").get("value").textValue().split(", "));
+			String lastBroaderId = broaderIds.get(broaderIds.size() - 1);
 			String broaderId =
-					itemIds.contains(lastBroaderId) ? lastBroaderId : broaderIds[0];
+					itemIds.contains(lastBroaderId) ? lastBroaderId : broaderIds.get(0);
 			if (broaderId.isEmpty() && item.has("bistum")) {
 				broaderId = item.get("bistum").get("value").textValue();
 			}
@@ -372,14 +372,14 @@ public class Classification {
 			if (id.equals(nrw)) {
 				topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
 						"label", "Sonstige", "notation", notation)));
-			} else if (broaderId.equals(nrw)
+			} else if (broaderIds.contains(nrw)
 					&& label.startsWith(topLevelLabelPrefix)) {
 				topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
 						"label", label, "gnd", gnd, "hits", hits, "notation", notation)));
 			}
-			if (isItem(json, broaderId)
-					&& (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
-							|| (broaderId.equals(nrw)))) {
+			if (isItem(json, broaderId) && (!(broaderIds.contains(nrw)
+					&& label.startsWith(topLevelLabelPrefix))
+					|| (broaderIds.contains(nrw)))) {
 				if (!subClasses.containsKey(toNwbibNamespace(broaderId)))
 					subClasses.put(toNwbibNamespace(broaderId),
 							new ArrayList<JsonNode>());
