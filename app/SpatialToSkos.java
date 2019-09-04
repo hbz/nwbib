@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -133,6 +134,7 @@ public class SpatialToSkos {
 				ArrayList<String> doneCopy = new ArrayList<>(done);
 				toDoCopy.removeAll(done);
 				doneCopy.removeAll(toDo);
+				doneCopy.removeAll(zeroHits(doneCopy));
 				pw1.println("qid,P6814");
 				pw2.println("qid,P6814");
 				toDoCopy.forEach(pw1::println);
@@ -141,6 +143,15 @@ public class SpatialToSkos {
 				e.printStackTrace();
 			}
 		});
+	}
+
+	private static List<String> zeroHits(List<String> list) {
+		return list.stream()
+				.filter((String line) -> Lobid
+						.getTotalHits("spatial.id",
+								"\"https://nwbib.de/spatial#" + line.split(",")[0] + "\"", "")
+						.get(Lobid.API_TIMEOUT).equals(0L))
+				.collect(Collectors.toList());
 	}
 
 	private static void setUpNamespaces(Model model) {
