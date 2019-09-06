@@ -54,6 +54,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
 
 import play.Logger;
+import play.Play;
 import play.cache.Cache;
 import play.libs.Json;
 
@@ -111,7 +112,8 @@ public class Classification {
 					addAsSubClass(subClasses, hit, json,
 							toNwbibNamespace(broader.findValue("@id").asText()));
 			}
-			if (this == SPATIAL && CONFIG.getBoolean("index.nwbibspatial.enrich")) {
+			if (this == SPATIAL && (CONFIG.getBoolean("index.nwbibspatial.enrich")
+					|| Play.isTest())) { /* SpatialToSkos uses Play test server */
 				addNonN90s(subClasses);
 				addN90s(subClasses);
 			}

@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
@@ -113,6 +114,7 @@ public class SpatialToSkos {
 	 * @param args Not used
 	 */
 	public static void main(String[] args) {
+		AtomicInteger exitCode = new AtomicInteger(-1);
 		running(testServer(3333), () -> {
 			initCsv();
 			Model model = ModelFactory.createDefaultModel();
@@ -139,10 +141,12 @@ public class SpatialToSkos {
 				pw2.println("qid,P6814");
 				toDoCopy.forEach(pw1::println);
 				doneCopy.forEach(pw2::println);
+				exitCode.set(toDoCopy.size() == 0 && doneCopy.size() == 0 ? 0 : -1);
 			} catch (FileNotFoundException | UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 		});
+		System.exit(exitCode.get());
 	}
 
 	private static List<String> zeroHits(List<String> list) {
