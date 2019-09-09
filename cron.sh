@@ -13,13 +13,18 @@ rm -rf ./data
 rm conf/wikidata.json
 sbt "runMain SpatialToSkos"
 
-if ! [ $? -eq 0 ]; then
+CODE=$?
+
+if ! [ $CODE -eq 0 ]; then
+
+echo "Non-0 code: $CODE"
 
 MISSING_NWBIB="$(cat conf/qid-p6814-missing-in-nwbib.csv)"
 MISSING_WIKID="$(cat conf/qid-p6814-missing-in-wiki.csv)"
+LOG="$(tail -n 50 logs/application.log)"
 
-MESSAGE="Missing in NWBib:\n$MISSING_NWBIB \n\nMissing in Wikidata:\n$MISSING_WIKID\n"
+MESSAGE="Missing in NWBib:\n$MISSING_NWBIB \n\nMissing in Wikidata:\n$MISSING_WIKID\n\nLog:\n$LOG"
 
-echo -e "$MESSAGE" | mail -s "Alert NWBib: missing items" "$RECIPIENT@hbz-nrw.de"
+echo -e "$MESSAGE" | mail -s "Alert nwbib-spatial" "$RECIPIENT@hbz-nrw.de"
 
 fi
