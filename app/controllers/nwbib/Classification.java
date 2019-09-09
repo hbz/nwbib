@@ -15,10 +15,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -52,6 +54,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
 
 import play.Logger;
+import play.Play;
 import play.cache.Cache;
 import play.libs.Json;
 
@@ -109,7 +112,8 @@ public class Classification {
 					addAsSubClass(subClasses, hit, json,
 							toNwbibNamespace(broader.findValue("@id").asText()));
 			}
-			if (this == SPATIAL && CONFIG.getBoolean("index.nwbibspatial.enrich")) {
+			if (this == SPATIAL && (CONFIG.getBoolean("index.nwbibspatial.enrich")
+					|| Play.isTest())) { /* SpatialToSkos uses Play test server */
 				addNonN90s(subClasses);
 				addN90s(subClasses);
 			}
@@ -339,10 +343,21 @@ public class Classification {
 			JsonNode json) {
 		List<JsonNode> topClasses = new ArrayList<>();
 		Map<String, List<JsonNode>> subClasses = new HashMap<>();
+		Set<String> itemIds = new HashSet<>();
+		json.elements().forEachRemaining(item -> {
+			itemIds.add(item.get("item").get("value").textValue());
+		});
 		json.elements().forEachRemaining(item -> {
 			String id = item.get("item").get("value").textValue();
 			String label = item.get("itemLabel").get("value").textValue();
-			String broaderId = item.get("partOf").get("value").textValue();
+			List<String> broaderIds = Arrays
+					.asList(item.get("partOf").get("value").textValue().split(", "));
+			String lastBroaderId = broaderIds.get(broaderIds.size() - 1);
+			String broaderId =
+					itemIds.contains(lastBroaderId) ? lastBroaderId : broaderIds.get(0);
+			if (broaderId.isEmpty() && item.has("bistum")) {
+				broaderId = item.get("bistum").get("value").textValue();
+			}
 			String gnd =
 					item.has("gnd") ? item.get("gnd").get("value").textValue() : "";
 			String dissolution = item.has("dissolutionDate")
@@ -359,14 +374,14 @@ public class Classification {
 			if (id.equals(nrw)) {
 				topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
 						"label", "Sonstige", "notation", notation)));
-			} else if (broaderId.equals(nrw)
+			} else if (broaderIds.contains(nrw)
 					&& label.startsWith(topLevelLabelPrefix)) {
 				topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
 						"label", label, "gnd", gnd, "hits", hits, "notation", notation)));
 			}
-			if (isItem(json, broaderId)
-					&& (!(broaderId.equals(nrw) && label.startsWith(topLevelLabelPrefix))
-							|| (broaderId.equals(nrw)))) {
+			if (isItem(json, broaderId) && (!(broaderIds.contains(nrw)
+					&& label.startsWith(topLevelLabelPrefix))
+					|| (broaderIds.contains(nrw)))) {
 				if (!subClasses.containsKey(toNwbibNamespace(broaderId)))
 					subClasses.put(toNwbibNamespace(broaderId),
 							new ArrayList<JsonNode>());

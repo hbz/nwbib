@@ -81,7 +81,9 @@ public class WikidataLocations {
 			File jsonFile = wikidataFile();
 			if (!jsonFile.exists()) {
 				// TODO Don't block, return Promise (but /classification no Promise yet)
-				WSResponse wsResponse = request().get(Integer.MAX_VALUE);
+				WSResponse wsResponse =
+						wikidataSparqlQuery("conf/wikidata.sparql", "json")
+								.get(Integer.MAX_VALUE);
 				if (wsResponse.getStatus() == Http.Status.OK) {
 					Iterator<JsonNode> elements =
 							wsResponse.asJson().findValue("bindings").elements();
@@ -120,15 +122,23 @@ public class WikidataLocations {
 		return x.toString();
 	}
 
-	private static Promise<WSResponse> request() throws IOException {
-		File sparqlFile = Play.application().getFile("conf/wikidata.sparql");
+	/**
+	 * @param file The location of the SPARQL query file, relative to the project
+	 * @param format The result format (json or csv)
+	 * @return A response promise
+	 * @throws IOException If the given file could not be read
+	 */
+	public static Promise<WSResponse> wikidataSparqlQuery(String file,
+			String format) throws IOException {
+		File sparqlFile = Play.application().getFile(file);
 		String sparqlString = Files.readAllLines(Paths.get(sparqlFile.toURI()))
 				.stream().collect(Collectors.joining("\n"));
 		Logger.info("Getting data from Wikidata, using query: \n{}", sparqlString);
 		return cachedRequest(sparqlString,
 				WS.url("https://query.wikidata.org/sparql")
 						.setQueryParameter("query", sparqlString)
-						.setQueryParameter("format", "json"));
+						.setHeader("Accept", format.equals("csv") ? "text/csv"
+								: "application/sparql-results+json"));
 	}
 
 	private static Promise<WSResponse> cachedRequest(String key,

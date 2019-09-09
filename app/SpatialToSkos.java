@@ -1,16 +1,16 @@
 
 /* Copyright 2019 Fabian Steeg, hbz. Licensed under the GPLv2 */
 
+import static controllers.nwbib.WikidataLocations.wikidataSparqlQuery;
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Reader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
@@ -18,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -34,6 +36,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import controllers.nwbib.Classification;
 import controllers.nwbib.Lobid;
+import play.libs.ws.WSResponse;
+import play.mvc.Http;
 
 /**
  * Generate a SKOS representation from the internal spatial classification data
@@ -52,17 +56,15 @@ public class SpatialToSkos {
 	// items already imported, see https://github.com/hbz/nwbib/issues/469
 	static List<String> done = new ArrayList<>();
 	static List<String> toDo = new ArrayList<>();
-	static {
+
+	private static void initCsv() {
 		try {
-			/*
-			 * CSV file created from SPARQL query at https://query.wikidata.org:
-			 * SELECT ?item ?itemLabel ?nwbibId WHERE { ?item wdt:P6814 ?nwbibId.
-			 * SERVICE wikibase:label { bd:serviceParam wikibase:language
-			 * "[AUTO_LANGUAGE],de". } }
-			 */
-			try (Reader in = new FileReader("conf/qid-query.csv")) {
+			WSResponse wsResponse =
+					wikidataSparqlQuery("conf/qid-nwbib.sparql", "csv")
+							.get(Integer.MAX_VALUE);
+			if (wsResponse.getStatus() == Http.Status.OK) {
 				for (CSVRecord record : CSVFormat.DEFAULT.withFirstRecordAsHeader()
-						.parse(in)) {
+						.parse(new StringReader(new String(wsResponse.asByteArray())))) {
 					done.add(record.get("item")
 							.substring("http://www.wikidata.org/entity/".length())
 							+ ",\"\"\"\"" + record.get("nwbibId") + "\"");
@@ -112,7 +114,9 @@ public class SpatialToSkos {
 	 * @param args Not used
 	 */
 	public static void main(String[] args) {
+		AtomicInteger exitCode = new AtomicInteger(-1);
 		running(testServer(3333), () -> {
+			initCsv();
 			Model model = ModelFactory.createDefaultModel();
 			setUpNamespaces(model);
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
@@ -132,14 +136,26 @@ public class SpatialToSkos {
 				ArrayList<String> doneCopy = new ArrayList<>(done);
 				toDoCopy.removeAll(done);
 				doneCopy.removeAll(toDo);
+				doneCopy.removeAll(zeroHits(doneCopy));
 				pw1.println("qid,P6814");
 				pw2.println("qid,P6814");
 				toDoCopy.forEach(pw1::println);
 				doneCopy.forEach(pw2::println);
+				exitCode.set(toDoCopy.size() == 0 && doneCopy.size() == 0 ? 0 : -1);
 			} catch (FileNotFoundException | UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 		});
+		System.exit(exitCode.get());
+	}
+
+	private static List<String> zeroHits(List<String> list) {
+		return list.stream()
+				.filter((String line) -> Lobid
+						.getTotalHits("spatial.id",
+								"\"https://nwbib.de/spatial#" + line.split(",")[0] + "\"", "")
+						.get(Lobid.API_TIMEOUT).equals(0L))
+				.collect(Collectors.toList());
 	}
 
 	private static void setUpNamespaces(Model model) {

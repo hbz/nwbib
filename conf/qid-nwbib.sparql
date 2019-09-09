@@ -1,0 +1,10 @@
+SELECT
+?item
+?itemLabel
+?nwbibId
+WHERE {
+  ?item wdt:P6814 ?nwbibId.
+  SERVICE wikibase:label { 
+    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de".
+  }
+}
