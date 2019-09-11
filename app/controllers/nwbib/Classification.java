@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.rdf.model.Model;
@@ -397,10 +398,9 @@ public class Classification {
 
 	private static String notation(JsonNode item, String nwbibNamespaceId) {
 		String idSuffix = nwbibNamespaceId.split("#")[1];
-		String notation = idSuffix.startsWith("N") ? idSuffix.substring(1)
-				: (item.has("ags") ? item.get("ags").get("value").textValue()
-						: (item.has("ks") ? item.get("ks").get("value").textValue() : ""));
-		return notation;
+		return idSuffix.startsWith("N") ? idSuffix.substring(1)
+				: Stream.of("ags", "ks", "rs").filter(k -> item.has(k)).findFirst()
+						.map(k -> item.get(k).get("value").textValue()).orElse("");
 	}
 
 	private static boolean isItem(JsonNode json, String broaderId) {
