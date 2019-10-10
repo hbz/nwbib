@@ -238,6 +238,34 @@ nwbib-spatial:N52  a    skos:Concept ;
         skos:notation   "52" ;
         skos:prefLabel  "Kleinere geistliche Territorien im Rheinland"@de .
 
+nwbib-spatial:Q325202
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N52 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Reichsabtei Burtscheid (bis 1802)"@de , "Reichsabtei Burtscheid"@de ;
+        foaf:focus      wd:Q325202 .
+
+nwbib-spatial:Q564155
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N52 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Stift Essen"@de ;
+        foaf:focus      wd:Q564155 .
+
+nwbib-spatial:Q152432
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N52 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Reichsabtei Kornelimünster"@de , "Reichsabtei Kornelimünster (bis 1802)"@de ;
+        foaf:focus      wd:Q152432 .
+
+nwbib-spatial:Q688373
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N52 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Kloster Werden"@de , "Kloster Werden (bis 1803)"@de ;
+        foaf:focus      wd:Q688373 .
+
 nwbib-spatial:N54  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
