@@ -337,10 +337,17 @@ nwbib-spatial:N70  a    skos:Concept ;
 
 nwbib-spatial:Q15130492
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N72 , nwbib-spatial:Q6228 ;
+        skos:broader    nwbib-spatial:N72 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Stift Corvey"@de ;
         foaf:focus      wd:Q15130492 .
+
+nwbib-spatial:Q316174
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N72 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Stift Herford (bis 1802)"@de , "Stift Herford"@de ;
+        foaf:focus      wd:Q316174 .
 
 nwbib-spatial:N74  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
