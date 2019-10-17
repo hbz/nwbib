@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,7 +27,10 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.DCTerms;
@@ -131,6 +135,12 @@ public class SpatialToSkos {
 									StandardCharsets.UTF_8.name());
 					PrintWriter pw2 =
 							new PrintWriter(new File("conf/qid-p6814-missing-in-nwbib.csv"),
+									StandardCharsets.UTF_8.name());
+					PrintWriter pw3 =
+							new PrintWriter(new File("conf/qid-p6814-qal4900-single.csv"),
+									StandardCharsets.UTF_8.name());
+					PrintWriter pw4 =
+							new PrintWriter(new File("conf/qid-p6814-qal4900-multi.csv"),
 									StandardCharsets.UTF_8.name())) {
 				ArrayList<String> toDoCopy = new ArrayList<>(toDo);
 				ArrayList<String> doneCopy = new ArrayList<>(done);
@@ -139,14 +149,46 @@ public class SpatialToSkos {
 				doneCopy.removeAll(zeroHits(doneCopy));
 				pw1.println("qid,P6814");
 				pw2.println("qid,P6814");
+				pw3.println("qid,P6814,qal4900");
+				pw4.println("qid,P6814,qal4900");
 				toDoCopy.forEach(pw1::println);
 				doneCopy.forEach(pw2::println);
+				Pair<Iterable<String>, Iterable<String>> singleAndMulti =
+						qalLines(model);
+				singleAndMulti.getLeft().forEach(pw3::println);
+				singleAndMulti.getRight().forEach(pw4::println);
 				exitCode.set(toDoCopy.size() == 0 && doneCopy.size() == 0 ? 0 : -1);
 			} catch (FileNotFoundException | UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 		});
 		System.exit(exitCode.get());
+	}
+
+	private static Pair<Iterable<String>, Iterable<String>> qalLines(
+			Model model) {
+		List<String> single = new ArrayList<>();
+		List<String> multi = new ArrayList<>();
+		StmtIterator broaderStatements =
+				model.listStatements((Resource) null, SKOS.broader, (RDFNode) null);
+		broaderStatements.forEachRemaining(broaderStatement -> {
+			String subId = broaderStatement.getSubject().getURI()
+					.substring("https://nwbib.de/spatial#".length());
+			List<Statement> focusStatements =
+					model.listStatements(broaderStatement.getObject().asResource(),
+							FOAF.focus, (RDFNode) null).toList();
+			for (Statement focusStatement : focusStatements) {
+				String focusOfTop = focusStatement.getObject().toString()
+						.substring("http://www.wikidata.org/entity/".length());
+				String line =
+						String.format("%s,\"\"\"\"%s\",%s", subId, subId, focusOfTop);
+				int broaderCount = model.listStatements(broaderStatement.getSubject(),
+						SKOS.broader, (RDFNode) null).toList().size();
+				(broaderCount == 1 ? single : multi).add(line);
+			}
+		});
+		Collections.sort(multi);
+		return Pair.of(single, multi);
 	}
 
 	private static List<String> zeroHits(List<String> list) {
