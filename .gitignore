@@ -22,3 +22,6 @@ dist
 conf/nwbib-spatial.ttl
 conf/qid-p6814*.csv
 conf/qid-query.csv
+conf/700n-import.jsonl
+conf/700n-import.zip
+conf/700n-import*.txt
