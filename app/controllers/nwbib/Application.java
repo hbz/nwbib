@@ -439,7 +439,7 @@ public class Application extends Controller {
 	private static Result classificationResultWikidata(JsonNode json, String t,
 			String placeholder) {
 		Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
-				Classification.buildHierarchyWikidata(json);
+				Classification.buildHierarchyWikidata(json, new HashMap<>());
 		String topClassesJson = Json.toJson(topAndSub.getLeft()).toString();
 		return ok(browse_classification.render(topClassesJson, topAndSub.getRight(),
 				t, placeholder));

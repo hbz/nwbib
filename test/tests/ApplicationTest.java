@@ -73,7 +73,7 @@ public class ApplicationTest {
 		List<String> nwbibsubjects = Classification
 				.toJsonLd(new URL(CONFIG.getString("index.data.nwbibsubject")));
 		nwbibsubjects.forEach(System.out::println);
-		assertThat(nwbibsubjects.size()).isEqualTo(1005);
+		assertThat(nwbibsubjects.size()).isGreaterThan(1000);
 		assertThat(nwbibsubjects.toString()).contains("Allgemeine Landeskunde")
 				.contains("Landesbeschreibungen").contains("Reiseberichte");
 	}
@@ -84,7 +84,7 @@ public class ApplicationTest {
 		List<String> nwbibspatials = Classification
 				.toJsonLd(new URL(CONFIG.getString("index.data.nwbibspatial")));
 		nwbibspatials.forEach(System.out::println);
-		assertThat(nwbibspatials.size()).isGreaterThan(4000);
+		assertThat(nwbibspatials.size()).isGreaterThan(60);
 		assertThat(nwbibspatials.toString()).contains("Nordrhein-Westfalen")
 				.contains("Rheinland").contains("Grafschaft, Herzogtum Jülich");
 	}

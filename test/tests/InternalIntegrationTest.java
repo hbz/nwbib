@@ -9,9 +9,11 @@ import static play.test.Helpers.testServer;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -177,6 +179,19 @@ public class InternalIntegrationTest {
 			assertThat(Classification.pathTo("http://www.example.org"))
 					.as("path in spatial classification")
 					.isEqualTo(Arrays.asList("http://www.example.org"));
+		});
+	}
+
+	@Test
+	public void buildSpatialHierarchy() {
+		running(testServer(3333), () -> {
+			Pair<List<JsonNode>, Map<String, List<JsonNode>>> pair =
+					Classification.Type.SPATIAL.buildHierarchy();
+			assertThat(pair.getLeft().size()).isEqualTo(5);
+			assertThat(pair.getRight().get("https://nwbib.de/spatial#N10").size())
+					.isGreaterThan(0);
+			assertThat(pair.getRight().get("https://nwbib.de/spatial#N36").size())
+					.isGreaterThan(0);
 		});
 	}
 

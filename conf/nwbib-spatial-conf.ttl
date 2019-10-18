@@ -238,6 +238,12 @@ nwbib-spatial:N52  a    skos:Concept ;
         skos:notation   "52" ;
         skos:prefLabel  "Kleinere geistliche Territorien im Rheinland"@de .
 
+nwbib-spatial:N72  a    skos:Concept ;
+        skos:broader    nwbib-spatial:N4-7 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:notation   "72" ;
+        skos:prefLabel  "Kleinere geistliche Territorien in Westfalen"@de .
+
 nwbib-spatial:Q325202
         a               skos:Concept ;
         skos:broader    nwbib-spatial:N52 ;
