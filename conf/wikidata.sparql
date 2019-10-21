@@ -15,5 +15,6 @@ WHERE {
   OPTIONAL { ?item wdt:P439 ?ags }
   OPTIONAL { ?item wdt:P440 ?ks }
   OPTIONAL { ?item wdt:P1388 ?rs }
-  OPTIONAL { ?item p:P6814 [ pq:P4900 ?partOf ] }
+  OPTIONAL { ?item p:P6814 [ pq:P4900 ?broader ] .
+             ?broader wdt:P6814 ?partOf }
 }
