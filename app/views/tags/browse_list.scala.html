@@ -72,8 +72,8 @@
              hits = (json\"hits").asOpt[scala.Long].getOrElse(0L);
              last = value.split("[/#]").last;
              anchor = if(last.startsWith("Q")) {last} else {"N"+last.substring(1)};
-             textToCopy = (if(value.contains("nwbib#")) "https://nwbib.de/subjects#" else "https://nwbib.de/spatial#") 
-                  + anchor + " " + (if(entryLabel.contains("span")){entryLabel.split("</span> ")(1)}else{entryLabel}) ) {
+             textToCopy = (if(entryLabel.contains("span")){entryLabel.split("</span> ")(1)}else{entryLabel}) + "$$0" +
+                          (if(value.contains("nwbib#")) "https://nwbib.de/subjects#" else "https://nwbib.de/spatial#") + anchor ) {
               <li id='@anchor'>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@Html(entryLabel)</b> } else {
                   @if(t!="Zeitschriften"){
                   }
