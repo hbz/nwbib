@@ -9,6 +9,7 @@ import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,7 +25,6 @@ import controllers.nwbib.Application;
 import controllers.nwbib.Classification;
 import controllers.nwbib.Lobid;
 import controllers.nwbib.WikidataLocations;
-import play.Logger;
 import play.libs.F.Promise;
 import play.mvc.Http;
 import play.test.Helpers;
@@ -143,12 +143,12 @@ public class ExternalIntegrationTest {
 	public void classificationWikidata() {
 		running(testServer(3333), () -> {
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
-					Classification.buildHierarchyWikidata(WikidataLocations.load());
+					Classification.buildHierarchyWikidata(WikidataLocations.load(),
+							new HashMap<>());
 			List<JsonNode> items =
 					topAndSub.getRight().values().stream().flatMap(x -> x.stream())
 							.filter(n -> n.toString().contains("Angermund"))
 							.collect(Collectors.toList());
-			Logger.info(items.toString());
 			assertThat(items.size()).isEqualTo(1).describedAs(items.toString());
 		});
 	}
