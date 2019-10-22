@@ -415,11 +415,25 @@ public class Application extends Controller {
 	}
 
 	/**
+	 * @return TTL classification data for "Raumsystematik"
+	 */
+	public static Result spatialTtl() {
+		return classificationResponse("download", "Raumsystematik");
+	}
+
+	/**
 	 * @param t The data type: classification, register, or download
 	 * @return Classification data for "Sachsystematik"
 	 */
 	public static Result subjects(String t) {
 		return classificationResponse(t, "Sachsystematik");
+	}
+
+	/**
+	 * @return TTL classification data for "Sachsystematik"
+	 */
+	public static Result subjectsTtl() {
+		return classificationResponse("download", "Sachsystematik");
 	}
 
 	private static Result classificationResponse(String t, String data) {
