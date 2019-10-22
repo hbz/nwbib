@@ -9,7 +9,6 @@ import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -143,8 +142,7 @@ public class ExternalIntegrationTest {
 	public void classificationWikidata() {
 		running(testServer(3333), () -> {
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
-					Classification.buildHierarchyWikidata(WikidataLocations.load(),
-							new HashMap<>());
+					Classification.buildHierarchyWikidata(WikidataLocations.load());
 			List<JsonNode> items =
 					topAndSub.getRight().values().stream().flatMap(x -> x.stream())
 							.filter(n -> n.toString().contains("Angermund"))

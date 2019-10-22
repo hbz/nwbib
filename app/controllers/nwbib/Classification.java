@@ -52,7 +52,6 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterators;
 
 import play.Logger;
 import play.Play;
@@ -66,6 +65,8 @@ import play.libs.Json;
  */
 public class Classification {
 
+	private static final String WIKIDATA = "http://www.wikidata.org/entity/";
+	private static final String NRW = WIKIDATA + "Q1198";
 	private static final String NWBIB_SUBJECTS = "https://nwbib.de/subjects#";
 	private static final String NWBIB_SPATIAL = "https://nwbib.de/spatial#";
 	private static final String INDEX = "nwbib";
@@ -124,9 +125,8 @@ public class Classification {
 		private static void addFromWikidata(
 				Map<String, List<JsonNode>> subClasses) {
 			JsonNode wikidataJson = WikidataLocations.load();
-			Map<String, String> keyForBroader = new HashMap<>();
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
-					Classification.buildHierarchyWikidata(wikidataJson, keyForBroader);
+					Classification.buildHierarchyWikidata(wikidataJson);
 			String n9 = NWBIB_SPATIAL + "N9";
 			String euregio = NWBIB_SPATIAL + "N91";
 			List<JsonNode> n9Sub = new ArrayList<>();
@@ -139,8 +139,7 @@ public class Classification {
 			for (Entry<String, List<JsonNode>> e : right.entrySet()) {
 				if (!e.getValue().stream().anyMatch(n -> subClasses.values().stream()
 						.flatMap(List::stream).collect(Collectors.toList()).contains(n))) {
-					String sup = keyForBroader.get(e.getKey());
-					subClasses.put(sup, e.getValue());
+					subClasses.put(e.getKey(), e.getValue());
 				}
 			}
 		}
@@ -322,12 +321,10 @@ public class Classification {
 
 	/**
 	 * @param json The Wikidata SPARQL query response
-	 * @param keyForBroader A mapping to be filled during processing of the JSON,
-	 *          maps QID-URIs to NID-URIs (the latter are used as broader values)
 	 * @return The hierarchy for the given Wikidata JSON
 	 */
 	public static Pair<List<JsonNode>, Map<String, List<JsonNode>>> buildHierarchyWikidata(
-			JsonNode json, Map<String, String> keyForBroader) {
+			JsonNode json) {
 		List<JsonNode> topClasses = new ArrayList<>();
 		Map<String, List<JsonNode>> subClasses = new HashMap<>();
 		Set<String> itemIds = new HashSet<>();
@@ -336,11 +333,6 @@ public class Classification {
 		});
 		json.elements().forEachRemaining(item -> {
 			String id = item.get("item").get("value").textValue();
-			String nwbibId =
-					item.has("nwbibId") ? item.get("nwbibId").get("value").textValue()
-							: "";
-			keyForBroader.put(toNwbibNamespace(id),
-					!nwbibId.isEmpty() ? NWBIB_SPATIAL + nwbibId : id);
 			String label = item.get("itemLabel").get("value").textValue();
 			String topLevelLabelPrefix = "Regierungsbezirk";
 			String nwbibNamespaceId = toNwbibNamespace(id);
@@ -352,21 +344,19 @@ public class Classification {
 				topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
 						"label", label, "gnd", gnd, "hits", hits, "notation", notation)));
 			} else if (item.has("partOf")) {
-				String broaderId = item.get("partOf").get("value").textValue();
+				String broaderId =
+						WIKIDATA + item.get("partOf").get("value").textValue();
 				String dissolution = item.has("dissolutionDate")
 						? item.get("dissolutionDate").get("value").textValue().split("-")[0]
 						: "";
 				label = !dissolution.isEmpty()
-						? label + String.format(" (bis %s)", dissolution)
-						: label;
-				String nrw = "http://www.wikidata.org/entity/Q1198";
-				if (id.equals(nrw)) {
+						? label + String.format(" (bis %s)", dissolution) : label;
+				if (id.equals(NRW)) {
 					topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
 							"label", "Sonstige", "notation", notation)));
 				}
-				if (isItem(json, broaderId) && (!(broaderId.equals(nrw)
-						&& label.startsWith(topLevelLabelPrefix))
-						|| (broaderId.equals(nrw)))) {
+				if ((!(broaderId.equals(NRW) && label.startsWith(topLevelLabelPrefix))
+						|| (broaderId.equals(NRW)))) {
 					if (!subClasses.containsKey(toNwbibNamespace(broaderId)))
 						subClasses.put(toNwbibNamespace(broaderId),
 								new ArrayList<JsonNode>());
@@ -386,12 +376,6 @@ public class Classification {
 		return idSuffix.startsWith("N") ? idSuffix.substring(1)
 				: Stream.of("ags", "ks", "rs").filter(k -> item.has(k)).findFirst()
 						.map(k -> item.get(k).get("value").textValue()).orElse("");
-	}
-
-	private static boolean isItem(JsonNode json, String broaderId) {
-		return Arrays.asList(Iterators.toArray(json.elements(), JsonNode.class))
-				.stream().anyMatch(
-						i -> i.get("item").get("value").textValue().equals(broaderId));
 	}
 
 	private static Map<String, List<JsonNode>> removeDuplicates(
@@ -467,7 +451,7 @@ public class Classification {
 		return id //
 				.replace("http://purl.org/lobid/nwbib-spatial#n", NWBIB_SPATIAL + "N")
 				.replace("http://purl.org/lobid/nwbib#s", NWBIB_SUBJECTS + "N")
-				.replace("http://www.wikidata.org/entity/Q", NWBIB_SPATIAL + "Q");
+				.replace(WIKIDATA, NWBIB_SPATIAL);
 	}
 
 	static String toPurlNamespace(String id) {
