@@ -353,8 +353,7 @@ public class Application extends Controller {
 		Result result = null;
 		String placeholder = t + " filtern";
 		if (t.equals("Wikidata")) {
-			return classificationResultWikidata(WikidataLocations.load(), t,
-					placeholder);
+			return classificationResultWikidata(t, placeholder);
 		}
 		if (t.isEmpty()) {
 			result = ok(classification.render());
@@ -449,11 +448,11 @@ public class Application extends Controller {
 		}
 	}
 
-	// Prototype, see https://github.com/hbz/nwbib/issues/392
-	private static Result classificationResultWikidata(JsonNode json, String t,
+	// Admin UI for reloading classification from Wikidata
+	private static Result classificationResultWikidata(String t,
 			String placeholder) {
 		Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
-				Classification.buildHierarchyWikidata(json);
+				Classification.Type.SPATIAL.buildHierarchy();
 		String topClassesJson = Json.toJson(topAndSub.getLeft()).toString();
 		return ok(browse_classification.render(topClassesJson, topAndSub.getRight(),
 				t, placeholder));

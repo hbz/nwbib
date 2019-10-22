@@ -85,18 +85,25 @@
                     case _ => value
                  }}">@Html(entryLabel)</a> @if(hits>0){
                  (<a href="@{t match {
-                    case "Wikidata" => nwbib.routes.Application.search(q=s"""spatial.id:"$value"""")
+                    case "Wikidata" => nwbib.routes.Application.search(nwbibspatial=value) //nwbib.routes.Application.search(q=s"""spatial.id:"$value"""")
                     case "Raumsystematik" => nwbib.routes.Application.search(nwbibspatial=value)
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
                     case _ => value
                  }}">@hits</a>)
-                 <span class='copy-link'><a data-toggle="tooltip" data-placement="right" title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy', $(this));return false;"><span class="octicon octicon-clippy"></span></a></span>
+                 <span @if(t!="Wikidata"){class='copy-link'}><a data-toggle="tooltip" data-placement="right" title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy', $(this));return false;"><span class="octicon octicon-clippy"></span></a></span>
                  }
                 <div style="display: none">@normalized</div>
               }
               @if(t=="Wikidata"){
+                    @if(anchor.startsWith("Q")) {
+                        <a title='Eintrag in Wikidata anzeigen' href='https://www.wikidata.org/wiki/@anchor'>
+                          <small><span class="label label-primary">wd</span></small>
+                        </a>
+                    }
                     @for(gnd <- (json\"gnd").asOpt[String]; if !gnd.isEmpty){
-                        <a title='Verknüpften GND-Eintrag anzeigen' href='http://lobid.org/gnd/@gnd'><small><span class="label label-info">gnd</span></small></a>
+                        <a title='Verknüpften GND-Eintrag anzeigen' href='http://lobid.org/gnd/@gnd'>
+                          <small><span class="label label-info">gnd</span></small>
+                        </a>
                     }
               }
               @if(subs != null && subs.get(value) != null){
