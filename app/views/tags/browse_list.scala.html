@@ -85,7 +85,7 @@
                     case _ => value
                  }}">@Html(entryLabel)</a> @if(hits>0){
                  (<a href="@{t match {
-                    case "Wikidata" => nwbib.routes.Application.search(nwbibspatial=value) //nwbib.routes.Application.search(q=s"""spatial.id:"$value"""")
+                    case "Wikidata" => nwbib.routes.Application.search(nwbibspatial=value)
                     case "Raumsystematik" => nwbib.routes.Application.search(nwbibspatial=value)
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
                     case _ => value
