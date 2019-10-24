@@ -8,7 +8,7 @@
 
 @main("NWBib - " + t) {
     @if(t=="Wikidata"){
-        <div class="alert alert-warning text-center" role="alert">Dies ist eine experimentelle Visualisierung von Orten und Verwaltungseinheiten in NRW aus Wikidata</div>
+        <div class="alert alert-warning text-center" role="alert">Dies ist eine Administrationsoberfläche zur Aktualisierung der Raumsystematik aus Wikidata</div>
     }
     @tags.browse_list(tops, subs, t, placeholder)
     @if(t=="Wikidata"){
@@ -19,7 +19,7 @@
     } else {
         <p>
           <a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatial("register")}else{@nwbib.routes.Application.subjects("register")}"><span class="glyphicon glyphicon-sort-by-alphabet"></span> A-Z Register</a> | 
-          <a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatial("download")}else{@nwbib.routes.Application.subjects("download")}"><span class="glyphicon glyphicon-download-alt"></span> SKOS-Datei</a>
+          <a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatialTtl()}else{@nwbib.routes.Application.subjectsTtl()}"><span class="glyphicon glyphicon-download-alt"></span> SKOS-Datei</a>
         </p>
     }
 }
