@@ -232,12 +232,6 @@ nwbib-spatial:N48  a    skos:Concept ;
         skos:prefLabel  "Niederrheinisch-Westfälischer Reichskreis"@de ;
         foaf:focus      wd:Q708742 .
 
-nwbib-spatial:N52  a    skos:Concept ;
-        skos:broader    nwbib-spatial:N4-7 ;
-        skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:notation   "52" ;
-        skos:prefLabel  "Kleinere geistliche Territorien im Rheinland"@de .
-
 nwbib-spatial:N72  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
@@ -246,28 +240,28 @@ nwbib-spatial:N72  a    skos:Concept ;
 
 nwbib-spatial:Q325202
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N52 ;
+        skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Reichsabtei Burtscheid (bis 1802)"@de , "Reichsabtei Burtscheid"@de ;
         foaf:focus      wd:Q325202 .
 
 nwbib-spatial:Q564155
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N52 ;
+        skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Stift Essen"@de ;
         foaf:focus      wd:Q564155 .
 
 nwbib-spatial:Q152432
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N52 ;
+        skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Reichsabtei Kornelimünster"@de , "Reichsabtei Kornelimünster (bis 1802)"@de ;
         foaf:focus      wd:Q152432 .
 
 nwbib-spatial:Q688373
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N52 ;
+        skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Kloster Werden"@de , "Kloster Werden (bis 1803)"@de ;
         foaf:focus      wd:Q688373 .
@@ -276,7 +270,7 @@ nwbib-spatial:N54  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "54" ;
-        skos:prefLabel  "Kleinere weltliche Territorien im Rheinland"@de .
+        skos:prefLabel  "Kleinere Territorien im Rheinland"@de .
 
 nwbib-spatial:N57  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
@@ -343,14 +337,14 @@ nwbib-spatial:N70  a    skos:Concept ;
 
 nwbib-spatial:Q15130492
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N72 ;
+        skos:broader    nwbib-spatial:N74 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Stift Corvey"@de ;
         foaf:focus      wd:Q15130492 .
 
 nwbib-spatial:Q316174
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N72 ;
+        skos:broader    nwbib-spatial:N74 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Stift Herford (bis 1802)"@de , "Stift Herford"@de ;
         foaf:focus      wd:Q316174 .
@@ -359,7 +353,7 @@ nwbib-spatial:N74  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "74" ;
-        skos:prefLabel  "Kleinere weltliche Territorien in Westfalen"@de .
+        skos:prefLabel  "Kleinere Territorien in Westfalen"@de .
 
 nwbib-spatial:N76  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
