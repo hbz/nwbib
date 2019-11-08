@@ -37,6 +37,35 @@ nwbib-spatial:N07  a    skos:Concept ;
         skos:notation   "07" ;
         skos:prefLabel  "Europaregionen"@de .
 
+nwbib-spatial:Q1374337
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N07 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Euregio (Sitz: Gronau)"@de ;
+        foaf:focus      wd:Q1374337 .
+
+nwbib-spatial:Q572255
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N07 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Euregio Maas-Rhein (Sitz: Eupen)"@de ;
+        foaf:focus      wd:Q572255 .
+
+nwbib-spatial:Q1374344
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N07 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Euregio Rhein-Maas-Nord (Sitz:
+Mönchengladbach)"@de ;
+        foaf:focus      wd:Q1374344 .
+
+nwbib-spatial:Q1374348
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N07 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Euregio Rhein-Waal (Sitz: Kleve)"@de ;
+        foaf:focus      wd:Q1374348 .
+
 nwbib-spatial:N1-2  a   skos:Concept ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "1-2" ;
