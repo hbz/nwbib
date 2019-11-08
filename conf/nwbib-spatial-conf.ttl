@@ -31,6 +31,12 @@ nwbib-spatial:N05  a    skos:Concept ;
         skos:prefLabel  "Westfalen"@de ;
         foaf:focus      wd:Q8614 .
 
+nwbib-spatial:N07  a    skos:Concept ;
+        skos:broader    nwbib-spatial:N0 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:notation   "07" ;
+        skos:prefLabel  "Europaregionen"@de .
+
 nwbib-spatial:N1-2  a   skos:Concept ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "1-2" ;
@@ -430,9 +436,3 @@ nwbib-spatial:Q313969
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Regierungsbezirk Minden (bis 1947)"@de ;
         foaf:focus      wd:Q313969 .
-
-nwbib-spatial:N91  a    skos:Concept ;
-        skos:broader    nwbib-spatial:N9 ;
-        skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:notation   "91" ;
-        skos:prefLabel  "Euregio"@de .
