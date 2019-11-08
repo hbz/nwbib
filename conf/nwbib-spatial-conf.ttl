@@ -276,7 +276,7 @@ nwbib-spatial:Q325202
         a               skos:Concept ;
         skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:prefLabel  "Reichsabtei Burtscheid (bis 1802)"@de , "Reichsabtei Burtscheid"@de ;
+        skos:prefLabel  "Reichsabtei Burtscheid"@de ;
         foaf:focus      wd:Q325202 .
 
 nwbib-spatial:Q564155
@@ -290,14 +290,14 @@ nwbib-spatial:Q152432
         a               skos:Concept ;
         skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:prefLabel  "Reichsabtei Kornelimünster"@de , "Reichsabtei Kornelimünster (bis 1802)"@de ;
+        skos:prefLabel  "Reichsabtei Kornelimünster"@de ;
         foaf:focus      wd:Q152432 .
 
 nwbib-spatial:Q688373
         a               skos:Concept ;
         skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:prefLabel  "Kloster Werden"@de , "Kloster Werden (bis 1803)"@de ;
+        skos:prefLabel  "Kloster Werden"@de ;
         foaf:focus      wd:Q688373 .
 
 nwbib-spatial:N54  a    skos:Concept ;
@@ -380,7 +380,7 @@ nwbib-spatial:Q316174
         a               skos:Concept ;
         skos:broader    nwbib-spatial:N74 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:prefLabel  "Stift Herford (bis 1802)"@de , "Stift Herford"@de ;
+        skos:prefLabel  "Stift Herford"@de ;
         foaf:focus      wd:Q316174 .
 
 nwbib-spatial:N74  a    skos:Concept ;
