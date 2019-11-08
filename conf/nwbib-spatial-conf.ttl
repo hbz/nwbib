@@ -55,8 +55,7 @@ nwbib-spatial:Q1374344
         a               skos:Concept ;
         skos:broader    nwbib-spatial:N07 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:prefLabel  "Euregio Rhein-Maas-Nord (Sitz:
-Mönchengladbach)"@de ;
+        skos:prefLabel  "Euregio Rhein-Maas-Nord (Sitz: Mönchengladbach)"@de ;
         foaf:focus      wd:Q1374344 .
 
 nwbib-spatial:Q1374348
