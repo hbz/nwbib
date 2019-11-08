@@ -133,9 +133,13 @@ public class Classification {
 			subClasses.put(n9, n9Sub);
 			Map<String, List<JsonNode>> right = topAndSub.getRight();
 			for (Entry<String, List<JsonNode>> e : right.entrySet()) {
+				String key = e.getKey();
+				List<JsonNode> list = subClasses.containsKey(key) ? subClasses.get(key)
+						: new ArrayList<>();
+				list.addAll(e.getValue());
 				if (!e.getValue().stream().anyMatch(n -> subClasses.values().stream()
 						.flatMap(List::stream).collect(Collectors.toList()).contains(n))) {
-					subClasses.put(e.getKey(), e.getValue());
+					subClasses.put(key, list);
 				}
 			}
 		}
