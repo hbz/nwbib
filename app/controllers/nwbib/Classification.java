@@ -128,12 +128,8 @@ public class Classification {
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
 					Classification.buildHierarchyWikidata(wikidataJson);
 			String n9 = NWBIB_SPATIAL + "N9";
-			String euregio = NWBIB_SPATIAL + "N91";
 			List<JsonNode> n9Sub = new ArrayList<>();
 			n9Sub.addAll(topAndSub.getLeft());
-			n9Sub.add(subClasses.get(n9).stream()
-					.filter(json -> json.get("value").textValue().equals(euregio))
-					.iterator().next());
 			subClasses.put(n9, n9Sub);
 			Map<String, List<JsonNode>> right = topAndSub.getRight();
 			for (Entry<String, List<JsonNode>> e : right.entrySet()) {
