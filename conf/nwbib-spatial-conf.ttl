@@ -266,12 +266,6 @@ nwbib-spatial:N48  a    skos:Concept ;
         skos:prefLabel  "Niederrheinisch-Westfälischer Reichskreis"@de ;
         foaf:focus      wd:Q708742 .
 
-nwbib-spatial:N72  a    skos:Concept ;
-        skos:broader    nwbib-spatial:N4-7 ;
-        skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:notation   "72" ;
-        skos:prefLabel  "Kleinere geistliche Territorien in Westfalen"@de .
-
 nwbib-spatial:Q325202
         a               skos:Concept ;
         skos:broader    nwbib-spatial:N54 ;
