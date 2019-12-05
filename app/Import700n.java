@@ -55,7 +55,9 @@ public class Import700n {
 						processSubject(record), processSpatial(record));
 				String resultLine = String.format("%s\t%s", //
 						record.get("hbzId").asText(),
-						subjects.collect(Collectors.joining(", ")));
+						subjects.collect(Collectors.joining(", "))//
+								// https://github.com/hbz/lobid-resources/issues/1018
+								.replaceAll("spatial#N05", "spatial#N04"));
 				System.out.println(resultLine);
 				writer.write(resultLine + "\n");
 			}
