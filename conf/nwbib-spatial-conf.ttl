@@ -31,6 +31,40 @@ nwbib-spatial:N05  a    skos:Concept ;
         skos:prefLabel  "Westfalen"@de ;
         foaf:focus      wd:Q8614 .
 
+nwbib-spatial:N07  a    skos:Concept ;
+        skos:broader    nwbib-spatial:N0 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:notation   "07" ;
+        skos:prefLabel  "Europaregionen"@de .
+
+nwbib-spatial:Q1374337
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N07 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Euregio (Sitz: Gronau)"@de ;
+        foaf:focus      wd:Q1374337 .
+
+nwbib-spatial:Q572255
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N07 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Euregio Maas-Rhein (Sitz: Eupen)"@de ;
+        foaf:focus      wd:Q572255 .
+
+nwbib-spatial:Q1374344
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N07 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Euregio Rhein-Maas-Nord (Sitz: Mönchengladbach)"@de ;
+        foaf:focus      wd:Q1374344 .
+
+nwbib-spatial:Q1374348
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N07 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Euregio Rhein-Waal (Sitz: Kleve)"@de ;
+        foaf:focus      wd:Q1374348 .
+
 nwbib-spatial:N1-2  a   skos:Concept ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "1-2" ;
@@ -232,51 +266,39 @@ nwbib-spatial:N48  a    skos:Concept ;
         skos:prefLabel  "Niederrheinisch-Westfälischer Reichskreis"@de ;
         foaf:focus      wd:Q708742 .
 
-nwbib-spatial:N52  a    skos:Concept ;
-        skos:broader    nwbib-spatial:N4-7 ;
-        skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:notation   "52" ;
-        skos:prefLabel  "Kleinere geistliche Territorien im Rheinland"@de .
-
-nwbib-spatial:N72  a    skos:Concept ;
-        skos:broader    nwbib-spatial:N4-7 ;
-        skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:notation   "72" ;
-        skos:prefLabel  "Kleinere geistliche Territorien in Westfalen"@de .
-
 nwbib-spatial:Q325202
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N52 ;
+        skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:prefLabel  "Reichsabtei Burtscheid (bis 1802)"@de , "Reichsabtei Burtscheid"@de ;
+        skos:prefLabel  "Reichsabtei Burtscheid"@de ;
         foaf:focus      wd:Q325202 .
 
 nwbib-spatial:Q564155
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N52 ;
+        skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Stift Essen"@de ;
         foaf:focus      wd:Q564155 .
 
 nwbib-spatial:Q152432
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N52 ;
+        skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:prefLabel  "Reichsabtei Kornelimünster"@de , "Reichsabtei Kornelimünster (bis 1802)"@de ;
+        skos:prefLabel  "Reichsabtei Kornelimünster"@de ;
         foaf:focus      wd:Q152432 .
 
 nwbib-spatial:Q688373
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N52 ;
+        skos:broader    nwbib-spatial:N54 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:prefLabel  "Kloster Werden"@de , "Kloster Werden (bis 1803)"@de ;
+        skos:prefLabel  "Kloster Werden"@de ;
         foaf:focus      wd:Q688373 .
 
 nwbib-spatial:N54  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "54" ;
-        skos:prefLabel  "Kleinere weltliche Territorien im Rheinland"@de .
+        skos:prefLabel  "Kleinere Territorien im Rheinland"@de .
 
 nwbib-spatial:N57  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
@@ -343,23 +365,23 @@ nwbib-spatial:N70  a    skos:Concept ;
 
 nwbib-spatial:Q15130492
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N72 ;
+        skos:broader    nwbib-spatial:N74 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Stift Corvey"@de ;
         foaf:focus      wd:Q15130492 .
 
 nwbib-spatial:Q316174
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N72 ;
+        skos:broader    nwbib-spatial:N74 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:prefLabel  "Stift Herford (bis 1802)"@de , "Stift Herford"@de ;
+        skos:prefLabel  "Stift Herford"@de ;
         foaf:focus      wd:Q316174 .
 
 nwbib-spatial:N74  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "74" ;
-        skos:prefLabel  "Kleinere weltliche Territorien in Westfalen"@de .
+        skos:prefLabel  "Kleinere Territorien in Westfalen"@de .
 
 nwbib-spatial:N76  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
@@ -385,7 +407,7 @@ nwbib-spatial:Q3708105
 nwbib-spatial:N9  a     skos:Concept ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "9" ;
-        skos:prefLabel  "Regierungsbezirke, Kreise, Orte. Euregio"@de .
+        skos:prefLabel  "Regierungsbezirke, Kreise, Orte"@de .
 
 nwbib-spatial:Q7926  a  skos:Concept ;
         skos:broader    nwbib-spatial:N9 ;
@@ -436,9 +458,3 @@ nwbib-spatial:Q313969
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Regierungsbezirk Minden (bis 1947)"@de ;
         foaf:focus      wd:Q313969 .
-
-nwbib-spatial:N91  a    skos:Concept ;
-        skos:broader    nwbib-spatial:N9 ;
-        skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:notation   "91" ;
-        skos:prefLabel  "Euregio"@de .
