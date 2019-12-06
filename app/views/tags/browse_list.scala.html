@@ -70,10 +70,8 @@
              normalized = entryLabel.replaceAll("ß", "ss") + entryLabel.replaceAll("ss", "ß");
              value = (json\"value").as[String];
              hits = (json\"hits").asOpt[scala.Long].getOrElse(0L);
-             last = value.split("[/#]").last;
-             anchor = if(last.startsWith("Q")) {last} else {"N"+last.substring(1)};
-             textToCopy = (if(entryLabel.contains("span")){entryLabel.split("</span> ")(1)}else{entryLabel}) + "$$0" +
-                          (if(value.contains("nwbib#")) "https://nwbib.de/subjects#" else "https://nwbib.de/spatial#") + anchor ) {
+             anchor = value.split("[/#]").last;
+             textToCopy = (if(entryLabel.contains("span")){entryLabel.split("</span> ")(1)}else{entryLabel}) + "$$0" + value) {
               <li id='@anchor'>@if(id=="root" && !placeholder.contains("Register") && t!="Wikidata" && t!="Zeitschriften") { <b>@Html(entryLabel)</b> } else {
                   @if(t!="Zeitschriften"){
                   }
