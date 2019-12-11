@@ -126,6 +126,13 @@ nwbib-spatial:N22  a    skos:Concept ;
         skos:prefLabel  "Bergisches Land"@de ;
         foaf:focus      wd:Q153464 .
 
+nwbib-spatial:N23  a    skos:Concept ;
+        skos:broader    nwbib-spatial:N1-2 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:notation   "23" ;
+        skos:prefLabel  "Siebengebirge"@de ;
+        foaf:focus      wd:Q4236 .
+
 nwbib-spatial:N24  a    skos:Concept ;
         skos:broader    nwbib-spatial:N1-2 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
