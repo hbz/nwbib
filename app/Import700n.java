@@ -52,7 +52,7 @@ public class Import700n {
 			while (scanner.hasNextLine()) {
 				JsonNode record = Json.parse(scanner.nextLine());
 				Stream<String> subjects = Streams.concat(//
-						processSubject(record), processSpatial(record));
+						processSpatial(record), processSubject(record));
 				String resultLine = String.format("%s\t%s", //
 						record.get("hbzId").asText(),
 						subjects.collect(Collectors.joining(", "))//
