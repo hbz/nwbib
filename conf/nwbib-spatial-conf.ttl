@@ -126,7 +126,7 @@ nwbib-spatial:N22  a    skos:Concept ;
         skos:prefLabel  "Bergisches Land"@de ;
         foaf:focus      wd:Q153464 .
 
-nwbib-spatial:N23  a    skos:Concept ;
+nwbib-spatial:Q4236  a  skos:Concept ;
         skos:broader    nwbib-spatial:N1-2 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "23" ;
