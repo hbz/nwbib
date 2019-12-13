@@ -24,10 +24,10 @@ nwbib-spatial:N03  a    skos:Concept ;
         skos:prefLabel  "Rheinland"@de ;
         foaf:focus      wd:Q152243 .
 
-nwbib-spatial:N05  a    skos:Concept ;
+nwbib-spatial:N04  a    skos:Concept ;
         skos:broader    nwbib-spatial:N0 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:notation   "05" ;
+        skos:notation   "04" ;
         skos:prefLabel  "Westfalen"@de ;
         foaf:focus      wd:Q8614 .
 
@@ -125,6 +125,13 @@ nwbib-spatial:N22  a    skos:Concept ;
         skos:notation   "22" ;
         skos:prefLabel  "Bergisches Land"@de ;
         foaf:focus      wd:Q153464 .
+
+nwbib-spatial:N23  a  skos:Concept ;
+        skos:broader    nwbib-spatial:N1-2 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:notation   "23" ;
+        skos:prefLabel  "Siebengebirge"@de ;
+        foaf:focus      wd:Q4236 .
 
 nwbib-spatial:N24  a    skos:Concept ;
         skos:broader    nwbib-spatial:N1-2 ;
