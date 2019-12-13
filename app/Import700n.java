@@ -58,6 +58,10 @@ public class Import700n {
 						subjects.collect(Collectors.joining(", "))//
 								// https://github.com/hbz/lobid-resources/issues/1018
 								.replaceAll("spatial#N05", "spatial#N04"));
+				resultLine = resultLine//
+						.replace("spatial#N04$$0", "Westfalen$$0")
+						.replace("Siebengebirge$$0https://nwbib.de/spatial#Q4236",
+								"Siebengebirge$$0https://nwbib.de/spatial#N23");
 				System.out.println(resultLine);
 				writer.write(resultLine + "\n");
 			}
