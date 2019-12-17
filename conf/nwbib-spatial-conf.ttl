@@ -413,7 +413,7 @@ nwbib-spatial:Q3708105
 
 nwbib-spatial:N9  a     skos:Concept ;
         skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:notation   "9" ;
+        skos:notation   "5" ;
         skos:prefLabel  "Regierungsbezirke, Kreise, Orte"@de .
 
 nwbib-spatial:Q7926  a  skos:Concept ;
