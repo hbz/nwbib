@@ -379,7 +379,7 @@ public class Classification {
 			return notationFromSkos.findValue("@value").asText();
 		}
 		Optional<String> notationKeyWikidata =
-				Stream.of("ags", "ks", "rs").filter(k -> item.has(k)).findFirst();
+				Stream.of("ks", "ags", "rs").filter(k -> item.has(k)).findFirst();
 		return notationKeyWikidata.map(k -> item.get(k).get("value").asText())
 				.orElse("");
 	}
