@@ -128,10 +128,10 @@ public class Classification {
 			JsonNode wikidataJson = WikidataLocations.load();
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
 					Classification.buildHierarchyWikidata(wikidataJson);
-			String n9 = NWBIB_SPATIAL + "N9";
-			List<JsonNode> n9Sub = new ArrayList<>();
-			n9Sub.addAll(topAndSub.getLeft());
-			subClasses.put(n9, n9Sub);
+			String n05 = NWBIB_SPATIAL + "N05";
+			List<JsonNode> n05Sub = new ArrayList<>();
+			n05Sub.addAll(topAndSub.getLeft());
+			subClasses.put(n05, n05Sub);
 			Map<String, List<JsonNode>> right = topAndSub.getRight();
 			for (Entry<String, List<JsonNode>> e : right.entrySet()) {
 				String key = e.getKey();
@@ -384,18 +384,6 @@ public class Classification {
 				.orElse("");
 	}
 
-	private static String formatted(String in) {
-		String result = in;
-		try {
-			int i = Integer.parseInt(result);
-			if (i > 10)
-				result = i + "";
-		} catch (NumberFormatException e) {
-			// if not a number, keep it as it is
-		}
-		return result.replaceAll("000$", "");
-	}
-
 	private static Map<String, List<JsonNode>> removeDuplicates(
 			Map<String, List<JsonNode>> subClasses) {
 		List<String> ids = new ArrayList<>(subClasses.keySet());
@@ -456,8 +444,7 @@ public class Classification {
 					"value", id, //
 					"label",
 					(style == Label.PLAIN || notation.isEmpty() ? ""
-							: "<span class='notation'>" + formatted(notation) + "</span>"
-									+ " ")
+							: "<span class='notation'>" + notation + "</span>" + " ")
 							+ label.findValue("@value").asText(), //
 					"hits", Lobid.getTotalHitsNwbibClassification(id), //
 					"notation", notation, //
