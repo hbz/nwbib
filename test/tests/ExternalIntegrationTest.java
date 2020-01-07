@@ -117,13 +117,13 @@ public class ExternalIntegrationTest {
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
 					Classification.Type.from("Sachsystematik").buildHierarchy();
 			String nwbib = "https://nwbib.de/subjects#";
-			assertThat(topAndSub.getRight().get(nwbib + "s882000")).isNotNull();
-			assertThat(topAndSub.getRight().get(nwbib + "s882000").size())
-					.describedAs("s882000").isGreaterThan(1);
-			assertThat(topAndSub.getRight().get(nwbib + "s884000")).isNull();
-			assertThat(topAndSub.getRight().get(nwbib + "s880000")).isNotNull();
-			assertThat(topAndSub.getRight().get(nwbib + "s880000").size())
-					.describedAs("s880000").isGreaterThan(1);
+			assertThat(topAndSub.getRight().get(nwbib + "N882000")).isNotNull();
+			assertThat(topAndSub.getRight().get(nwbib + "N882000").size())
+					.describedAs("N882000").isGreaterThan(1);
+			assertThat(topAndSub.getRight().get(nwbib + "N884000")).isNull();
+			assertThat(topAndSub.getRight().get(nwbib + "N880000")).isNotNull();
+			assertThat(topAndSub.getRight().get(nwbib + "N880000").size())
+					.describedAs("N880000").isGreaterThan(1);
 		});
 	}
 

@@ -167,7 +167,8 @@ public class InternalIntegrationTest {
 			assertThat(Classification.pathTo("https://nwbib.de/spatial#Q365"))
 					.as("path in spatial classification")
 					.isEqualTo(Arrays.asList(//
-							"https://nwbib.de/spatial#N9", //
+							"https://nwbib.de/spatial#N0", //
+							"https://nwbib.de/spatial#N05", //
 							"https://nwbib.de/spatial#Q7927", //
 							"https://nwbib.de/spatial#Q365"));
 		});
@@ -187,7 +188,7 @@ public class InternalIntegrationTest {
 		running(testServer(3333), () -> {
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> pair =
 					Classification.Type.SPATIAL.buildHierarchy();
-			assertThat(pair.getLeft().size()).isEqualTo(5);
+			assertThat(pair.getLeft().size()).isEqualTo(4);
 			assertThat(pair.getRight().get("https://nwbib.de/spatial#N10").size())
 					.isGreaterThan(0);
 			assertThat(pair.getRight().get("https://nwbib.de/spatial#N36").size())
