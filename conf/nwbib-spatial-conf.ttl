@@ -31,6 +31,12 @@ nwbib-spatial:N04  a    skos:Concept ;
         skos:prefLabel  "Westfalen"@de ;
         foaf:focus      wd:Q8614 .
 
+nwbib-spatial:N05  a    skos:Concept ;
+        skos:broader    nwbib-spatial:N0 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:notation   "05" ;
+        skos:prefLabel  "Regierungsbezirke, Kreise, Orte"@de .
+
 nwbib-spatial:N07  a    skos:Concept ;
         skos:broader    nwbib-spatial:N0 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
@@ -411,20 +417,15 @@ nwbib-spatial:Q3708105
         skos:prefLabel  "Fürstbistum Corvey"@de ;
         foaf:focus      wd:Q3708105 .
 
-nwbib-spatial:N9  a     skos:Concept ;
-        skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:notation   "9" ;
-        skos:prefLabel  "Regierungsbezirke, Kreise, Orte"@de .
-
 nwbib-spatial:Q7926  a  skos:Concept ;
-        skos:broader    nwbib-spatial:N9 ;
+        skos:broader    nwbib-spatial:N05 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "051" ;
         skos:prefLabel  "Regierungsbezirk Düsseldorf"@de ;
         foaf:focus      wd:Q7926 .
 
 nwbib-spatial:Q7927  a  skos:Concept ;
-        skos:broader    nwbib-spatial:N9 ;
+        skos:broader    nwbib-spatial:N05 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "053" ;
         skos:prefLabel  "Regierungsbezirk Köln"@de ;
@@ -432,28 +433,28 @@ nwbib-spatial:Q7927  a  skos:Concept ;
 
 nwbib-spatial:Q896929
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N9 ;
+        skos:broader    nwbib-spatial:N05 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "054" ;
         skos:prefLabel  "Regierungsbezirk Aachen (bis 1972)"@de ;
         foaf:focus      wd:Q896929 .
 
 nwbib-spatial:Q7920  a  skos:Concept ;
-        skos:broader    nwbib-spatial:N9 ;
+        skos:broader    nwbib-spatial:N05 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "055" ;
         skos:prefLabel  "Regierungsbezirk Münster"@de ;
         foaf:focus      wd:Q7920 .
 
 nwbib-spatial:Q7923  a  skos:Concept ;
-        skos:broader    nwbib-spatial:N9 ;
+        skos:broader    nwbib-spatial:N05 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "057" ;
         skos:prefLabel  "Regierungsbezirk Detmold"@de ;
         foaf:focus      wd:Q7923 .
 
 nwbib-spatial:Q7924  a  skos:Concept ;
-        skos:broader    nwbib-spatial:N9 ;
+        skos:broader    nwbib-spatial:N05 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:notation   "059" ;
         skos:prefLabel  "Regierungsbezirk Arnsberg"@de ;
@@ -461,7 +462,7 @@ nwbib-spatial:Q7924  a  skos:Concept ;
 
 nwbib-spatial:Q313969
         a               skos:Concept ;
-        skos:broader    nwbib-spatial:N9 ;
+        skos:broader    nwbib-spatial:N05 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Regierungsbezirk Minden (bis 1947)"@de ;
         foaf:focus      wd:Q313969 .

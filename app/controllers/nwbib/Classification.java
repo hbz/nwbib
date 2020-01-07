@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -127,10 +128,10 @@ public class Classification {
 			JsonNode wikidataJson = WikidataLocations.load();
 			Pair<List<JsonNode>, Map<String, List<JsonNode>>> topAndSub =
 					Classification.buildHierarchyWikidata(wikidataJson);
-			String n9 = NWBIB_SPATIAL + "N9";
-			List<JsonNode> n9Sub = new ArrayList<>();
-			n9Sub.addAll(topAndSub.getLeft());
-			subClasses.put(n9, n9Sub);
+			String n05 = NWBIB_SPATIAL + "N05";
+			List<JsonNode> n05Sub = new ArrayList<>();
+			n05Sub.addAll(topAndSub.getLeft());
+			subClasses.put(n05, n05Sub);
 			Map<String, List<JsonNode>> right = topAndSub.getRight();
 			for (Entry<String, List<JsonNode>> e : right.entrySet()) {
 				String key = e.getKey();
@@ -190,7 +191,8 @@ public class Classification {
 
 	private enum Property {
 		LABEL("http://www.w3.org/2004/02/skos/core#prefLabel"), //
-		BROADER("http://www.w3.org/2004/02/skos/core#broader");
+		BROADER("http://www.w3.org/2004/02/skos/core#broader"), //
+		NOTATION("http://www.w3.org/2004/02/skos/core#notation");
 
 		String value;
 
@@ -338,7 +340,7 @@ public class Classification {
 			String nwbibNamespaceId = toNwbibNamespace(id);
 			String gnd =
 					item.has("gnd") ? item.get("gnd").get("value").textValue() : "";
-			String notation = notation(item, nwbibNamespaceId);
+			String notation = notation(item);
 			long hits = Lobid.getTotalHitsNwbibClassification(nwbibNamespaceId);
 			if (label.startsWith(topLevelLabelPrefix)) {
 				topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
@@ -371,11 +373,15 @@ public class Classification {
 		return Pair.of(topClasses, removeDuplicates(subClasses));
 	}
 
-	private static String notation(JsonNode item, String nwbibNamespaceId) {
-		String idSuffix = nwbibNamespaceId.split("#")[1];
-		return idSuffix.startsWith("N") ? idSuffix.substring(1)
-				: Stream.of("ags", "ks", "rs").filter(k -> item.has(k)).findFirst()
-						.map(k -> item.get(k).get("value").textValue()).orElse("");
+	private static String notation(JsonNode item) {
+		JsonNode notationFromSkos = item.findValue(Property.NOTATION.value);
+		if (notationFromSkos != null) {
+			return notationFromSkos.findValue("@value").asText();
+		}
+		Optional<String> notationKeyWikidata =
+				Stream.of("ks", "ags", "rs").filter(k -> item.has(k)).findFirst();
+		return notationKeyWikidata.map(k -> item.get(k).get("value").asText())
+				.orElse("");
 	}
 
 	private static Map<String, List<JsonNode>> removeDuplicates(
@@ -433,15 +439,15 @@ public class Classification {
 		final JsonNode label = json.findValue(Property.LABEL.value);
 		if (label != null) {
 			String id = toNwbibNamespace(hit.getId());
+			String notation = notation(json);
 			ImmutableMap<String, ?> map = ImmutableMap.of(//
 					"value", id, //
 					"label",
-					(style == Label.PLAIN ? ""
-							: "<span class='notation'>" + notation(json, id) + "</span>"
-									+ " ")
+					(style == Label.PLAIN || notation.isEmpty() ? ""
+							: "<span class='notation'>" + notation + "</span>" + " ")
 							+ label.findValue("@value").asText(), //
 					"hits", Lobid.getTotalHitsNwbibClassification(id), //
-					"notation", notation(json, id), //
+					"notation", notation, //
 					"focus", focus(json));
 			result.add(Json.toJson(map));
 		}
@@ -525,9 +531,8 @@ public class Classification {
 	 *         https://nwbib.de/subjects#N582060]
 	 */
 	public static List<String> pathTo(String uri) {
-		Type type =
-				uri.contains("spatial") || uri.contains("wikidata") ? Type.SPATIAL
-						: Type.NWBIB;
+		Type type = uri.contains("spatial") || uri.contains("wikidata")
+				? Type.SPATIAL : Type.NWBIB;
 		Map<String, List<String>> candidates = Cache.getOrElse(type.toString(),
 				() -> generateAllPaths(type.buildHierarchy()), Application.ONE_DAY);
 		return candidates.containsKey(uri) ? candidates.get(uri)
