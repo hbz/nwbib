@@ -271,7 +271,7 @@ public class Classification {
 	}
 
 	/**
-	 * @param uri The NWBib classificationURI
+	 * @param uri The NWBib classification URI
 	 * @param type The ES classification type (see {@link Classification.Type})
 	 * @return The label for the given URI
 	 */
@@ -336,6 +336,11 @@ public class Classification {
 		json.elements().forEachRemaining(item -> {
 			String id = item.get("item").get("value").textValue();
 			String label = item.get("itemLabel").get("value").textValue();
+			String dissolution = item.has("dissolutionDate")
+					? item.get("dissolutionDate").get("value").textValue().split("-")[0]
+					: "";
+			label = !dissolution.isEmpty()
+					? label + String.format(" (bis %s)", dissolution) : label;
 			String topLevelLabelPrefix = "Regierungsbezirk";
 			String nwbibNamespaceId = toNwbibNamespace(id);
 			String gnd =
@@ -348,11 +353,6 @@ public class Classification {
 			} else if (item.has("partOf")) {
 				String broaderId =
 						WIKIDATA + item.get("partOf").get("value").textValue();
-				String dissolution = item.has("dissolutionDate")
-						? item.get("dissolutionDate").get("value").textValue().split("-")[0]
-						: "";
-				label = !dissolution.isEmpty()
-						? label + String.format(" (bis %s)", dissolution) : label;
 				if (id.equals(NRW)) {
 					topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
 							"label", "Sonstige", "notation", notation)));
