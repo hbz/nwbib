@@ -56,8 +56,8 @@ public class Import700n {
 							new FileOutputStream(dataOut), StandardCharsets.UTF_8))) {
 				while (scanner.hasNextLine()) {
 					JsonNode record = Json.parse(scanner.nextLine());
-					// String resultLine = processLobidResource(record);
-					String resultLine = processNwbibSnapshot(record);
+					String resultLine = processLobidResource(record);
+					// String resultLine = processNwbibSnapshot(record);
 					System.out.println(resultLine);
 					writer.write(resultLine + "\n");
 				}
@@ -67,6 +67,7 @@ public class Import700n {
 		});
 	}
 
+	@SuppressWarnings("unused")
 	private static String processNwbibSnapshot(JsonNode record) {
 		String id = record.get("hbzId").asText();
 		String result = processLobidResource(Lobid.getResource(id));
@@ -89,7 +90,10 @@ public class Import700n {
 		resultLine = resultLine//
 				.replace("spatial#N04$$0", "Westfalen$$0")
 				.replace("Siebengebirge$$0https://nwbib.de/spatial#Q4236",
-						"Siebengebirge$$0https://nwbib.de/spatial#N23");
+						"Siebengebirge$$0https://nwbib.de/spatial#N23")
+				.replace(//
+						"Kleinere geistliche Territorien im Rheinland$$0https://nwbib.de/spatial#N52", //
+						"Kleinere Territorien im Rheinland$$0https://nwbib.de/spatial#N54");
 		return resultLine;
 	}
 
