@@ -68,12 +68,13 @@ public class Import700n {
 	}
 
 	private static String processNwbibSnapshot(JsonNode record) {
-		// See https://github.com/hbz/nwbib/issues/514
 		String id = record.get("hbzId").asText();
 		String result = processLobidResource(Lobid.getResource(id));
-		result = result.replace(
-				"Kreis Düsseldorf-Mettmann$$0https://nwbib.de/spatial#Q1787267",
-				"Kreis Mettmann$$0https://nwbib.de/spatial#Q6257");
+		// See https://github.com/hbz/nwbib/issues/516
+		result = result
+				.replace("\t",
+						"\t\"Bistum Münster$$0https://nwbib.de/spatial#Q769380\", ")
+				.replaceAll(", $", "");
 		return result;
 	}
 
