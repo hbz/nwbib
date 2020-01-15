@@ -120,7 +120,7 @@ public class Classification {
 				addFromWikidata(subClasses);
 			}
 			Collections.sort(topClasses, comparator);
-			return Pair.of(topClasses, removeZeroHits(subClasses));
+			return Pair.of(topClasses, subClasses);
 		}
 
 		private static void addFromWikidata(
@@ -143,31 +143,6 @@ public class Classification {
 					subClasses.put(key, list);
 				}
 			}
-		}
-
-		private static Map<String, List<JsonNode>> removeZeroHits(
-				Map<String, List<JsonNode>> subClasses) {
-			Map<String, List<JsonNode>> newSubClasses = new HashMap<>();
-			for (Entry<String, List<JsonNode>> entry : subClasses.entrySet()) {
-				List<JsonNode> newList = new ArrayList<>();
-				for (JsonNode value : entry.getValue()) {
-					if (value.has("hits") && value.get("hits").longValue() > 0L
-							|| isIntermediateNode(value, subClasses)) {
-						newList.add(value);
-					}
-				}
-				if (!newList.isEmpty()) {
-					newSubClasses.put(entry.getKey(), newList);
-				}
-			}
-			return newSubClasses;
-		}
-
-		private static boolean isIntermediateNode(JsonNode json,
-				Map<String, List<JsonNode>> subClasses) {
-			String value = json.get("value").textValue();
-			return subClasses.containsKey(value) && subClasses.get(value).stream()
-					.filter(sub -> sub.get("hits").longValue() > 0L).count() > 0;
 		}
 
 		/**
