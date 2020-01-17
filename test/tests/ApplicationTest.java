@@ -17,6 +17,7 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import controllers.nwbib.Classification;
+import controllers.nwbib.Classification.Type;
 import controllers.nwbib.Lobid;
 import play.libs.Json;
 
@@ -40,8 +41,9 @@ public class ApplicationTest {
 
 	@Test
 	public void classificationLabelNotAvailable() {
-		assertThat(Classification.label("https://nwbib.de/spatial#N58", "no-type"))
-				.as("empty label").isEqualTo("");
+		assertThat(
+				Classification.label("https://nwbib.de/spatial#N58", Type.SPATIAL))
+						.as("empty label").isEqualTo("");
 	}
 
 	@Test

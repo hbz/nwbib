@@ -271,19 +271,34 @@ public class Classification {
 	}
 
 	/**
-	 * @param uri The NWBib classificationURI
+	 * @param uri The NWBib classification URI
 	 * @param type The ES classification type (see {@link Classification.Type})
-	 * @return The label for the given URI
+	 * @return The label for the given classification URI
 	 */
-	public static String label(String uri, String type) {
+	public static String label(String uri, Type type) {
+		return getValueFromIndex(uri, type.elasticsearchType,
+				"http://www.w3.org/2004/02/skos/core#prefLabel");
+	}
+
+	/**
+	 * @param uri The NWBib classification URI
+	 * @param type The ES classification type (see {@link Classification.Type})
+	 * @return The notation for the given classification URI
+	 */
+	public static String notation(String uri, Type type) {
+		return getValueFromIndex(uri, type.elasticsearchType,
+				"http://www.w3.org/2004/02/skos/core#notation");
+	}
+
+	private static String getValueFromIndex(String uri, String type,
+			String field) {
 		try {
 			String response =
 					client.prepareGet(INDEX, type, uri).get().getSourceAsString();
 			if (response != null) {
-				String textValue = Json.parse(response)
-						.findValue("http://www.w3.org/2004/02/skos/core#prefLabel")
-						.findValue("@value").textValue();
-				return textValue != null ? textValue : "";
+				JsonNode resultNode = Json.parse(response).findValue(field);
+				return resultNode != null ? resultNode.findValue("@value").textValue()
+						: "";
 			}
 		} catch (Throwable t) {
 			Logger.error(

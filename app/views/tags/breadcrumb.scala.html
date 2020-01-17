@@ -2,6 +2,7 @@
 
 @import controllers.nwbib.Lobid
 @import controllers.nwbib.Classification
+@import controllers.nwbib.Classification.Type
 @import controllers.nwbib.WikidataLocations
 
 @(nwbibsubject: String, nwbibspatial: String, person:String="", name:String="", subject:String="", id:String="", publisher:String="", issued:String="", medium: String="", owner: String="", t: String="", location: String="", word: String="", corporation: String="", raw: String="", search: Boolean = false)
@@ -10,7 +11,7 @@
 	@if(Lobid.isWikidata(uri)) {
 		@defining(WikidataLocations.label(uri)) { label =>
 		<a title='@uri.split("#").last @WikidataLocations.label(uri)' href='@if(label.startsWith("http")){@label}else{@nwbib.routes.Application.spatial()#@uri.split("#").last}'>
-			@label
+			<span style='color: #777777'>@Classification.notation(uri, Type.SPATIAL)</span> @label
 		</a>
 		}
 	} else {
@@ -30,9 +31,9 @@
 			@labels(nwbibspatial)
 		} else {
 			@defining(Classification.pathTo((if(!nwbibsubject.isEmpty) nwbibsubject else nwbibspatial))) { path => 
-				@defining(path.takeWhile(_.contains("spatial#N"))) { withNotation =>
-					@if(!withNotation.isEmpty){@labels(withNotation.last) &gt;}
-					@for(segment <- path.dropWhile(_.contains("spatial#N"))) {
+				@defining(path.takeWhile(!Classification.notation(_, Type.SPATIAL).isEmpty())) { withNotation =>
+					@if(!withNotation.isEmpty){@labels(withNotation.last) @if(path.last != withNotation.last) {&gt;}}
+					@for(segment <- path.dropWhile(!Classification.notation(_, Type.SPATIAL).isEmpty())) {
 						@labels(segment) @if(segment != path.last) {&gt;}
 					}
 				}
