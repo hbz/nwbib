@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.html.HtmlEscapers;
 
+import controllers.nwbib.Classification.Type;
 import play.Logger;
 import play.Play;
 import play.cache.Cache;
@@ -407,9 +408,8 @@ public class Lobid {
 		if (cachedResult != null) {
 			return cachedResult;
 		}
-		String type =
-				uri.contains("spatial") ? Classification.Type.SPATIAL.elasticsearchType
-						: Classification.Type.NWBIB.elasticsearchType;
+		Type type = uri.contains("spatial") ? Classification.Type.SPATIAL
+				: Classification.Type.NWBIB;
 		String label =
 				Classification.label(Classification.toPurlNamespace(uri), type);
 		label = HtmlEscapers.htmlEscaper().escape(label);
