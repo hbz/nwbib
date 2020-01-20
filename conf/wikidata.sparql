@@ -14,7 +14,7 @@ WHERE {
   ?item wdt:P6814 ?nwbibId.
   SERVICE wikibase:label { bd:serviceParam wikibase:language "de" }
   OPTIONAL { ?item wdt:P31 ?instanceOf
-            FILTER(str(?instanceOf)="http://www.wikidata.org/entity/Q2740635")}
+            VALUES ?instanceOf { wd:Q2740635 wd:Q15632133 wd:Q13415859 wd:Q317669 } }
   OPTIONAL { ?item wdt:P227 ?gnd }
   OPTIONAL { ?item wdt:P576 ?dissolutionDate }
   OPTIONAL { ?item wdt:P439 ?ags
