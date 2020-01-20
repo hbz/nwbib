@@ -9,7 +9,7 @@ SELECT DISTINCT
 ?partOf
 ?nwbibId
 ?gnd
-(group_concat(distinct ?stadtbezirkTyp; separator = ", ") as ?instanceOf)
+(group_concat(distinct ?stadtbezirkTyp; separator = ", ") as ?isStadtbezirk)
 WHERE {
   ?item wdt:P6814 ?nwbibId.
   SERVICE wikibase:label { bd:serviceParam wikibase:language "de" }
