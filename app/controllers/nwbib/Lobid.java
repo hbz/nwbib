@@ -665,7 +665,7 @@ public class Lobid {
 
 	private static boolean isNwBibSpatial(String term) {
 		return term.startsWith("http://purl.org/lobid/nwbib-spatial#")
-				|| term.startsWith("https://nwbib.de/spatial#N");
+				|| term.startsWith("https://nwbib.de/spatial#");
 	}
 
 	private static boolean isGnd(String term) {

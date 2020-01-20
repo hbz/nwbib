@@ -9,9 +9,12 @@ SELECT DISTINCT
 ?partOf
 ?nwbibId
 ?gnd
+?instanceOf
 WHERE {
   ?item wdt:P6814 ?nwbibId.
   SERVICE wikibase:label { bd:serviceParam wikibase:language "de" }
+  OPTIONAL { ?item wdt:P31 ?instanceOf
+            FILTER(str(?instanceOf)="http://www.wikidata.org/entity/Q2740635")}
   OPTIONAL { ?item wdt:P227 ?gnd }
   OPTIONAL { ?item wdt:P576 ?dissolutionDate }
   OPTIONAL { ?item wdt:P439 ?ags

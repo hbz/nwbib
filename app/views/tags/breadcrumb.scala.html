@@ -7,19 +7,17 @@
 
 @(nwbibsubject: String, nwbibspatial: String, person:String="", name:String="", subject:String="", id:String="", publisher:String="", issued:String="", medium: String="", owner: String="", t: String="", location: String="", word: String="", corporation: String="", raw: String="", search: Boolean = false)
 
-@labels(uri: String) = {
+@labels(uri: String) = { @defining(Lobid.facetLabel(Seq(uri),"","")) { label =>
 	@if(Lobid.isWikidata(uri)) {
-		@defining(WikidataLocations.label(uri)) { label =>
 		<a title='@uri.split("#").last @WikidataLocations.label(uri)' href='@if(label.startsWith("http")){@label}else{@nwbib.routes.Application.spatial()#@uri.split("#").last}'>
 			<span style='color: #777777'>@Classification.notation(uri, Type.SPATIAL)</span> @label
 		</a>
-		}
 	} else {
 		<a title='@Classification.shortId(uri) @Lobid.facetLabel(Seq(uri),"","")' href='@if(uri.contains("spatial")){@nwbib.routes.Application.spatial()}else{@nwbib.routes.Application.subjects()}#@(if(uri.contains("#")){"N"+uri.split("#")(1).substring(1)}else{uri})'>
-			<span style='color: #777777'>@Classification.shortId(uri)</span> @if(!uri.endsWith("#n9")){@Lobid.facetLabel(Seq(uri),"","")}
+			<span style='color: #777777'>@Classification.shortId(uri)</span> @if(!uri.endsWith("#n9")){@label}
 		</a>
 	}
-}
+}}
 
 @if(!nwbibsubject.isEmpty && !nwbibsubject.contains(",") && Seq(nwbibspatial, person, name, subject, id, publisher, issued, medium, owner, t, location, word, corporation, raw).forall(_.isEmpty)){
 	@if(search){in <a href="@nwbib.routes.Application.subjects()"> Sachgebiete</a> &gt;}

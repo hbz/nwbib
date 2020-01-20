@@ -325,12 +325,7 @@ public class Classification {
 		});
 		json.elements().forEachRemaining(item -> {
 			String id = item.get("item").get("value").textValue();
-			String label = item.get("itemLabel").get("value").textValue();
-			String dissolution = item.has("dissolutionDate")
-					? item.get("dissolutionDate").get("value").textValue().split("-")[0]
-					: "";
-			label = !dissolution.isEmpty()
-					? label + String.format(" (bis %s)", dissolution) : label;
+			String label = buildLabel(item);
 			String topLevelLabelPrefix = "Regierungsbezirk";
 			String nwbibNamespaceId = toNwbibNamespace(id);
 			String gnd =
@@ -361,6 +356,23 @@ public class Classification {
 		});
 		Collections.sort(topClasses, comparator);
 		return Pair.of(topClasses, removeDuplicates(subClasses));
+	}
+
+	private static String buildLabel(JsonNode item) {
+		String label = item.get("itemLabel").get("value").textValue();
+		String instanceOf =
+				item.has("instanceOf") ? item.get("instanceOf").get("value").textValue()
+						: "";
+		label = !instanceOf.isEmpty()
+				&& instanceOf.equals("http://www.wikidata.org/entity/Q2740635")
+				&& !label.contains("Stadtbezirk") ? label + " (Stadtbezirk)" : label;
+		String dissolution = item.has("dissolutionDate")
+				? item.get("dissolutionDate").get("value").textValue().split("-")[0]
+				: "";
+		label =
+				!dissolution.isEmpty() ? label + String.format(" (bis %s)", dissolution)
+						: label;
+		return label;
 	}
 
 	private static String notation(JsonNode item) {
