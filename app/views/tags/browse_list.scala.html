@@ -88,8 +88,8 @@
                     case "Sachsystematik" => nwbib.routes.Application.search(nwbibsubject=value)
                     case _ => value
                  }}">@hits</a>)
-                 <span @if(t!="Wikidata"){class='copy-link'}><a data-toggle="tooltip" data-placement="right" title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy', $(this));return false;"><span class="octicon octicon-clippy"></span></a></span>
                  }
+                 <span @if(t!="Wikidata"){class='copy-link'}><a data-toggle="tooltip" data-placement="right" title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy', $(this));return false;"><span class="octicon octicon-clippy"></span></a></span>
                 <div style="display: none">@normalized</div>
               }
               @if(t=="Wikidata"){
