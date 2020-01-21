@@ -360,12 +360,10 @@ public class Classification {
 
 	private static String buildLabel(JsonNode item) {
 		String label = item.get("itemLabel").get("value").textValue();
-		String instanceOf =
-				item.has("instanceOf") ? item.get("instanceOf").get("value").textValue()
-						: "";
-		label = !instanceOf.isEmpty()
-				&& instanceOf.equals("http://www.wikidata.org/entity/Q2740635")
-				&& !label.contains("Stadtbezirk") ? label + " (Stadtbezirk)" : label;
+		String isStadtbezirk = item.has("isStadtbezirk")
+				? item.get("isStadtbezirk").get("value").textValue() : "";
+		label = !isStadtbezirk.isEmpty() && !label.contains("Stadtbezirk")
+				? label + " (Stadtbezirk)" : label;
 		String dissolution = item.has("dissolutionDate")
 				? item.get("dissolutionDate").get("value").textValue().split("-")[0]
 				: "";
