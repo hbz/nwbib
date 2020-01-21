@@ -56,8 +56,8 @@ public class Import700n {
 							new FileOutputStream(dataOut), StandardCharsets.UTF_8))) {
 				while (scanner.hasNextLine()) {
 					JsonNode record = Json.parse(scanner.nextLine());
-					String resultLine = processLobidResource(record);
-					// String resultLine = processNwbibSnapshot(record);
+					// String resultLine = processLobidResource(record);
+					String resultLine = processNwbibSnapshot(record);
 					System.out.println(resultLine);
 					writer.write(resultLine + "\n");
 				}
@@ -67,15 +67,16 @@ public class Import700n {
 		});
 	}
 
-	@SuppressWarnings("unused")
+	// @SuppressWarnings("unused")
 	private static String processNwbibSnapshot(JsonNode record) {
 		String id = record.get("hbzId").asText();
 		String result = processLobidResource(Lobid.getResource(id));
-		// See https://github.com/hbz/nwbib/issues/516
-		result = result
-				.replace("\t",
-						"\t\"Bistum Münster$$0https://nwbib.de/spatial#Q769380\", ")
-				.replaceAll(", $", "");
+		// See https://github.com/hbz/nwbib/issues/530
+		String toAdd =
+				"Stadtbezirk Hamm-Bockum-Hövel$$0https://nwbib.de/spatial#Q1573603";
+		if (!result.contains(toAdd))
+			result =
+					result.replace("\t", "\t\"" + toAdd + "\", ").replaceAll(", $", "");
 		return result;
 	}
 
