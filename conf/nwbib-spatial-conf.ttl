@@ -383,13 +383,6 @@ nwbib-spatial:Q15130492
         skos:prefLabel  "Stift Corvey"@de ;
         foaf:focus      wd:Q15130492 .
 
-nwbib-spatial:Q316174
-        a               skos:Concept ;
-        skos:broader    nwbib-spatial:N74 ;
-        skos:inScheme   <https://nwbib.de/spatial> ;
-        skos:prefLabel  "Stift Herford"@de ;
-        foaf:focus      wd:Q316174 .
-
 nwbib-spatial:N74  a    skos:Concept ;
         skos:broader    nwbib-spatial:N4-7 ;
         skos:inScheme   <https://nwbib.de/spatial> ;
