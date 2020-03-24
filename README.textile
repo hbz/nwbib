@@ -21,6 +21,28 @@ h2. Production
 
 Use @"start 8000"@ to run in production background mode on port 8000 (hit Ctrl+D to exit logs). To restart a production instance running in the background, you can use the included @restart.sh@ script (configured to use port 8000). For more information, see the "Play documentation":https://playframework.com/documentation/2.4.x/Home.
 
+h2. Classification
+
+This application uses the classifications in "https://github.com/hbz/lobid-vocabs/tree/master/nwbib":https://github.com/hbz/lobid-vocabs/tree/master/nwbib. The @nwbib-spatial@ classification is based on Wikidata (see "http://slides.lobid.org/nwbib-wikidatacon/":http://slides.lobid.org/nwbib-wikidatacon/ for details). To update the local classification from Wikidata:
+
+Delete the local Elasticsearch data:
+
+@rm -rf ./data@
+
+Delete the local Wikidata cache:
+
+@rm conf/wikidata.json@
+
+Re-generate the full classification:
+
+@sbt "runMain SpatialToSkos"@
+
+This creates a new @conf/nwbib-spatial.ttl@ file with data from the new @conf/wikidata.json@ and @conf/nwbib-spatial-conf.ttl@. The classification is consumed from "https://raw.githubusercontent.com/hbz/lobid-vocabs/master/nwbib/nwbib-spatial.ttl":https://raw.githubusercontent.com/hbz/lobid-vocabs/master/nwbib/nwbib-spatial.ttl, so we copy the result to the @lobid-vocabs@ repo:
+
+@cp conf/nwbib-spatial.ttl ../lobid-vocabs/nwbib/@
+
+From here, we can diff, commit, and push our updated classification.
+
 h1. License
 
 GNU General Public License, version 2: "http://www.gnu.org/licenses/gpl-2.0.html":http://www.gnu.org/licenses/gpl-2.0.html
