@@ -127,7 +127,7 @@ public class Import700n {
 	private static boolean isRedundantSuperordinate(JsonNode candidate,
 			Supplier<Stream<JsonNode>> spatialsSupplier) {
 		List<String> spatials = others(spatialsSupplier, candidate);
-		if (spatials.size() <= 1 || !candidate.has("notation")) {
+		if (spatials.isEmpty() || !candidate.has("notation")) {
 			return false;
 		}
 		String id = candidate.get("id").textValue();
