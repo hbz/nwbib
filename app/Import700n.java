@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import controllers.nwbib.Classification;
 import controllers.nwbib.Lobid;
+import controllers.nwbib.WikidataLocations;
 import play.libs.Json;
 
 /**
@@ -40,10 +41,16 @@ public class Import700n {
 	// see conf/700n-import.sh to obtain full input data
 	private static File dataIn = new File("conf/700n-import-test.jsonl");
 	private static File dataOut = new File("conf/700n-import-test.txt");
-	private static Function<JsonNode, String> toAlephImportValue =
-			node -> String.format("\"%s$$0%s\"", //
-					node.get("label").asText(), //
-					node.get("id").asText());
+	private static Function<JsonNode, String> toAlephImportValue = node -> {
+		String label = node.get("label").asText();
+		String id = node.get("id").asText();
+		// See https://github.com/hbz/nwbib/issues/540
+		if (label.contains("spatial#")) {
+			String newLabel = Classification.label(id, Classification.Type.SPATIAL);
+			label = newLabel.isEmpty() ? WikidataLocations.label(id) : newLabel;
+		}
+		return String.format("\"%s$$0%s\"", label, id);
+	};
 
 	/**
 	 * @param args Optional, the input (jsonl) and the output (txt) file names
