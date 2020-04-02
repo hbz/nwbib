@@ -66,8 +66,8 @@ public class Import700n {
 							new FileOutputStream(dataOut), StandardCharsets.UTF_8))) {
 				while (scanner.hasNextLine()) {
 					JsonNode record = Json.parse(scanner.nextLine());
-					String resultLine = processLobidResource(record);
-					// String resultLine = processNwbibSnapshot(record);
+					// String resultLine = processLobidResource(record);
+					String resultLine = processNwbibSnapshot(record);
 					if (resultLine != null) {
 						System.out.println(resultLine);
 						writer.write(resultLine + "\n");
@@ -79,34 +79,29 @@ public class Import700n {
 		});
 	}
 
-	@SuppressWarnings("unused")
 	private static String processNwbibSnapshot(JsonNode record) {
 		String id = record.get("hbzId").asText();
-		String result = processLobidResource(Lobid.getResource(id));
+		JsonNode resource = Lobid.getResource(id);
+		// See https://github.com/hbz/nwbib/issues/540#issuecomment-607698311
+		if (resource.has("inCollection")
+				&& resource.get("inCollection").findValues("id").toString()
+						.contains("http://lobid.org/resources/HT014846970#!")) {
+			return null;
+		}
+		String result = processLobidResource(resource);
+		// See https://github.com/hbz/nwbib/issues/541
+		result = result.replace("https://nwbib.de/spatial#Q881204",
+				"https://nwbib.de/spatial#Q10936");
 		return result;
 	}
 
 	private static String processLobidResource(JsonNode record) {
-		Supplier<Stream<JsonNode>> spatials =
-				() -> asStream(record.findValue("spatial"));
-		if (spatials.get() == null) {
-			return null;
-		}
-		if (shouldProcess(spatials)) {
-			Stream<String> subjects = Streams.concat(//
-					processSpatial(record), processSubject(record));
-			String resultLine = String.format("%s\t%s", //
-					record.get("hbzId").asText(),
-					subjects.collect(Collectors.joining(", ")));
-			return resultLine;
-		}
-		return null;
-	}
-
-	private static boolean shouldProcess(Supplier<Stream<JsonNode>> spatials) {
-		// See https://github.com/hbz/nwbib/issues/540
-		return spatials.get()
-				.anyMatch(spatial -> isRedundantSuperordinate(spatial, spatials));
+		Stream<String> subjects = Streams.concat(//
+				processSpatial(record), processSubject(record));
+		String resultLine = String.format("%s\t%s", //
+				record.get("hbzId").asText(),
+				subjects.collect(Collectors.joining(", ")));
+		return resultLine;
 	}
 
 	private static Stream<String> processSubject(JsonNode record) {
