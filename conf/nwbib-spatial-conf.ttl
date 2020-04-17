@@ -459,3 +459,10 @@ nwbib-spatial:Q313969
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Regierungsbezirk Minden (bis 1947)"@de ;
         foaf:focus      wd:Q313969 .
+
+nwbib-spatial:Q1110953
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:Q7926 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Landkreis Grevenbroich-Neuß (1929 bis 1946)"@de ;
+        foaf:focus      wd:Q1110953 .
