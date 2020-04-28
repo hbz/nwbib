@@ -56,8 +56,8 @@ public class Import700n {
 							new FileOutputStream(dataOut), StandardCharsets.UTF_8))) {
 				while (scanner.hasNextLine()) {
 					JsonNode record = Json.parse(scanner.nextLine());
-					String resultLine = processLobidResource(record);
-					// String resultLine = processNwbibSnapshot(record);
+					// String resultLine = processLobidResource(record);
+					String resultLine = processNwbibSnapshot(record);
 					System.out.println(resultLine);
 					writer.write(resultLine + "\n");
 				}
@@ -67,15 +67,16 @@ public class Import700n {
 		});
 	}
 
-	@SuppressWarnings("unused")
+	// @SuppressWarnings("unused")
 	private static String processNwbibSnapshot(JsonNode record) {
 		String id = record.get("hbzId").asText();
 		String result = processLobidResource(Lobid.getResource(id));
-		// See https://github.com/hbz/nwbib/issues/516
-		result = result
-				.replace("\t",
-						"\t\"Bistum Münster$$0https://nwbib.de/spatial#Q769380\", ")
-				.replaceAll(", $", "");
+		// See https://github.com/hbz/nwbib/issues/530
+		String toAdd =
+				"Stadtbezirk Hamm-Bockum-Hövel$$0https://nwbib.de/spatial#Q1573603";
+		if (!result.contains(toAdd))
+			result =
+					result.replace("\t", "\t\"" + toAdd + "\", ").replaceAll(", $", "");
 		return result;
 	}
 
@@ -83,8 +84,7 @@ public class Import700n {
 		Stream<String> subjects = Streams.concat(//
 				processSpatial(record), processSubject(record));
 		String resultLine = String.format("%s\t%s", //
-				record.get("hbzId").asText(),
-				subjects.collect(Collectors.joining(", "))//
+				record.get("hbzId").asText(), subjects.collect(Collectors.joining(", "))//
 						// https://github.com/hbz/lobid-resources/issues/1018
 						.replaceAll("spatial#N05", "spatial#N04"));
 		resultLine = resultLine//
@@ -100,17 +100,24 @@ public class Import700n {
 	private static Stream<String> processSubject(JsonNode record) {
 		Stream<JsonNode> subjects = asStream(record.findValue("subject"));
 		return subjects == null ? Collections.<String> emptyList().stream()
-				: subjects.filter(subject -> subject.has("source")
-						&& subject.get("source").get("id").textValue()
-								.startsWith("https://nwbib.de")
-						&& subject.has("id") && subject.has("label"))
+				: subjects
+						.filter(subject -> subject.has("source")
+								&& subject.get("source").get("id").textValue()
+										.startsWith("https://nwbib.de")
+								&& subject.has("id") && subject.has("label")
+								// https://github.com/hbz/nwbib/issues/523
+								&& (!subject.get("id").textValue().endsWith("N96")
+										&& !subject.get("id").textValue().endsWith("N97")))
 						.map(toAlephImportValue);
 	}
 
 	private static Stream<String> processSpatial(JsonNode record) {
 		Stream<JsonNode> spatials = asStream(record.findValue("spatial"));
 		return spatials == null ? Collections.<String> emptyList().stream()
-				: spatials.filter(spatial -> spatial.has("id") && spatial.has("label"))
+				: spatials.filter(spatial -> spatial.has("id") && spatial.has("label")
+				// https://github.com/hbz/nwbib/issues/523
+						&& (!spatial.get("id").textValue().endsWith("N96")
+								&& !spatial.get("id").textValue().endsWith("N97")))
 						.map(toAlephImportValue);
 	}
 
