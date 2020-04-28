@@ -1,5 +1,5 @@
 
-/* Copyright 2019 Fabian Steeg, hbz. Licensed under the GPLv2 */
+/* Copyright 2019-2020 Fabian Steeg, hbz. Licensed under the GPLv2 */
 
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -21,7 +23,9 @@ import org.apache.jena.ext.com.google.common.collect.Streams;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import controllers.nwbib.Classification;
 import controllers.nwbib.Lobid;
+import controllers.nwbib.WikidataLocations;
 import play.libs.Json;
 
 /**
@@ -37,10 +41,16 @@ public class Import700n {
 	// see conf/700n-import.sh to obtain full input data
 	private static File dataIn = new File("conf/700n-import-test.jsonl");
 	private static File dataOut = new File("conf/700n-import-test.txt");
-	private static Function<JsonNode, String> toAlephImportValue =
-			node -> String.format("\"%s$$0%s\"", //
-					node.get("label").asText(), //
-					node.get("id").asText());
+	private static Function<JsonNode, String> toAlephImportValue = node -> {
+		String label = node.get("label").asText();
+		String id = node.get("id").asText();
+		// See https://github.com/hbz/nwbib/issues/540
+		if (label.contains("spatial#")) {
+			String newLabel = Classification.label(id, Classification.Type.SPATIAL);
+			label = newLabel.isEmpty() ? WikidataLocations.label(id) : newLabel;
+		}
+		return String.format("\"%s$$0%s\"", label, id);
+	};
 
 	/**
 	 * @param args Optional, the input (jsonl) and the output (txt) file names
@@ -58,8 +68,10 @@ public class Import700n {
 					JsonNode record = Json.parse(scanner.nextLine());
 					// String resultLine = processLobidResource(record);
 					String resultLine = processNwbibSnapshot(record);
-					System.out.println(resultLine);
-					writer.write(resultLine + "\n");
+					if (resultLine != null) {
+						System.out.println(resultLine);
+						writer.write(resultLine + "\n");
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -67,16 +79,19 @@ public class Import700n {
 		});
 	}
 
-	// @SuppressWarnings("unused")
 	private static String processNwbibSnapshot(JsonNode record) {
 		String id = record.get("hbzId").asText();
-		String result = processLobidResource(Lobid.getResource(id));
-		// See https://github.com/hbz/nwbib/issues/530
-		String toAdd =
-				"Stadtbezirk Hamm-Bockum-Hövel$$0https://nwbib.de/spatial#Q1573603";
-		if (!result.contains(toAdd))
-			result =
-					result.replace("\t", "\t\"" + toAdd + "\", ").replaceAll(", $", "");
+		JsonNode resource = Lobid.getResource(id);
+		// See https://github.com/hbz/nwbib/issues/540#issuecomment-607698311
+		if (resource.has("inCollection")
+				&& resource.get("inCollection").findValues("id").toString()
+						.contains("http://lobid.org/resources/HT014846970#!")) {
+			return null;
+		}
+		String result = processLobidResource(resource);
+		// See https://github.com/hbz/nwbib/issues/541
+		result = result.replace("https://nwbib.de/spatial#Q881204",
+				"https://nwbib.de/spatial#Q10936");
 		return result;
 	}
 
@@ -84,16 +99,8 @@ public class Import700n {
 		Stream<String> subjects = Streams.concat(//
 				processSpatial(record), processSubject(record));
 		String resultLine = String.format("%s\t%s", //
-				record.get("hbzId").asText(), subjects.collect(Collectors.joining(", "))//
-						// https://github.com/hbz/lobid-resources/issues/1018
-						.replaceAll("spatial#N05", "spatial#N04"));
-		resultLine = resultLine//
-				.replace("spatial#N04$$0", "Westfalen$$0")
-				.replace("Siebengebirge$$0https://nwbib.de/spatial#Q4236",
-						"Siebengebirge$$0https://nwbib.de/spatial#N23")
-				.replace(//
-						"Kleinere geistliche Territorien im Rheinland$$0https://nwbib.de/spatial#N52", //
-						"Kleinere Territorien im Rheinland$$0https://nwbib.de/spatial#N54");
+				record.get("hbzId").asText(),
+				subjects.collect(Collectors.joining(", ")));
 		return resultLine;
 	}
 
@@ -112,13 +119,38 @@ public class Import700n {
 	}
 
 	private static Stream<String> processSpatial(JsonNode record) {
-		Stream<JsonNode> spatials = asStream(record.findValue("spatial"));
-		return spatials == null ? Collections.<String> emptyList().stream()
-				: spatials.filter(spatial -> spatial.has("id") && spatial.has("label")
-				// https://github.com/hbz/nwbib/issues/523
-						&& (!spatial.get("id").textValue().endsWith("N96")
-								&& !spatial.get("id").textValue().endsWith("N97")))
-						.map(toAlephImportValue);
+		Supplier<Stream<JsonNode>> spatials =
+				() -> asStream(record.findValue("spatial"));
+		if (spatials.get() == null) {
+			return Collections.<String> emptyList().stream();
+		}
+		return spatials.get()
+				.filter(spatial -> spatial.has("id") && spatial.has("label")
+						&& !isRedundantSuperordinate(spatial, spatials))
+				.map(toAlephImportValue);
+	}
+
+	private static boolean isRedundantSuperordinate(JsonNode candidate,
+			Supplier<Stream<JsonNode>> spatialsSupplier) {
+		List<String> spatials = others(spatialsSupplier, candidate);
+		if (spatials.isEmpty() || !candidate.has("notation")) {
+			return false;
+		}
+		String id = candidate.get("id").textValue();
+		for (String spatial : spatials) {
+			boolean isRedundant = Classification.pathTo(spatial).contains(id);
+			if (isRedundant)
+				return true;
+		}
+		return false;
+	}
+
+	private static List<String> others(Supplier<Stream<JsonNode>> spatials,
+			JsonNode spatial) {
+		return spatials.get()
+				.filter(s -> !s.has("notation")
+						&& !s.get("id").textValue().equals(spatial.get("id").textValue()))
+				.map(s -> s.get("id").textValue()).collect(Collectors.toList());
 	}
 
 	private static Stream<JsonNode> asStream(JsonNode record) {
