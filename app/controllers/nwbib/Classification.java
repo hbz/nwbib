@@ -137,9 +137,17 @@ public class Classification {
 				String key = e.getKey();
 				List<JsonNode> list = subClasses.containsKey(key) ? subClasses.get(key)
 						: new ArrayList<>();
-				list.addAll(e.getValue());
-				if (!e.getValue().stream().anyMatch(n -> subClasses.values().stream()
-						.flatMap(List::stream).collect(Collectors.toList()).contains(n))) {
+				List<JsonNode> additionalSubclasses = e.getValue();
+				for (JsonNode candidate : additionalSubclasses) {
+					// Don't replace an existing entry with a Wikidata entry, see
+					// https://github.com/hbz/nwbib/pull/546#issuecomment-618610540
+					if (list.stream().noneMatch(existing -> existing.get("value")
+							.textValue().equals(candidate.get("value").textValue())))
+						list.add(candidate);
+				}
+				if (!additionalSubclasses.stream()
+						.anyMatch(n -> subClasses.values().stream().flatMap(List::stream)
+								.collect(Collectors.toList()).contains(n))) {
 					subClasses.put(key, list);
 				}
 			}
