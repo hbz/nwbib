@@ -11,15 +11,13 @@
         <div class="alert alert-warning text-center" role="alert">Dies ist eine Administrationsoberfläche zur Aktualisierung der Raumsystematik aus Wikidata</div>
     }
     @tags.browse_list(tops, subs, t, placeholder)
-    @if(t=="Wikidata"){
-        <p style="margin-top:10px">@(subs.values.flatMap((vals: List[JsonNode]) => vals).size + Json.parse(tops).asOpt[Seq[JsValue]].getOrElse(Seq()).size - 1) Orte | 
-            <a href='@nwbib.routes.Application.classification("WikidataImport")'>aus Wikidata aktualisieren
-            <span class="glyphicon glyphicon-repeat"></span></a>
-        </p>
-    } else {
-        <p>
-          <a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatial("register")}else{@nwbib.routes.Application.subjects("register")}"><span class="glyphicon glyphicon-sort-by-alphabet"></span> A-Z Register</a> | 
-          <a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatialTtl()}else{@nwbib.routes.Application.subjectsTtl()}"><span class="glyphicon glyphicon-download-alt"></span> SKOS-Datei</a>
-        </p>
-    }
+    <p>
+      @if(controllers.nwbib.Application.CONFIG.getBoolean("index.reload_ui_enabled")){
+        @(subs.values.flatMap((vals: List[JsonNode]) => vals).size + Json.parse(tops).asOpt[Seq[JsValue]].getOrElse(Seq()).size - 1) Orte | 
+        <a href='@nwbib.routes.Application.classification("WikidataImport")'>aus Wikidata aktualisieren
+        <span class="glyphicon glyphicon-repeat"></span></a> | 
+      }
+      <a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatial("register")}else{@nwbib.routes.Application.subjects("register")}"><span class="glyphicon glyphicon-sort-by-alphabet"></span> A-Z Register</a> | 
+      <a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatialTtl()}else{@nwbib.routes.Application.subjectsTtl()}"><span class="glyphicon glyphicon-download-alt"></span> SKOS-Datei</a>
+    </p>
 }

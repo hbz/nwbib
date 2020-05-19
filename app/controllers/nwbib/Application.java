@@ -344,8 +344,9 @@ public class Application extends Controller {
 		if (t.equals("WikidataImport")) {
 			File data = WikidataLocations.wikidataFile();
 			boolean deleteSuccess = data.delete();
+			Cache.remove("classification.Raumsystematik");
 			Logger.debug("Deleting local data: {}, success: {}", data, deleteSuccess);
-			return redirect(routes.Application.classification("Wikidata"));
+			return redirect(routes.Application.spatial("classification"));
 		}
 		Result cachedResult = (Result) Cache.get("classification." + t);
 		if (cachedResult != null)
