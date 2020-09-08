@@ -12,7 +12,7 @@ NWBIB_DUMP=$1
 echo "#FORMAT: BEACON
 #VERSION: 0.1
 #PREFIX: https://d-nb.info/gnd/
-#TARGET: https://lobid.org/nwbib/search?person=https%3A%2F%2Fd-nb.info%2Fgnd%2F{ID}
+#TARGET: https://nwbib.de/search?person=https%3A%2F%2Fd-nb.info%2Fgnd%2F{ID}
 #FEED: https://lobid.org/download/beacons/$NWBIB_CONTRIBUTORS
 #CONTACT: lobid-Team im hbz <semweb at hbz-nrw.de>
 #NAME: Nordrhein-Westfälische Bibliographie (NWBib)
