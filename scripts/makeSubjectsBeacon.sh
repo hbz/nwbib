@@ -9,7 +9,7 @@ NWBIB_SUBJECTS="nwbibSubjects.bf"
 echo "#FORMAT: BEACON
 #VERSION: 0.1
 #PREFIX: https://d-nb.info/gnd/
-#TARGET: https://lobid.org/nwbib/search?subject={ID}
+#TARGET: https://lobid.org/nwbib/search?subject=https%3A%2F%2Fd-nb.info%2Fgnd%2F{ID}
 #FEED: https://lobid.org/download/beacons/$NWBIB_SUBJECTS
 #CONTACT: lobid-Team im hbz <semweb at hbz-nrw.de>
 #NAME: Nordrhein-Westfälische Bibliographie (NWBib)
