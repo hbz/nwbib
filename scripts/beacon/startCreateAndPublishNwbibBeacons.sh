@@ -7,9 +7,9 @@
 
 NWBIB_DUMP="nwbibDump.jsonl"
 
-getNwbibDump.sh $NWBIB_DUMP
-makeContributorsBeacon.sh $NWBIB_DUMP
-makeSubjectsBeacon.sh $NWBIB_DUMP
+bash getNwbibDump.sh $NWBIB_DUMP
+bash makeContributorsBeacon.sh $NWBIB_DUMP
+bash makeSubjectsBeacon.sh $NWBIB_DUMP
 
 scp *.bf lobid@emphytos:/usr/local/lobid/src/lobid.org/download/beacons/
 
