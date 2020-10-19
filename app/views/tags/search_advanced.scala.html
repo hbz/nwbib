@@ -86,7 +86,7 @@ function suggests(term){
   @for(((k,v),i)<- (if(fields.isEmpty) TreeMap("q" -> "") else fields).zipWithIndex){
   <div class="search-field row" id="search-field-@i">
       <div class="form-group col col-md-2">
-            <select id="query-select" class="form-control" onChange="setAutosuggest()">
+            <select id="query-select" title="Suchtyp" class="form-control" onChange="setAutosuggest()">
               <option value="word" @if(k=="word"){selected="selected"})>Alle Wörter</option>
               <option value="id" @if(k=="id"){selected="selected"}>ISBN/ISSN</option>
               <option value="name" @if(k=="name"){selected="selected"}>Titel</option>
@@ -99,7 +99,7 @@ function suggests(term){
       </div>
       <div class="form-group col col-md-9">
         <div class="input-group">
-            <input type="text" id="nwbib-query-advanced" class="form-control" placeholder='@if(v.startsWith("_")){@v.drop(1)}else{Suchanfrage}' value="@if(v.startsWith("_")){}else{@v}" onFocus="$('#search-button').show();"/>
+            <input type="text" id="nwbib-query-advanced" title="Suchtext" class="form-control" placeholder='@if(v.startsWith("_")){@v.drop(1)}else{Suchanfrage}' value="@if(v.startsWith("_")){}else{@v}" onFocus="$('#search-button').show();"/>
             <span class="input-group-btn">
                 <a href="#" title="Kriterium entfernen" class="btn btn-default rem @if(fields.isEmpty||fields.size==1){disabled}" onclick="remSearchWidget(@i)">
                 <span class="octicon octicon-x"></span>
@@ -119,7 +119,7 @@ function suggests(term){
   }
   <div class="row" id="search-button">
       <div class="form-group col-md-2 col-md-offset-5">
-          <button type=submit class="btn btn-link" onclick="addParameters()">
+          <button type=submit class="btn btn-link" onclick="addParameters()" aria-label="@label">
                   <span class="glyphicon glyphicon-search"></span> @label</button>
       </div>
   </div>
