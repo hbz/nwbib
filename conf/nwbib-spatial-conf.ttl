@@ -480,3 +480,10 @@ nwbib-spatial:Q1982226
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Neviges"@de ;
         foaf:focus      wd:Q1982226 .
+
+nwbib-spatial:Q326089
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:Q2942 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Gräfrath"@de ;
+        foaf:focus      wd:Q326089 .
