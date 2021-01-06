@@ -487,3 +487,10 @@ nwbib-spatial:Q326089
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Gräfrath"@de ;
         foaf:focus      wd:Q326089 .
+
+nwbib-spatial:Q15815893
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:Q14878 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Obschwarzbach"@de ;
+        foaf:focus      wd:Q15815893 .
