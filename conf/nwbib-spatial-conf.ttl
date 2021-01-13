@@ -494,3 +494,45 @@ nwbib-spatial:Q15815893
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Obschwarzbach"@de ;
         foaf:focus      wd:Q15815893 .
+
+nwbib-spatial:Q486577
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:Q3097 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Lennep"@de ;
+        foaf:focus      wd:Q486577 .
+
+nwbib-spatial:Q740616
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:Q3097 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Lüttringhausen"@de ;
+        foaf:focus      wd:Q740616 .
+
+nwbib-spatial:Q380591
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:Q12434 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Aegidienberg"@de ;
+        foaf:focus      wd:Q380591 .
+
+nwbib-spatial:Q865701
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:Q4090 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Birlinghoven"@de ;
+        foaf:focus      wd:Q865701 .
+
+nwbib-spatial:Q1486892
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:Q4090 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Hangelar"@de ;
+        foaf:focus      wd:Q1486892 .
+
+nwbib-spatial:Q1436564
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:Q4090 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Menden"@de ;
+        foaf:focus      wd:Q1436564 .
