@@ -1,8 +1,8 @@
 h1. Build
 
-"!https://api.travis-ci.org/hbz/nwbib.png!":https://travis-ci.org/hbz/nwbib
+"!https://github.com/hbz/nwbib/workflows/Scala%20CI/badge.svg?branch=master!":https://github.com/hbz/nwbib/actions?query=workflow%3AScala%20CI
 
-See the @.travis.yml@ file for details on the CI config used by Travis.
+See the @.github/workflows/build.yml@ file for details on the CI config used by Github Actions.
 
 h1. Setup
 
