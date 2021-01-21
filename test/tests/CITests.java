@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * All quick, self-contained tests for running in Travis CI. For running all
+ * All quick, self-contained tests for running as CI. For running all
  * tests, including long running tests and integration tests with dependencies
  * on external services see {@link AllTests}.
  * 
@@ -14,6 +14,6 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ ApplicationTest.class, InternalIntegrationTest.class })
-public class TravisTests {
+public class CITests {
 	//
 }
