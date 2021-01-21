@@ -1,6 +1,6 @@
 h1. Build
 
-"!https://github.com/hbz/nwbib/workflows/Scala%20CI/badge.svg?branch=master!":https://github.com/hbz/nwbib/actions?query=workflow%3AScala%20CI
+"!https://github.com/hbz/nwbib/workflows/Build/badge.svg?branch=master!":https://github.com/hbz/nwbib/actions?query=workflow%3ABuild
 
 See the @.github/workflows/build.yml@ file for details on the CI config used by Github Actions.
 
