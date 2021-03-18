@@ -14,7 +14,7 @@ echo "#FORMAT: BEACON
 #PREFIX: https://d-nb.info/gnd/
 #TARGET: https://nwbib.de/search?q=contribution.agent.id%3A"https%3A%2F%2Fd-nb.info%2Fgnd%2F{ID}"
 #FEED: https://lobid.org/download/beacons/$NWBIB_CONTRIBUTORS
-#CONTACT: lobid-Team im hbz <semweb at hbz-nrw.de>
+#CONTACT: lobid-Team im hbz <lobid-admin at hbz-nrw.de>
 #NAME: Nordrhein-Westfälische Bibliographie (NWBib)
 #INSTITUTION: Hochschulbibliothekszentrum des Landes Nordrhein-Westfalen (hbz)
 #MESSAGE Literatur dieses Beitragenden in der Nordrhein-Westfälischen Bibliographie (NWBib)
