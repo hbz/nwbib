@@ -609,8 +609,8 @@ public class Application extends Controller {
 			JsonNode json = pair.getLeft();
 			String label = pair.getRight();
 			int count = json.get("doc_count").asInt();
-			return (!label.contains("http")) && label.length() > String
-					.format(labelTemplate, "", "", count).length();
+			return (!label.contains("http") && !label.contains("_:")) && label
+					.length() > String.format(labelTemplate, "", "", count).length();
 		};
 
 		Collator collator = Collator.getInstance(Locale.GERMAN);
