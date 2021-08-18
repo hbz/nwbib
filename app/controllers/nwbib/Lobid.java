@@ -108,7 +108,10 @@ public class Lobid {
 		requestHolder = setupWordParameter(q, nwbibspatial, word, requestHolder);
 		if (!name.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("name", name);
-		if (!subject.trim().isEmpty())
+		if (!nwbibsubject.trim().isEmpty() && !subject.trim().isEmpty())
+			requestHolder = requestHolder.setQueryParameter("subject",
+					subject + "," + nwbibsubject);
+		if (!subject.trim().isEmpty() && nwbibsubject.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("subject", subject);
 		if (!id.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("id", id);
@@ -118,7 +121,7 @@ public class Lobid {
 			requestHolder = requestHolder.setQueryParameter("issued", issued);
 		if (!medium.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("medium", medium);
-		if (!nwbibsubject.trim().isEmpty())
+		if (!nwbibsubject.trim().isEmpty() && subject.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("subject", nwbibsubject);
 		if (!owner.isEmpty())
 			requestHolder = requestHolder.setQueryParameter("owner", owner);
@@ -464,7 +467,11 @@ public class Lobid {
 		else if (!corporation.isEmpty())
 			request = request.setQueryParameter("agent", corporation);
 
-		if (!nwbibsubject.isEmpty())
+		if (!nwbibsubject.isEmpty() && !subject.isEmpty())
+			request =
+					request.setQueryParameter("subject", subject + "," + nwbibsubject);
+
+		if (!nwbibsubject.isEmpty() && subject.isEmpty())
 			request = request.setQueryParameter("subject", nwbibsubject);
 
 		if (!raw.isEmpty()
@@ -475,7 +482,7 @@ public class Lobid {
 
 		if (!field.equals(Application.ITEM_FIELD))
 			request = request.setQueryParameter("owner", owner);
-		if (!field.startsWith("http"))
+		if (!field.startsWith("http") && nwbibsubject.isEmpty())
 			request = request.setQueryParameter("subject", subject);
 
 		String url = request.getUrl();
