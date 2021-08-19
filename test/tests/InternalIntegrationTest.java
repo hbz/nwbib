@@ -4,6 +4,9 @@ package tests;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static play.test.Helpers.GET;
+import static play.test.Helpers.fakeRequest;
+import static play.test.Helpers.route;
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 
@@ -24,7 +27,9 @@ import controllers.nwbib.Application;
 import controllers.nwbib.Classification;
 import controllers.nwbib.Lobid;
 import play.libs.F.Promise;
+import play.libs.Json;
 import play.mvc.Http;
+import play.mvc.Result;
 import play.test.Helpers;
 import play.twirl.api.Content;
 
@@ -63,6 +68,22 @@ public class InternalIntegrationTest {
 			assertThat(facets.findValues("count").stream().map(e -> e.intValue())
 					.collect(Collectors.toList())).excludes(0);
 		});
+	}
+
+	@Test // See https://github.com/hbz/nwbib/issues/557
+	public void testSubjectAndNwbibQuery() {
+		running(testServer(3333), () -> {
+			assertThat(hitsFor("subject=bocholt")).as("less-filtered result count")
+					.isGreaterThan(hitsFor(
+							"subject=bocholt&nwbibsubject=https://nwbib.de/subjects#N240000"));
+		});
+	}
+
+	private static Long hitsFor(String params) {
+		Result result = route(fakeRequest(GET, "/search?format=json&" + params));
+		assertThat(result).isNotNull();
+		return Json.parse(Helpers.contentAsString(result)).get("totalItems")
+				.asLong();
 	}
 
 	@Test
