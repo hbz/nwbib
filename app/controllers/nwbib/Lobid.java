@@ -45,7 +45,7 @@ import play.mvc.Http;
  */
 public class Lobid {
 
-	private static final String GND_PREFIX = "https://d-nb.info/gnd";
+	private static final String GND_PREFIX = "https://d-nb.info/gnd/";
 
 	/** Timeout for API calls in milliseconds. */
 	public static final int API_TIMEOUT = 50000;
