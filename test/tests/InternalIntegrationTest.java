@@ -71,12 +71,29 @@ public class InternalIntegrationTest {
 	}
 
 	@Test // See https://github.com/hbz/nwbib/issues/557
-	public void testSubjectAndNwbibQuery() {
+	public void testSubjectLabelAndNwbibQuery() {
 		running(testServer(3333), () -> {
 			assertThat(hitsFor("subject=bocholt")).as("less-filtered result count")
-					.isGreaterThan(hitsFor(
-							"subject=bocholt&nwbibsubject=https://nwbib.de/subjects#N240000"));
+					.isGreaterThan(
+							hitsFor("subject=bocholt&nwbibsubject=" + nwbib("N240000")));
 		});
+	}
+
+	@Test // See https://github.com/hbz/nwbib/issues/573
+	public void testSubjectUriAndNwbibQuery() {
+		running(testServer(3333), () -> {
+			assertThat(hitsFor("subject=" + gnd("4001307-8")))
+					.as("less-filtered result count").isGreaterThan(hitsFor("subject="
+							+ gnd("4001307-8") + "&nwbibsubject=" + nwbib("N702000")));
+		});
+	}
+
+	private static String nwbib(String string) {
+		return "https%3A%2F%2Fnwbib.de%2Fsubjects%23" + string;
+	}
+
+	private static String gnd(String string) {
+		return "https%3A%2F%2Fd-nb.info%2Fgnd%2F" + string;
 	}
 
 	private static Long hitsFor(String params) {
