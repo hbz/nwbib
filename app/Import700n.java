@@ -100,7 +100,7 @@ public class Import700n {
 		Stream<String> subjects = Streams.concat(//
 				processSpatial(record), processSubject(record));
 		String resultLine = String.format("%s\t%s", //
-				record.get("hbzId").asText(),
+				record.get("zdbId").asText(),
 				subjects.collect(Collectors.joining(", ")));
 		return resultLine;
 	}
