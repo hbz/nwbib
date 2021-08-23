@@ -112,7 +112,7 @@ public class Lobid {
 			requestHolder = requestHolder.setQueryParameter("name", name);
 		if (!nwbibsubject.trim().isEmpty() && !subject.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("subject",
-					subject + "," + nwbibsubject);
+					subjectAndNwbibSubject(subject, nwbibsubject));
 		if (!subject.trim().isEmpty() && nwbibsubject.trim().isEmpty())
 			requestHolder = requestHolder.setQueryParameter("subject", subject);
 		if (!id.trim().isEmpty())
@@ -470,8 +470,8 @@ public class Lobid {
 			request = request.setQueryParameter("agent", corporation);
 
 		if (!nwbibsubject.isEmpty() && !subject.isEmpty())
-			request =
-					request.setQueryParameter("subject", subject + "," + nwbibsubject);
+			request = request.setQueryParameter("subject",
+					subjectAndNwbibSubject(subject, nwbibsubject));
 
 		if (!nwbibsubject.isEmpty() && subject.isEmpty())
 			request = request.setQueryParameter("subject", nwbibsubject);
@@ -499,6 +499,11 @@ public class Lobid {
 			return Json.toJson(ImmutableMap.of("entries", Arrays.asList(), "field",
 					field, "count", 0));
 		});
+	}
+
+	private static String subjectAndNwbibSubject(String subject,
+			String nwbibsubject) {
+		return subject + "," + nwbibsubject + ",AND";
 	}
 
 	private static String setUpNwbibspatial(String nwbibspatial) {
