@@ -115,7 +115,7 @@
 
 <dl>
     <dt></dt><dd>
-      <input placeholder="@placeholder" type="text" id="nwbibQuery" class="form-control" onchange="if(this.value!=''){$('#expandAll').click()}else{$('#collapseAll').click()};"/>
+      <input placeholder="@placeholder" title="@placeholder" type="text" id="nwbibQuery" class="form-control" onchange="if(this.value!=''){$('#expandAll').click()}else{$('#collapseAll').click()};"/>
       <input type="hidden" id="nwbibQueryHidden" onchange="$('#expandAll').click();"/>
     </dd>
     @if(subs!=null && !subs.values.isEmpty){

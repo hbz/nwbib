@@ -102,6 +102,8 @@ $(function() {
 			$("#issued-link").attr("href", issuedLink(fromTo));
 			$("#issued-link").show();
 		}
+	}).children().each(function () {
+		$(this).attr('tabindex','-1');
 	});
 	var left = $( "#slider-range" ).slider( "values", 0 );
 	var right = $( "#slider-range" ).slider( "values", 1 );

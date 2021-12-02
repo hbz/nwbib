@@ -4,6 +4,9 @@ package tests;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static play.test.Helpers.GET;
+import static play.test.Helpers.fakeRequest;
+import static play.test.Helpers.route;
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 
@@ -24,7 +27,9 @@ import controllers.nwbib.Application;
 import controllers.nwbib.Classification;
 import controllers.nwbib.Lobid;
 import play.libs.F.Promise;
+import play.libs.Json;
 import play.mvc.Http;
+import play.mvc.Result;
 import play.test.Helpers;
 import play.twirl.api.Content;
 
@@ -63,6 +68,39 @@ public class InternalIntegrationTest {
 			assertThat(facets.findValues("count").stream().map(e -> e.intValue())
 					.collect(Collectors.toList())).excludes(0);
 		});
+	}
+
+	@Test // See https://github.com/hbz/nwbib/issues/557
+	public void testSubjectLabelAndNwbibQuery() {
+		running(testServer(3333), () -> {
+			assertThat(hitsFor("subject=bocholt")).as("less-filtered result count")
+					.isGreaterThan(
+							hitsFor("subject=bocholt&nwbibsubject=" + nwbib("N240000")));
+		});
+	}
+
+	@Test // See https://github.com/hbz/nwbib/issues/573
+	public void testSubjectUriAndNwbibQuery() {
+		running(testServer(3333), () -> {
+			assertThat(hitsFor("subject=" + gnd("4001307-8")))
+					.as("less-filtered result count").isGreaterThan(hitsFor("subject="
+							+ gnd("4001307-8") + "&nwbibsubject=" + nwbib("N702000")));
+		});
+	}
+
+	private static String nwbib(String string) {
+		return "https%3A%2F%2Fnwbib.de%2Fsubjects%23" + string;
+	}
+
+	private static String gnd(String string) {
+		return "https%3A%2F%2Fd-nb.info%2Fgnd%2F" + string;
+	}
+
+	private static Long hitsFor(String params) {
+		Result result = route(fakeRequest(GET, "/search?format=json&" + params));
+		assertThat(result).isNotNull();
+		return Json.parse(Helpers.contentAsString(result)).get("totalItems")
+				.asLong();
 	}
 
 	@Test

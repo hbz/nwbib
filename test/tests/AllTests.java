@@ -7,7 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 /**
  * All tests, including long running tests and integration tests with
  * dependencies on external services. For quick, self-contained tests see
- * {@link TravisTests}.
+ * {@link CITests}.
  * 
  * @author Fabian Steeg (fsteeg)
  *

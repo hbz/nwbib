@@ -610,8 +610,8 @@ public class Application extends Controller {
 			JsonNode json = pair.getLeft();
 			String label = pair.getRight();
 			int count = json.get("doc_count").asInt();
-			return (!label.contains("http")) && label.length() > String
-					.format(labelTemplate, "", "", count).length();
+			return (!label.contains("http") && !label.contains("_:")) && label
+					.length() > String.format(labelTemplate, "", "", count).length();
 		};
 
 		Collator collator = Collator.getInstance(Locale.GERMAN);
@@ -673,11 +673,12 @@ public class Application extends Controller {
 					sort(sort, nwbibspatialQuery, nwbibsubjectQuery, subjectQuery), false,
 					locationQuery, word, corporation, rawQuery, "").url();
 
-			String result = String.format("<li " + (current ? "class=\"active\"" : "")
-					+ "><a class=\"%s-facet-link\" href='%s'>"
-					+ "<input onclick=\"location.href='%s'\" class=\"facet-checkbox\" "
-					+ "type=\"checkbox\" %s>&nbsp;%s</input>" + "</a></li>",
-					Math.abs(field.hashCode()), routeUrl, routeUrl,
+			String result = String.format(
+					"<li " + (current ? "class=\"active\"" : "")
+							+ "><a class=\"%s-facet-link\" href='%s'>"
+							+ "<label for=\"%s\"><input id=\"%s\" onclick=\"location.href='%s'\" class=\"facet-checkbox\" "
+							+ "type=\"checkbox\" %s>&nbsp;%s</input></label>" + "</a></li>",
+					Math.abs(field.hashCode()), routeUrl, routeUrl, routeUrl, routeUrl,
 					current ? "checked" : "", fullLabel);
 
 			return result;

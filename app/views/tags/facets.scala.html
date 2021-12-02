@@ -28,12 +28,12 @@
       <script>
         $("#@(Application.ISSUED_FIELD.hashCode.abs)-facet").hide();
       </script>
-      <h5 id="@field.hashCode.abs-header">
+      <p class="h5" id="@field.hashCode.abs-header">
         @facetToggle("facets-ul-" + field.hashCode.abs.toString){@facet}
         <span id="@field.hashCode.abs-label">
           @facetLabel(current, "ausgewählt", field.hashCode.abs + "-count", current.split("[,+]").size.toString)
         </span>
-      </h5>
+      </p>
       <ul class="facet" id="facets-ul-@field.hashCode.abs">
           <script>
           function appendSection(divId, linkId, lessId, sectionId, facet){
@@ -67,7 +67,7 @@
                for(i = 0; i < lis.length; i++){
                  if(i % step == 0 || lis.length-i < step){
                    var divId = c + "more-@field.hashCode.abs";
-                   ul.append("<div id='" + divId + "' " + (i == 0 ? "" : "style='display:none;'") + ">");
+                   ul.append("<li id='" + divId + "' " + (i == 0 ? "" : "style='display:none;'") + ">");
                    if(c > 0){
                      step = 15;
                    }
@@ -82,7 +82,7 @@
                    }
                    i=j-1;
                    c++;
-                   ul.append("</div>");
+                   ul.append("</li>");
                  }
                }
                var active = $("#facets-ul-@field.hashCode.abs li.active");
@@ -122,22 +122,21 @@
 
 <div class="col-md-3 hide-in-print" style="font-size: small">
   <p class="lead"> Ergebnisse eingrenzen: </p>
-  <h5>@facetToggle("issued-facet-all"){Erscheinungsjahr} @facetLabel(issued, issued)</h5>
+  <p class="h5">@facetToggle("issued-facet-all"){Erscheinungsjahr} @facetLabel(issued, issued)</p>
   <div id="issued-facet-all" style="display:none">  
   <p>
   <div class="row facet"><div class="col-md-12">@facets("Erscheinungsjahre", Application.ISSUED_FIELD, issued, "dropup")</div></div> 
 <div class="row facet"><div class="col-md-12"><canvas id="issued-chart"></canvas></div></div>
-  <div id="slider-range"></div>
-  <input type="text" id="issued-range" readonly value="Lade Erscheinungsjahre...">
+  <div aria-hidden="true" id="slider-range"></div>
+  <input type="text" id="issued-range" readonly value="Lade Erscheinungsjahre..." aria-label="Erscheinungsjahre">
   <div id="issued-div"> <a id="issued-link" style="display:none" href="@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from,size,owner,t,sortParam,location=location,word=word,corporation=corporation,raw=raw)">Anwenden</a> </div>
   </div>
   <p/>
-  <div id="coverage"><h5>@facetToggle("coverage-map"){Raumbezug} @facetLabel(location, locationLabel(location.split("\\|")(0)))</h5>
+  <div id="coverage"><p class="h5">@facetToggle("coverage-map"){Raumbezug} @facetLabel(location, locationLabel(location.split("\\|")(0)))</p>
   <div class="row facet" id="coverage-map"><div class="col-md-12">@coverage_map(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,owner,t,sortParam,location,word,corporation,raw,from,size)</div></div>
   </div>
   <div class="row facet"><div class="col-md-12">@facets("Regionen", Application.NWBIB_SPATIAL_FIELD, nwbibspatial)</div></div>
   <div class="row facet"><div class="col-md-12">@facets("Sachgebiete", Application.NWBIB_SUBJECT_FIELD, nwbibsubject)</div></div>
-  <div class="row facet"><div class="col-md-12">@facets("Orte", Application.COVERAGE_FIELD, raw.split(":").last)</div></div>
   <div class="row facet"><div class="col-md-12">@facets("Schlagwörter", Application.SUBJECT_FIELD, if(!urisOnly(subject).isEmpty) urisOnly(subject) else "", "dropup")</div></div>
   <div class="row facet"><div class="col-md-12">@facets("Medientypen", Application.MEDIUM_FIELD, medium, "dropup")</div></div>
   <div class="row facet"><div class="col-md-12">@facets("Publikationstypen", Application.TYPE_FIELD, t, "dropup")</div></div>

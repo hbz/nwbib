@@ -33,13 +33,13 @@
  }
 
 @sort(param: String, label: String)={
-<li @if(sortParam==param){class="active"}>
+<li role="tab" @if(sortParam==param){class="active" aria-selected="true"} else {aria-selected="false" tabindex="-1" aria-controls="@label"}>
   <a href="@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from,size,owner,t,param,location=location,word=word,corporation=corporation,raw=raw)">@label</a>
 </li>
 }
 
 @pageLink(num: Int)={
-<li @if(size==num){class="active"}>
+<li role="tab" @if(size==num){class="active" aria-selected="true"} else {aria-selected="false" tabindex="-1" aria-controls="@num"}>
   <a href="@nwbib.routes.Application.search(q,person,name,subject,id,publisher,issued,medium,nwbibspatial,nwbibsubject,from,num,owner,t,sortParam,location=location,word=word,corporation=corporation,raw=raw)">@num</a>
 </li>
 }
@@ -73,7 +73,7 @@
              <div class="row hide-in-print" >
                  <div class="col-md-6" style="text-align:left">
                    <ul class="nav nav-pills" role="tablist">
-                     <li class="disabled"> <a href="#">Sortierung:</a> </li>
+                     <li role="tab" class="disabled"> <a href="#">Sortierung:</a> </li>
                      @sort("", "Relevanz")
                      @sort("newest", "Neueste")
                      @sort("oldest", "Älteste")
@@ -81,7 +81,7 @@
                  </div>
                  <div class="col-md-6 text-right" style="text-align:right">
                    <ul class="nav nav-pills" style="display:inline-block" role="tablist">
-                     <li class="disabled">  <a href="#">Treffer pro Seite:</a> </li>
+                     <li role="tab" class="disabled">  <a href="#">Treffer pro Seite:</a> </li>
                      @pageLink(15)
                      @pageLink(25)
                      @pageLink(50)
