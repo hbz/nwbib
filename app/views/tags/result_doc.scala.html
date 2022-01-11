@@ -207,6 +207,19 @@
   }
 }
 
+@parallelausgabe() = {
+  @for(
+      related <- (doc \ "related").asOpt[Seq[JsValue]].getOrElse(Seq());
+      id <- (related \ "id").asOpt[String];
+      hbzId = id.split("\\/").last.replace("#!", "");
+      note <- (related \ "note").asOpt[Seq[String]]) {
+    <tr>
+        <td>Parallelausgabe</td>
+        <td><a href="@hbzId">@note</a></td>
+    </tr>
+  }
+}
+
 @table(){
   <tr><td>Titel</td><td><b>@((doc \ "title").asOpt[String].getOrElse(""))</b></td></tr>
   @for(x <- (doc \ "otherTitleInformation").asOpt[Seq[JsValue]]) {
@@ -236,7 +249,7 @@
    @subordinate("isPartOf.hasSuperordinate.id", id, "Bände", ("zugehöriger Band", "zugehörige Bände"))
    @subordinate("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
   }
-
+  @parallelausgabe()
   @raumsystematik("https://nwbib.de/spatial")
   @sachsystematik("https://nwbib.de/subjects")
 
