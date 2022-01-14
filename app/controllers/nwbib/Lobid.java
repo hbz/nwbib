@@ -415,8 +415,7 @@ public class Lobid {
 		}
 		Type type = uri.contains("spatial") ? Classification.Type.SPATIAL
 				: Classification.Type.NWBIB;
-		String label =
-				Classification.label(Classification.toPurlNamespace(uri), type);
+		String label = Classification.label(uri, type);
 		label = HtmlEscapers.htmlEscaper().escape(label);
 		label = label.trim().isEmpty() ? uri : label;
 		Cache.set(cacheKey, label, Application.ONE_DAY);

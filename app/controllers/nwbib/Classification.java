@@ -468,11 +468,6 @@ public class Classification {
 				.replace(WIKIDATA, NWBIB_SPATIAL);
 	}
 
-	static String toPurlNamespace(String id) {
-		return id //
-				.replace(NWBIB_SUBJECTS + "N", "http://purl.org/lobid/nwbib#s");
-	}
-
 	/**
 	 * @param uri The full URI
 	 * @return A short, human readable representation of the URI
