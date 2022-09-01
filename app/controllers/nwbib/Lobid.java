@@ -682,7 +682,8 @@ public class Lobid {
 	}
 
 	private static boolean isGnd(String term) {
-		return term.startsWith(GND_PREFIX);
+		String oldGndPrefix = "http://d-nb.info/gnd/"; // TODO: temp
+		return term.startsWith(GND_PREFIX) || term.startsWith(oldGndPrefix);
 	}
 
 	private static String locationPolygon(String location) {
