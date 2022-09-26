@@ -515,7 +515,7 @@ liegen in der Zuständigkeit der Universitäts- und Landesbibliothek (ULB) Düss
 Die rot markierten Bereiche liegen in der Zuständigkeit der ULB Münster (Kontaktadressen
 unter der "ULB Münster-Webseite(ULB Münster)":https://www.ulb.uni-muenster.de/landesbibliothek/profil/ansprechpartner/index.html).
 Für selbstständige Werke, die dem Pflichtexemplarrecht unterliegen, sollte die ULB
-Bonn kontaktiert werden ("Kontaktperson der ULB Bonn(Kontaktperson der ULB Bonn)":https://www.ulb.uni-bonn.de/de/die-ulb/organisation-ansprechpartner/ansprechpartner-von-a-z/albrink).
+Bonn kontaktiert werden ("Kontaktperson der ULB Bonn(Kontaktperson der ULB Bonn)":https://www.sammlungen.ulb.uni-bonn.de/de/landesbibliothekarische-sammlungen).
 Einen Tag nach der Korrektur in der GND bzw. im Verbundkatalog sind die Daten in der
 NWBib aktualisiert.
 
