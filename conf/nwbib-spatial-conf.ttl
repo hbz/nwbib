@@ -536,3 +536,11 @@ nwbib-spatial:Q1436564
         skos:inScheme   <https://nwbib.de/spatial> ;
         skos:prefLabel  "Menden"@de ;
         foaf:focus      wd:Q1436564 .
+
+nwbib-spatial:Q47443308
+        a               skos:Concept ;
+        skos:broader    nwbib-spatial:N54 ;
+        skos:inScheme   <https://nwbib.de/spatial> ;
+        skos:prefLabel  "Herrschaft Homburg, Nümbrecht (bis 1806)"@de ;
+        foaf:focus      wd:Q1934754 .
+
