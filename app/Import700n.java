@@ -1,5 +1,5 @@
 
-/* Copyright 2019-2020 Fabian Steeg, hbz. Licensed under the GPLv2 */
+/* Copyright 2019-2021 Fabian Steeg, hbz. Licensed under the GPLv2 */
 
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
@@ -86,7 +86,8 @@ public class Import700n {
 		if (resource.has("inCollection")
 				&& resource.get("inCollection").findValues("id").toString()
 						.contains("http://lobid.org/resources/HT014846970#!")) {
-			return null;
+			// See https://github.com/hbz/nwbib/issues/465, we actually want ZDB here
+			// return null;
 		}
 		String result = processLobidResource(resource);
 		// See https://github.com/hbz/nwbib/issues/541
@@ -99,7 +100,7 @@ public class Import700n {
 		Stream<String> subjects = Streams.concat(//
 				processSpatial(record), processSubject(record));
 		String resultLine = String.format("%s\t%s", //
-				record.get("hbzId").asText(),
+				record.get("zdbId").asText(),
 				subjects.collect(Collectors.joining(", ")));
 		return resultLine;
 	}
