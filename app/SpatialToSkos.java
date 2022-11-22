@@ -283,10 +283,11 @@ public class SpatialToSkos {
 	private static Resource addInSchemePrefLabelAndNotation(Model model,
 			JsonNode top) {
 		String subject = top.get("value").asText();
+		String nwbibId = top.has("nwbibId") ? top.get("nwbibId").asText() : "";
 		String label = top.get("label").asText()
 				.replaceAll("<span class='notation'>([^<]*)</span>", "").trim();
 		boolean wiki = Lobid.isWikidata(subject);
-		String id = subject.split("#")[1].trim();
+		String id = !nwbibId.isEmpty() ? nwbibId : subject.split("#")[1].trim();
 		if (id.equalsIgnoreCase("n35") || id.equalsIgnoreCase("n37"))
 			throw new IllegalArgumentException(
 					"Skipping n35/n37 (temp. workaround, expected)");
