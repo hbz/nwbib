@@ -338,11 +338,16 @@ public class Classification {
 			String nwbibNamespaceId = toNwbibNamespace(id);
 			String gnd =
 					item.has("gnd") ? item.get("gnd").get("value").textValue() : "";
+			String nwbibID = item.has("nwbibId")
+					? item.get("nwbibId").get("value").textValue() : "";
 			String notation = notation(item);
 			long hits = Lobid.getTotalHitsNwbibClassification(nwbibNamespaceId);
+			JsonNode itemJson =
+					Json.toJson(ImmutableMap.builder().put("value", nwbibNamespaceId)
+							.put("label", label).put("gnd", gnd).put("hits", hits)
+							.put("notation", notation).put("nwbibId", nwbibID).build());
 			if (label.startsWith(topLevelLabelPrefix)) {
-				topClasses.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
-						"label", label, "gnd", gnd, "hits", hits, "notation", notation)));
+				topClasses.add(itemJson);
 			} else if (item.has("partOf")) {
 				String broaderId =
 						WIKIDATA + item.get("partOf").get("value").textValue();
@@ -356,8 +361,7 @@ public class Classification {
 						subClasses.put(toNwbibNamespace(broaderId),
 								new ArrayList<JsonNode>());
 					List<JsonNode> sub = subClasses.get(toNwbibNamespace(broaderId));
-					sub.add(Json.toJson(ImmutableMap.of("value", nwbibNamespaceId,
-							"label", label, "gnd", gnd, "hits", hits, "notation", notation)));
+					sub.add(itemJson);
 					Collections.sort(sub, comparator);
 				}
 			}
