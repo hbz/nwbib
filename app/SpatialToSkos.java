@@ -283,17 +283,20 @@ public class SpatialToSkos {
 	private static Resource addInSchemePrefLabelAndNotation(Model model,
 			JsonNode top) {
 		String subject = top.get("value").asText();
-		String nwbibId = top.has("nwbibId") ? top.get("nwbibId").asText() : "";
+		String nwbibId =
+				top.has("nwbibId") ? top.get("nwbibId").asText() : lastSegment(subject);
 		String label = top.get("label").asText()
 				.replaceAll("<span class='notation'>([^<]*)</span>", "").trim();
 		boolean wiki = Lobid.isWikidata(subject);
-		String id = !nwbibId.isEmpty() ? nwbibId : subject.split("#")[1].trim();
+		String wikidataId =
+				lastSegment(top.has("focus") ? top.get("focus").asText() : subject);
+		String id = top.has("nwbibId") ? nwbibId : wikidataId;
 		if (id.equalsIgnoreCase("n35") || id.equalsIgnoreCase("n37"))
 			throw new IllegalArgumentException(
 					"Skipping n35/n37 (temp. workaround, expected)");
 		JsonNode notation = top.get("notation");
 		if (wiki) {
-			toDo.add(id + ",\"\"\"\"" + id + "\"");
+			toDo.add(wikidataId + ",\"\"\"\"" + nwbibId + "\"");
 		}
 		Resource result = model
 				.createResource(wiki ? NWBIB_SPATIAL_NAMESPACE + id : subject,
@@ -305,6 +308,11 @@ public class SpatialToSkos {
 			result.addProperty(SKOS.notation, notation.asText());
 		}
 		return result;
+	}
+
+	private static String lastSegment(String uri) {
+		String[] segments = uri.split("[#/]");
+		return segments[segments.length - 1].trim();
 	}
 
 	private static void write(Model model) {
