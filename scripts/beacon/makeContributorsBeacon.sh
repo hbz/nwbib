@@ -12,12 +12,12 @@ NWBIB_DUMP=$1
 echo "#FORMAT: BEACON
 #VERSION: 0.1
 #PREFIX: https://d-nb.info/gnd/
-#TARGET: https://nwbib.de/search?q=contribution.agent.id%3A"https%3A%2F%2Fd-nb.info%2Fgnd%2F{ID}"
+#TARGET: https://nwbib.de/search?q=contribution.agent.id:%22https//d-nb.info/gnd/{ID}%22
 #FEED: https://lobid.org/download/beacons/$NWBIB_CONTRIBUTORS
 #CONTACT: lobid-Team im hbz <lobid-admin at hbz-nrw.de>
-#NAME: Nordrhein-Westfälische Bibliographie (NWBib)
+#NAME: Nordrhein-Westfaelische Bibliographie (NWBib)
 #INSTITUTION: Hochschulbibliothekszentrum des Landes Nordrhein-Westfalen (hbz)
-#MESSAGE Literatur dieses Beitragenden in der Nordrhein-Westfälischen Bibliographie (NWBib)
+#MESSAGE Literatur dieses Beitragenden in der Nordrhein-Westfaelischen Bibliographie (NWBib)
 #DESCRIPTION: This is an automatically generated BEACON file for all contributors of works catalogued in the Northrhine-Westphalian Bibliography.
 #TIMESTAMP: $TIMESTAMP
 #REVISIT: $REVISIT
