@@ -124,7 +124,7 @@
   <tr>
     <td>Schlagwörter</td>
     <td>
-    @for(subject <- subjects;
+    @for(subject <- subjects.sortBy((s:JsValue) => !(s\"componentList").asOpt[Seq[JsValue]].isDefined);
          components = (subject \ "componentList").asOpt[Seq[JsValue]].getOrElse(Seq(subject));
          component <- components;
          sourceLabel = (component\"source"\"label").asOpt[String];
