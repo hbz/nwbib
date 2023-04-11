@@ -768,6 +768,25 @@ public class Lobid {
 		return numerical(all1[1]) < numerical(all2[1]);
 	}
 
+	/**
+	 * @param idUri The full `id` URI, e.g.
+	 *          "http://lobid.org/resources/990020187880206441#!"
+	 * @return The short ID, e.g. "990020187880206441"
+	 */
+	public static String shortId(String idUri) {
+		String[] elems = idUri.replace("#!", "").split("/");
+		return elems[elems.length - 1];
+	}
+
+	/**
+	 * @param shortId The full `id` URI, e.g. "990020187880206441"
+	 * @return The long ID URI, e.g.
+	 *         "http://lobid.org/resources/990020187880206441#!"
+	 */
+	public static String longId(String shortId) {
+		return String.format("http://lobid.org/resources/%s#!", shortId);
+	}
+
 	private static int numerical(String s) {
 		// replace non-digits with 9, e.g. for DE-5 before DE-Walb1
 		return Integer.parseInt(s.replaceAll("\\D", "9"));

@@ -242,7 +242,7 @@ public class Application extends Controller {
 		String uuid = session("uuid");
 		if (uuid == null)
 			session("uuid", UUID.randomUUID().toString());
-		if (!q.contains("hbzId:")) {
+		if (!q.contains("id:")) {
 			session("lastSearchUrl", request().uri());
 			response().setHeader("Cache-Control",
 					"no-cache, no-store, must-revalidate");
@@ -282,8 +282,8 @@ public class Application extends Controller {
 		} else {
 			Logger.warn("No pagination session data for {}", id);
 		}
-		return search("hbzId:" + id, "", "", "", "", "", "", "", "", "", 0, 1, "",
-				"", "", true, "", "", "", "", "");
+		return search("id:\"" + Lobid.longId(id) + "\"", "", "", "", "", "", "", "",
+				"", "", 0, 1, "", "", "", true, "", "", "", "", "");
 	}
 
 	/**
@@ -519,11 +519,17 @@ public class Application extends Controller {
 				JsonNode json = response.asJson();
 				hits = Lobid.getTotalResults(json);
 				s = json.toString();
-				if (!q.contains("hbzId:")) {
-					List<JsonNode> ids = json.findValues("hbzId");
-					uncache(
-							ids.stream().map(j -> j.asText()).collect(Collectors.toList()));
-					Cache.set(session("uuid") + "-lastSearch", ids.toString(), ONE_DAY);
+				if (!q.contains("id:")) {
+					List<String> ids = StreamSupport
+							.stream(Spliterators.spliteratorUnknownSize(
+									json.get("member").elements(), 0), false)
+							.map(doc -> Lobid.shortId(doc.get("id").asText()))
+							.collect(Collectors.toList());
+					uncache(ids);
+					Cache.set(session("uuid") + "-lastSearch",
+							ids.stream().map(string -> "\"" + string + "\"")
+									.collect(Collectors.toList()).toString(),
+							ONE_DAY);
 				}
 			} else {
 				Logger.warn("{}: {} ({}, {})", response.getStatus(),

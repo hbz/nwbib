@@ -60,6 +60,10 @@
 	}
 }
 
+@memberIds(searchJsonResult: String) = @{
+	(Json.parse(searchJsonResult)\"member").as[Seq[JsValue]].map(value => Lobid.shortId((value\"id").as[String]))
+}
+
 @main("NWBib - Ergebnisliste") {
     @if(Seq(person, name, subject, id, publisher, issued, word, corporation).exists(!_.isEmpty)){
       @tags.search_advanced("Suche aktualisieren", q, person, name, subject, nwbibspatial, nwbibsubject, id, publisher, issued, sortParam, word=word, corporation=corporation)
@@ -100,7 +104,7 @@
                        zeige @(from+1) bis @(Math.min(from+hits.size,from+size)):
                     </div>
                     <div class="col-md-1" style="text-align: right; padding-right: 4px;">
-                      @defining((Json.parse(result)\\"hbzId").map(_.as[String]).mkString(",")) { ids =>
+                      @defining(memberIds(result).mkString(",")) { ids =>
                       @if(ids.split(",").forall(Application.currentlyStarred().split(" ").contains)) {
                         <a href='@nwbib.routes.Application.clearStars(ids)' title="Alle Titel dieser Seite von Merkliste entfernen"><span class="glyphicon glyphicon-star"></span></a>
                       } else {
@@ -118,8 +122,8 @@
                   <th style="width: 5%; text-align: right"></th>
                   <th style="width: 5%; text-align: right"></th>
                  </tr>
-                 @for((doc,i) <- hits; id = (doc\\"hbzId")(0).as[String]) {
-                    @tags.result_short(id,doc,i,(Json.parse(result)\\"hbzId").map(_.as[String]))
+                 @for((doc,i) <- hits; id = Lobid.shortId((doc\"id").as[String])) {
+                    @tags.result_short(id,doc,i,memberIds(result))
                  }
                  </table>
                  <div class="panel-body hide-in-print" style="text-align:center">

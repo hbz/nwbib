@@ -35,7 +35,7 @@
 } else {
   @defining(Json.parse(docJson)) { doc =>
     @main(if( (doc\\"title").isEmpty) "NWBib - Vollanzeige" else (doc\\"title")(0).asOpt[String].getOrElse(q), docJson = Some(docJson)) {
-      @if(Cache.get(session("uuid") + "-" + (doc\\"hbzId")(0).as[String]) != null) {
+      @if(Cache.get(session("uuid") + "-" + Lobid.shortId((doc\"id").as[String])) != null) {
         @defining(Cache.get(session("uuid") + "-lastSearch")) { lastSearch =>
           @if(lastSearch != null) {
             @defining(Json.parse(lastSearch.asInstanceOf[String]).as[JsArray].as[Seq[String]]) { last =>
@@ -43,7 +43,7 @@
               <ul class="pager">
                 @pageLink(last, "prev", "&larr;", "Voriger Treffer")
                 @defining(session("lastSearchUrl")){ lastSearchUrl =>
-                  <li><a href="@lastSearchUrl">Treffer @(last.indexOf((doc\\"hbzId")(0).as[String])+1) von @last.size in der 
+                  <li><a href="@lastSearchUrl">Treffer @(last.indexOf(Lobid.shortId((doc\"id").as[String]))+1) von @last.size in der 
                   @if(lastSearchUrl==nwbib.routes.Application.showStars().toString()) {Merkliste} else {letzten Trefferliste}</a></li>
                 }
                 @pageLink(last, "next", "&rarr;", "Nächster Treffer")
@@ -63,7 +63,7 @@
         @defining(!(doc\\"containedIn").isEmpty && (doc\"type").toString.contains("Article")){superordination =>
           <div class="col-md-@if(items.isEmpty && !doc.toString.contains("fulltextOnline") && !superordination){12} else {8}">
             <dl>
-            @defining((doc\\"hbzId")(0).asOpt[String].getOrElse(q)){ id =>
+            @defining(Lobid.shortId((doc\"id").asOpt[String].getOrElse(q))){ id =>
               <dt>@tags.star_button(id) Titeldetails:
               <small style='float:right'>
               <a target="_top" title="Datenquelle in der hbz-Verbunddatenbank zeigen" href="http://193.30.112.134/F/?func=find-c&ccl_term=IDN%3D@id"><span class='octicon octicon-database'></span></a>
