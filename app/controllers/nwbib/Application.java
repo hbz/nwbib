@@ -282,8 +282,11 @@ public class Application extends Controller {
 		} else {
 			Logger.warn("No pagination session data for {}", id);
 		}
-		return search("id:\"" + Lobid.longId(id) + "\"", "", "", "", "", "", "", "",
-				"", "", 0, 1, "", "", "", true, "", "", "", "", "");
+		String cleanId = id.replace("#!", "");
+		String q = String.format("id:\"%s\" OR hbzId:%s OR almaMmsId:%s",
+				Lobid.longId(cleanId), cleanId, cleanId);
+		return search(q, "", "", "", "", "", "", "", "", "", 0, 1, "", "", "", true,
+				"", "", "", "", "");
 	}
 
 	/**
