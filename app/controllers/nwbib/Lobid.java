@@ -453,9 +453,7 @@ public class Lobid {
 				.setQueryParameter("id", id)//
 				.setQueryParameter("aggregations", field.split("<")[0])//
 				.setQueryParameter("from", "0")//
-				.setQueryParameter("size",
-						field.equals(Application.ITEM_FIELD) ? "9999"
-								: Application.MAX_FACETS + "")
+				.setQueryParameter("size", Application.MAX_FACETS + "")
 				.setQueryParameter("medium", medium)//
 				.setQueryParameter("location", locationPolygon(location))//
 				.setQueryParameter("issued", issued)//
