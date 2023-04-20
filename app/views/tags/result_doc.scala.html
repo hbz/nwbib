@@ -84,10 +84,6 @@
   }}}
 }
 
-@lobidUrl(hbzId: String) = @{
-  "http://lobid.org/resources/" + hbzId + "#!"
-}
-
 @part_of(field: String, subField: String) = {
   @if(!(doc \ field).isInstanceOf[JsUndefined]){
       @Html(TableRow.VALUES_MULTI.process(new com.fasterxml.jackson.databind.ObjectMapper().readTree(doc.toString()),
@@ -211,11 +207,11 @@
   @for(
       related <- (doc \ "related").asOpt[Seq[JsValue]].getOrElse(Seq());
       id <- (related \ "id").asOpt[String];
-      hbzId = id.split("\\/").last.replace("#!", "");
+      shortId = Lobid.shortId(id);
       note <- (related \ "note").asOpt[Seq[String]]) {
     <tr>
         <td>Parallelausgabe</td>
-        <td><a href="@hbzId">@note</a></td>
+        <td><a href="@shortId">@note</a></td>
     </tr>
   }
 }
@@ -245,7 +241,7 @@
   @result_field("In", "containedIn", doc, TableRow.LINKS)
 
   @part_of("isPartOf", "hasSuperordinate")
-  @defining(lobidUrl((doc \ "hbzId").asOpt[String].getOrElse(""))){ id =>
+  @defining((doc \ "id").asOpt[String].getOrElse("")){ id =>
    @subordinate("isPartOf.hasSuperordinate.id", id, "Bände", ("zugehöriger Band", "zugehörige Bände"))
    @subordinate("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
   }
