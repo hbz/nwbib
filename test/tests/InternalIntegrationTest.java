@@ -10,6 +10,9 @@ import static play.test.Helpers.route;
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -85,6 +88,29 @@ public class InternalIntegrationTest {
 			assertThat(hitsFor("subject=" + gnd("4001307-8")))
 					.as("less-filtered result count").isGreaterThan(hitsFor("subject="
 							+ gnd("4001307-8") + "&nwbibsubject=" + nwbib("N702000")));
+		});
+	}
+
+	@Test // See https://github.com/hbz/nwbib/issues/603
+	public void testLeadingBlanksInSearchQ() {
+		searchLeadingBlankWith("q=");
+	}
+
+	@Test // See https://github.com/hbz/nwbib/issues/603
+	public void testLeadingBlanksInSearchWord() {
+		searchLeadingBlankWith("word=");
+	}
+
+	private static void searchLeadingBlankWith(String param) {
+		running(testServer(3333), () -> {
+			try {
+				assertThat(hitsFor(param + URLEncoder.encode(
+						" Stimmungsvolle Erinnerungen an die Eisenbahn in Bocholt",
+						StandardCharsets.UTF_8.name()))).as("less-filtered result count")
+								.isGreaterThan(0);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		});
 	}
 
