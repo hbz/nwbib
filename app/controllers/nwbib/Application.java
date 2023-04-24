@@ -79,7 +79,7 @@ public class Application extends Controller {
 	/** The internal ES field for the medium facet. */
 	public static final String MEDIUM_FIELD = "medium.id";
 	/** The internal ES field for the item/exemplar facet. */
-	public static final String ITEM_FIELD = "owner";
+	public static final String ITEM_FIELD = "hasItem.heldBy.id";
 
 	/** The internal ES field for the NWBib subject facet. */
 	public static final String NWBIB_SUBJECT_FIELD = "subject.id<subjects#";

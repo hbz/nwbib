@@ -453,9 +453,7 @@ public class Lobid {
 				.setQueryParameter("id", id)//
 				.setQueryParameter("aggregations", field.split("<")[0])//
 				.setQueryParameter("from", "0")//
-				.setQueryParameter("size",
-						field.equals(Application.ITEM_FIELD) ? "9999"
-								: Application.MAX_FACETS + "")
+				.setQueryParameter("size", Application.MAX_FACETS + "")
 				.setQueryParameter("medium", medium)//
 				.setQueryParameter("location", locationPolygon(location))//
 				.setQueryParameter("issued", issued)//
@@ -687,6 +685,24 @@ public class Lobid {
 
 	private static String locationPolygon(String location) {
 		return location.contains("|") ? location.split("\\|")[1] : location;
+	}
+
+	/**
+	 * @param doc The result JSON doc
+	 * @return A mapping of item IDs (URIs) to item details (JSON strings)
+	 */
+	public static Map<String, String> itemDetails(String doc) {
+		JsonNode items = Json.parse(doc).findValue("hasItem");
+		Map<String, String> result = new HashMap<>();
+		if (items != null && (items.isArray() || items.isTextual())) {
+			Iterator<JsonNode> elements =
+					items.isArray() ? items.elements() : Arrays.asList(items).iterator();
+			while (elements.hasNext()) {
+				JsonNode nextItem = elements.next();
+				result.put(nextItem.get("id").asText(), nextItem.toString());
+			}
+		}
+		return result;
 	}
 
 	/**

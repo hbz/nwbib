@@ -16,8 +16,10 @@
 }
 
 @optional(label: String, key: String, v: JsValue) = {
-  @if((v\key).asOpt[String].isDefined) {
-   <br/> @((v\key).as[String])
+  @defining((v\key).asOpt[Seq[JsValue]].getOrElse(Seq(v\key))) { elems =>
+    @for(elem <- elems; elemString <- elem.asOpt[String]) {
+      @(elemString)@if(elem!=elems.last){ | } else {<br/>}
+    }
   }
 }
 
@@ -41,6 +43,7 @@
           @* Otherwise show only one date, no range (no periodical or series, and just one date given) *@
           @start.asOpt[String].getOrElse(end.asOpt[String].getOrElse(""))
         }
+        <br/>
         @optional("Erscheinungsort", "location", pub)
         @optional("Verlag", "publishedBy", pub)
         @((pub\"frequency").asOpt[Seq[JsValue]].map { freq =>
