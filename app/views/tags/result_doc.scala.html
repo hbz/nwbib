@@ -221,6 +221,10 @@
   }
 }
 
+@lobidUrl(hbzId: String) = @{
+  "http://lobid.org/resources/" + hbzId + "#!"
+}
+
 @table(){
   <tr><td>Titel</td><td><b>@((doc \ "title").asOpt[String].getOrElse(""))</b></td></tr>
   @for(x <- (doc \ "otherTitleInformation").asOpt[Seq[JsValue]]) {
@@ -246,7 +250,7 @@
   @result_field("In", "containedIn", doc, TableRow.LINKS)
 
   @part_of("isPartOf", "hasSuperordinate")
-  @defining((doc \ "id").asOpt[String].getOrElse("")){ id =>
+  @defining(lobidUrl((doc \ "hbzId").asOpt[String].getOrElse(""))){ id =>
    @subordinate("isPartOf.hasSuperordinate.id", id, "Bände", ("zugehöriger Band", "zugehörige Bände"))
    @subordinate("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
   }
