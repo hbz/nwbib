@@ -5,6 +5,7 @@
 @import views.TableRow
 @import controllers.nwbib.Lobid
 @import controllers.nwbib.Application.CONFIG
+@import controllers.nwbib.Application.ZDB_PREFIX
 
 @labelled(label: String, key: String) = {
   @if((doc\key).asOpt[Seq[JsValue]].isDefined) {
@@ -221,8 +222,13 @@
   }
 }
 
-@lobidUrl(hbzId: String) = @{
-  "http://lobid.org/resources/" + hbzId + "#!"
+@lobidUrl(format: String, idField: String) = @{
+  String.format("http://lobid.org/resources/" + format, (doc \ idField).asOpt[String].getOrElse(""))
+}
+
+@subordinateSearchFor(id: String) = {
+  @subordinate("isPartOf.hasSuperordinate.id", id, "Bände", ("zugehöriger Band", "zugehörige Bände"))
+  @subordinate("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
 }
 
 @table(){
@@ -250,10 +256,8 @@
   @result_field("In", "containedIn", doc, TableRow.LINKS)
 
   @part_of("isPartOf", "hasSuperordinate")
-  @defining(lobidUrl((doc \ "hbzId").asOpt[String].getOrElse(""))){ id =>
-   @subordinate("isPartOf.hasSuperordinate.id", id, "Bände", ("zugehöriger Band", "zugehörige Bände"))
-   @subordinate("containedIn.id", id, "Enthält", ("Beitrag", "Beiträge"))
-  }
+  @subordinateSearchFor(lobidUrl("%s#!", "hbzId"))
+  @subordinateSearchFor(lobidUrl(ZDB_PREFIX+"%s#!", "zdbId"))
   @parallelausgabe()
   @raumsystematik("https://nwbib.de/spatial")
   @sachsystematik("https://nwbib.de/subjects")
