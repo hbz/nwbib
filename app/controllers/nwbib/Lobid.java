@@ -512,11 +512,13 @@ public class Lobid {
 
 	private static String preprocess(final String q) {
 		String result = q.trim();
-		if (result.isEmpty() || result.matches(".*?([+~]|AND|OR|\\s-|\\*|:).*?")) {
+		if (result.isEmpty()
+				|| result.matches(".*?([+~]|AND|OR|\\s-[^\\s]|\\*|:).*?")) {
 			// if supported query string syntax is used, leave it alone
 		} else {
 			// else prepend '+' to all terms for AND search:
-			result = Arrays.asList(result.split("[\\s-]")).stream().map(x -> "+" + x)
+			result = Arrays.asList(result.split("[\\s-]")).stream()
+					.filter(x -> !x.trim().isEmpty()).map(x -> "+" + x)
 					.collect(Collectors.joining(" "));
 		}
 		return result// but escape unsupported query string syntax:
