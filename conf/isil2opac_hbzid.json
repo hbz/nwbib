@@ -228,7 +228,7 @@
     "DE-743": "http://www.hs-owl.de/webOPACClient/start.do?Login=sisis&Query=0010=%22{hbzid}%22",
     "DE-829": "http://seth7.hs-niederrhein.de/webOPACClient/start.do?Query=0010=%22{hbzid}%22",
     "DE-832": "http://www.digibib.net/permalink/832/FHBK-x/HBZ:{hbzid}",
-    "DE-836": "https://hb063.fh-muenster.de/webOPACClient/start.do?Query=0010=%22{hbzid}%22",
+    "DE-836": "https://fhb-muenster.digibib.net/search/katalog/list?start=1&defaults=on&q-al={hbzid}",
     "DE-929": "http://kat.lbz-rlp.de/webOPACClient.lbzsis/start.do?Language=De&Query=010%3D%22{hbzid}%22&selectedViewBranchlib=0",
     "DE-1044": "https://bib-sisis.bib.hochschule-bonn-rhein-sieg.de/webOPACClient/start.do?Query=0010=%22{hbzid}%22",
     "DE-1105": "http://www.hs-koblenz.de/RACwebOPAC/start.do?Login=webopac&Query=0010=%22{hbzid}%22",
