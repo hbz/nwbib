@@ -150,7 +150,7 @@
     "DE-6-Z": "https://hbz-ulbms.primo.exlibrisgroup.com/discovery/search?query=any,contains,{hbzid}&tab=Everything&search_scope=MyInst_and_CI&vid=49HBZ_ULM:VU2&offset=0",
     "DE-38": "http://www.ub.uni-koeln.de/cgi-bin/redirect.pl?referrer=hbzvk&service=showrecord&hbzid={hbzid}",
     "DE-61": "https://katalog.ulb.hhu.de/Search/Results?lookfor={hbzid}",
-    "DE-82": "http://sisis.bth.rwth-aachen.de:8080/InfoGuideClient/start.do?Language=de&Query=0010=%22{hbzid}%22",
+    "DE-82": "https://katalog.ub.rwth-aachen.de/discovery/search?query=any,contains,{hbzid}&tab=BibNoArticle609&search_scope=BibliothekskatalogMOD&vid=49HBZ_UBA:VU1&offset=0",
     "DE-98": "http://www.medpilot.de/?ID={hbzid}",
     "DE-107": "https://kat.lbz-rlp.de/webOPACClient.lbzsis/start.do?Query=0010=%22{hbzid}%22",
     "DE-121": "https://www.dshs-koeln.de/aleph/F?func=item-cen-2&doc_library=STR01&doc_001_number={hbzid}&local_base=STR01",
