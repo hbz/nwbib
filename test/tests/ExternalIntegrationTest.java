@@ -85,18 +85,18 @@ public class ExternalIntegrationTest {
 	public void sizeRequest() {
 		running(testServer(3333), () -> {
 			Long hits = Lobid
-					.getTotalHits("@graph.http://purl.org/lobid/lv#multiVolumeWork.@id",
-							"http://lobid.org/resource/HT018486420", "")
+					.getTotalHits("isPartOf.hasSuperordinate.id",
+							"http://lobid.org/resource/HT018486420#!", "")
 					.get(Lobid.API_TIMEOUT);
 			assertThat(hits).isGreaterThan(0);
 			hits = Lobid
-					.getTotalHits("@graph.http://purl.org/lobid/lv#series.@id",
-							"http://lobid.org/resource/HT002091108", "")
+					.getTotalHits("isPartOf.hasSuperordinate.id",
+							"http://lobid.org/resources/HT002091108#!", "")
 					.get(Lobid.API_TIMEOUT);
 			assertThat(hits).isGreaterThan(0);
 			hits = Lobid
-					.getTotalHits("@graph.http://purl.org/lobid/lv#containedIn.@id",
-							"http://lobid.org/resource/HT001387709", "")
+					.getTotalHits("containedIn.id",
+							"http://lobid.org/resource/HT001387709#!", "")
 					.get(Lobid.API_TIMEOUT);
 			assertThat(hits).isGreaterThan(0);
 		});
