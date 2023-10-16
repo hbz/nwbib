@@ -2,8 +2,6 @@
 
 package controllers.nwbib;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,7 +26,6 @@ import com.google.common.html.HtmlEscapers;
 
 import controllers.nwbib.Classification.Type;
 import play.Logger;
-import play.Play;
 import play.cache.Cache;
 import play.libs.F.Promise;
 import play.libs.Json;
@@ -231,7 +228,8 @@ public class Lobid {
 			initAggregation("subject.id");
 		}
 		return (AGGREGATION_COUNT.containsKey(value) || isWikidata(value))
-				? AGGREGATION_COUNT.getOrDefault(value, 0L) : lobidRequest(value);
+				? AGGREGATION_COUNT.getOrDefault(value, 0L)
+				: lobidRequest(value);
 	}
 
 	private static Long lobidRequest(String value) {
@@ -737,29 +735,6 @@ public class Lobid {
 				Logger.debug(x.getMessage(), x);
 			}
 		}
-	}
-
-	/**
-	 * @param itemUri The lobid item URI
-	 * @return The OPAC URL for the given item, or null
-	 */
-	public static String opacUrl(String itemUri) {
-		try (InputStream stream =
-				Play.application().resourceAsStream("isil2opac_hbzid.json")) {
-			JsonNode json = Json.parse(stream);
-			String[] hbzId_isil_sig =
-					itemUri.substring(itemUri.indexOf("items/") + 6).split(":");
-			String hbzId = hbzId_isil_sig[0];
-			String isil = hbzId_isil_sig[1];
-			Logger.debug("From item URI {}, got ISIL {} and HBZ-ID {}", itemUri, isil,
-					hbzId);
-			JsonNode urlTemplate = json.get(isil);
-			if (urlTemplate != null)
-				return urlTemplate.asText().replace("{hbzid}", hbzId);
-		} catch (IOException e) {
-			Logger.error("Could not create OPAC URL", e);
-		}
-		return null;
 	}
 
 	/**
