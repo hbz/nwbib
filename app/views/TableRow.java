@@ -219,8 +219,16 @@ public enum TableRow {
 		}
 		String label =
 				labels.isPresent() && labels.get().size() > 0 ? labels.get().get(0)
-						: value.startsWith("http") ? URI.create(value).getHost() : value;
+						: value.startsWith("http") ? hostFromUri(value) : value;
 		return new String[] { value, label };
+	}
+
+	private static String hostFromUri(String value) {
+		try {
+			return URI.create(value).getHost();
+		} catch (IllegalArgumentException e) {
+			return value;
+		}
 	}
 
 	public abstract String process(JsonNode doc, String property, String param,
