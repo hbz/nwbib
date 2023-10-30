@@ -17,16 +17,6 @@
     } else {alt}
 }
 
-@valueFor(doc: JsValue, id: String, keys: Seq[String]) = @{
-    val res = for (elem <- ((doc \\ "@graph").head).as[Seq[JsValue]]; key <- keys;
-        if ((elem \ "@id").as[String] == id && elem.as[Map[String, JsValue]].contains(key))
-    ) yield {
-        val result = (elem \ key)
-        result.asOpt[String].getOrElse(result.toString)
-    }
-    if(res.isEmpty) id else res.get(0)
-}
-
 @icon_span(v: Seq[String], fullField: String) = {
   <span title="@Html(Lobid.facetLabel(v,fullField,""))" class="@Lobid.facetIcon(v,fullField)"></span>
 }

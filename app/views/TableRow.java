@@ -181,8 +181,7 @@ public enum TableRow {
 			return id;
 		}
 
-		List<JsonNode> graphs = doc.findValues("@graph");
-		for (JsonNode node : graphs.isEmpty() ? doc : graphs.get(0)) {
+		for (JsonNode node : doc) {
 			for (String key : labelKeys.get()) {
 				String idField = node.has("id") ? "id" : "@id";
 				if (node.has(key) && node.has(idField)
