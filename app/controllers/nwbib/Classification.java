@@ -233,8 +233,6 @@ public class Classification {
 	 */
 	public static JsonNode ids(String q, String t) {
 		QueryBuilder queryBuilder = QueryBuilders.boolQuery()
-				.should(QueryBuilders.matchQuery(//
-						"@graph." + Property.LABEL.value + ".@value", q))
 				.should(QueryBuilders.idsQuery(Type.NWBIB.elasticsearchType,
 						Type.SPATIAL.elasticsearchType).ids(q))
 				.minimumNumberShouldMatch(1);
