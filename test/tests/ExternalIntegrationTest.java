@@ -47,6 +47,7 @@ public class ExternalIntegrationTest {
 		Http.Context.current.set(context);
 	}
 
+	@Ignore // https://github.com/hbz/nwbib/issues/633
 	@Test
 	public void testFacets() {
 		running(testServer(3333), () -> {
@@ -81,6 +82,7 @@ public class ExternalIntegrationTest {
 		});
 	}
 
+	@Ignore // https://github.com/hbz/nwbib/issues/633
 	@Test
 	public void sizeRequest() {
 		running(testServer(3333), () -> {
