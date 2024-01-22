@@ -4,7 +4,6 @@ package controllers.nwbib;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -29,9 +28,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.elasticsearch.common.base.Charsets;
 import org.elasticsearch.common.geo.GeoPoint;
-import org.elasticsearch.common.io.Streams;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +37,6 @@ import com.typesafe.config.ConfigFactory;
 
 import controllers.nwbib.Classification.Type;
 import play.Logger;
-import play.Play;
 import play.cache.Cache;
 import play.cache.Cached;
 import play.data.Form;
@@ -320,26 +316,49 @@ public class Application extends Controller {
 
 	/**
 	 * @return A list of nwbib journals
-	 * @throws IOException If reading the journals list data fails
 	 */
 	@Cached(key = "journals", duration = ONE_DAY)
-	public static Result journals() throws IOException {
-		try (InputStream stream = Play.application().classloader()
-				.getResourceAsStream("nwbib-journals.csv")) {
-			String csv = new String(Streams.copyToByteArray(stream), Charsets.UTF_8);
-			List<String> lines = Arrays.asList(csv.split("\n"));
-			List<HashMap<String, String>> maps = lines.stream()
-					.filter(line -> line.split("\",\"").length == 2).map(line -> {
-						HashMap<String, String> map = new HashMap<>();
-						String[] strings = line.split("\",\"");
-						map.put("label", strings[0].replace("\"\"", "'").replace("\"", ""));
-						map.put("value", strings[1].replace("\"", ""));
-						return map;
-					}).collect(Collectors.toList());
-			String journals = Json.toJson(maps).toString();
-			return ok(browse_register.render(journals, "Zeitschriften",
-					"Zeitschriftenliste filtern"));
-		}
+	public static Promise<Result> journals() {
+		WSRequest requestHolder = WS.url(Application.CONFIG.getString("nwbib.api"))
+				.setHeader("Accept", "application/json")
+				.setQueryParameter("size", "1000")//
+				.setQueryParameter("filter",
+						"inCollection.id:\"https://nwbib.de/journals\"");
+		return requestHolder.get().map((WSResponse response) -> {
+			if (response.getStatus() == Http.Status.OK) {
+				final String label = "label";
+				List<Map<String, String>> journals = StreamSupport
+						.stream(Spliterators.spliteratorUnknownSize(
+								response.asJson().get("member").elements(), 0), false)
+						.map((JsonNode doc) -> {
+							HashMap<String, String> journal = new HashMap<>();
+							journal.put(label, journalLabelFor(doc));
+							journal.put("value", Lobid.shortId(doc.get("id").asText()));
+							return journal;
+						}).collect(Collectors.toList());
+				Collections.sort(journals, (map1, map2) -> {
+					return Collator.getInstance(Locale.GERMANY).compare(//
+							map1.get(label), map2.get(label));
+				});
+				return ok(browse_register.render(Json.toJson(journals).toString(),
+						"Zeitschriften", "Zeitschriftenliste filtern"));
+			}
+			Logger.warn("{}: {} ({}, {})", response.getStatus(),
+					response.getStatusText(), requestHolder.getUrl(),
+					requestHolder.getQueryParameters());
+			return internalServerError("Could not load journals");
+		});
+	}
+
+	private static String journalLabelFor(JsonNode doc) {
+		String other = "otherTitleInformation";
+		String responsibility = "responsibilityStatement";
+		String label = doc.get("title").asText();
+		if (doc.has(other))
+			label += ": " + doc.get(other).elements().next().asText();
+		if (doc.has(responsibility))
+			label += " / " + doc.get(responsibility).elements().next().asText();
+		return label;
 	}
 
 	/**
