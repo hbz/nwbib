@@ -60,7 +60,7 @@
       }
       <div class="row" id="search-results">
       @defining((Lobid.items(doc.toString),Lobid.itemDetails(doc.toString))) { case (items, itemDetails) =>
-        @defining(!(doc\\"containedIn").isEmpty && (doc\"type").toString.contains("Article")){superordination =>
+        @defining(!(doc\\"containedIn").isEmpty){superordination =>
           <div class="col-md-@if(items.isEmpty && !doc.toString.contains("fulltextOnline") && !superordination){12} else {8}">
             <dl>
             @defining(Lobid.shortId((doc\"id").asOpt[String].getOrElse(q))){ id =>
