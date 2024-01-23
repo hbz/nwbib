@@ -338,7 +338,7 @@ public class Application extends Controller {
 						}).collect(Collectors.toList());
 				Collections.sort(journals, (map1, map2) -> {
 					return Collator.getInstance(Locale.GERMANY).compare(//
-							map1.get(label), map2.get(label));
+							sortValue(map1, label), sortValue(map2, label));
 				});
 				return ok(browse_register.render(Json.toJson(journals).toString(),
 						"Zeitschriften", "Zeitschriftenliste filtern"));
@@ -348,6 +348,10 @@ public class Application extends Controller {
 					requestHolder.getQueryParameters());
 			return internalServerError("Could not load journals");
 		});
+	}
+
+	private static String sortValue(Map<String, String> map, final String key) {
+		return map.get(key).replaceAll("^(Der|Die|Das|\\.\\.\\.)\\s", "");
 	}
 
 	private static String journalLabelFor(JsonNode doc) {
