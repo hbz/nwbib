@@ -92,7 +92,8 @@ map.addLayer(layer);
                 var icon@(id) = L.icon({
                     iconUrl: '@controllers.routes.Assets.at("javascripts/images/marker-icon-book.png")',
                     iconSize: [30, 30],
-                    popupAnchor: [0, -15]
+                    iconAnchor: [15, 30],
+                    popupAnchor: [0, -30]
                 });
                 var marker@(id) = L.marker([lat, lon],{
                     title: "@ownerName (@key)",
