@@ -212,12 +212,22 @@
 @parallelausgabe() = {
   @for(
       related <- (doc \ "related").asOpt[Seq[JsValue]].getOrElse(Seq());
-      id <- (related \ "id").asOpt[String];
-      shortId = Lobid.shortId(id);
-      note <- (related \ "note").asOpt[Seq[String]]) {
+      id = (related \ "id").asOpt[String];
+      shortId = Lobid.shortId(id.getOrElse(""));
+      note = (related \ "note").asOpt[Seq[String]]){
     <tr>
         <td>Parallelausgabe</td>
-        <td><a href="@shortId">@note</a></td>
+        <td>
+          @if(id.isDefined){
+            <a href="@shortId">@note.getOrElse(shortId)</a> | 
+            <a title="Linked-Data-Quelle abrufen" href='@id'><span class='glyphicon glyphicon-link'></span></a>
+            <br/>
+          } else {
+            @optional("", "note", related)
+          }
+          @optional("", "isbn", related)
+          @optional("", "issn", related)
+        </td>
     </tr>
   }
 }
