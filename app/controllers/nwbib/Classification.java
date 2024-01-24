@@ -233,11 +233,8 @@ public class Classification {
 	 */
 	public static JsonNode ids(String q, String t) {
 		QueryBuilder queryBuilder = QueryBuilders.boolQuery()
-				.should(QueryBuilders.matchQuery(//
-						"@graph." + Property.LABEL.value + ".@value", q))
-				.should(QueryBuilders.idsQuery(Type.NWBIB.elasticsearchType,
-						Type.SPATIAL.elasticsearchType).ids(q))
-				.minimumNumberShouldMatch(1);
+				.must(QueryBuilders.idsQuery(Type.NWBIB.elasticsearchType,
+						Type.SPATIAL.elasticsearchType).ids(q));
 		SearchRequestBuilder requestBuilder = client.prepareSearch(INDEX)
 				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setQuery(queryBuilder);
 		if (t.isEmpty()) {

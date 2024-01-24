@@ -3,28 +3,16 @@
 @(id:String, doc: play.api.libs.json.JsValue, i: Int = -1, hits: Seq[String] = Seq())
 
 @import play.api.libs.json._
-@import views.TableRow
 @import controllers.nwbib.Lobid
-@import scala.collection.immutable.Map
 @import play.mvc.Controller.session
 @import play.cache.Cache
 @import controllers.nwbib.Application
 
 @optional(doc: JsValue, key: String, sep: String, alt: String)=@{
-    val other = (doc \\ key)
-    if(!other.isEmpty){
-        sep + other(0).asOpt[String].getOrElse(other(0).as[Seq[JsValue]].map(_.as[String]).mkString("; "))
+    val other = doc \\ key
+    if(other.nonEmpty){
+        sep + other.head.asOpt[String].getOrElse(other.head.as[Seq[JsValue]].map(_.as[String]).mkString("; "))
     } else {alt}
-}
-
-@valueFor(doc: JsValue, id: String, keys: Seq[String]) = @{
-    val res = for (elem <- ((doc \\ "@graph").head).as[Seq[JsValue]]; key <- keys;
-        if ((elem \ "@id").as[String] == id && elem.as[Map[String, JsValue]].contains(key))
-    ) yield {
-        val result = (elem \ key)
-        result.asOpt[String].getOrElse(result.toString)
-    }
-    if(res.isEmpty) id else res.get(0)
 }
 
 @icon_span(v: Seq[String], fullField: String) = {
