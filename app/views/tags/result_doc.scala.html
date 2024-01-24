@@ -135,6 +135,7 @@
          components = (subject \ "componentList").asOpt[Seq[JsValue]].getOrElse(Seq(subject));
          component <- components;
          sourceLabel = (component\"source"\"label").asOpt[String];
+         if !sourceLabel.getOrElse("").contains("Freie Verschlagwortung");
          if !sourceLabel.getOrElse("").contains("Nordrhein-Westfälischen");
          if !sourceLabel.getOrElse("").contains("RPB-Sachgruppen");
          if !sourceLabel.getOrElse("").contains("Dewey");
