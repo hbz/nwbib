@@ -351,7 +351,8 @@ public class Application extends Controller {
 	}
 
 	private static String sortValue(Map<String, String> map, final String key) {
-		return map.get(key).replaceAll("^(Der|Die|Das|\\.\\.\\.)\\s", "");
+		String value = map.get(key).replaceAll("^(Der|Die|Das|\\.\\.\\.)\\s", "");
+		return Arrays.asList(value.split("\\s")).toString();
 	}
 
 	private static String journalLabelFor(JsonNode doc) {
