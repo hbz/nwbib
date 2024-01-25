@@ -90,9 +90,9 @@ map.addLayer(layer);
                 var lon = @string((json \\ "lon").head)
                 var latlng@(id) = L.latLng(lat, lon);
                 var icon@(id) = L.icon({
-                    iconUrl: '@controllers.routes.Assets.at("javascripts/images/marker-icon-book.png")',
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 30],
+                    iconUrl: '@controllers.routes.Assets.at("javascripts/images/marker-icon-red.png")',
+                    iconSize: [20, 30],
+                    iconAnchor: [10, 30],
                     popupAnchor: [0, -30]
                 });
                 var marker@(id) = L.marker([lat, lon],{
