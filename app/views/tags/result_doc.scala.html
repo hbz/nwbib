@@ -18,6 +18,7 @@
 
 @optional(label: String, key: String, v: JsValue) = {
   @defining((v\key).asOpt[Seq[JsValue]].getOrElse(Seq(v\key))) { elems =>
+    @if(!elems.isEmpty && elems.head.asOpt[String].isDefined) { @label }
     @for(elem <- elems; elemString <- elem.asOpt[String]) {
       @(elemString)@if(elem!=elems.last){ | } else {<br/>}
     }
@@ -49,11 +50,11 @@
           @start.asOpt[String].getOrElse(end.asOpt[String].getOrElse(""))
         }
         <br/>
-        @optional("Erscheinungsort", "location", pub)
-        @optional("Verlag", "publishedBy", pub)
-        @optional("Hersteller", "manufacturedBy", pub)
+        @optional("", "location", pub)
+        @optional("", "publishedBy", pub)
+        @optional("", "manufacturedBy", pub)
         @((pub\"frequency").asOpt[Seq[JsValue]].map { freq =>
-          optional("Erscheinungsweise", "label", freq.head)
+          optional("", "label", freq.head)
         })
       </td>
     </tr>
@@ -218,12 +219,22 @@
 @parallelausgabe() = {
   @for(
       related <- (doc \ "related").asOpt[Seq[JsValue]].getOrElse(Seq());
-      id <- (related \ "id").asOpt[String];
-      shortId = Lobid.shortId(id);
-      note <- (related \ "note").asOpt[Seq[String]]) {
+      id = (related \ "id").asOpt[String];
+      shortId = Lobid.shortId(id.getOrElse(""));
+      note = (related \ "note").asOpt[Seq[String]]){
     <tr>
         <td>Parallelausgabe</td>
-        <td><a href="@shortId">@note</a></td>
+        <td>
+          @if(id.isDefined){
+            <a href="@shortId">@note.getOrElse(shortId)</a> | 
+            <a title="Linked-Data-Quelle abrufen" href='@id'><span class='glyphicon glyphicon-link'></span></a>
+            <br/>
+          } else {
+            @optional("", "note", related)
+          }
+          @optional("ISBN: ", "isbn", related)
+          @optional("ISSN: ", "issn", related)
+        </td>
     </tr>
   }
 }
@@ -254,8 +265,8 @@
   @result_field("Auflage", "edition", doc, TableRow.VALUES)
   @result_field("Inhalt", "abstract", doc, TableRow.VALUES)
   @result_field("Anmerkungen", "note", doc, TableRow.VALUES, node = Option(doc))
-  @result_field("ISBN", "isbn", doc, TableRow.VALUES)
-  @result_field("ISSN", "issn", doc, TableRow.VALUES)
+  @result_field("ISBN", "isbn", doc, TableRow.VALUES, node = Option(doc))
+  @result_field("ISSN", "issn", doc, TableRow.VALUES, node = Option(doc))
   @withPrefixedLink("DOI", "https://dx.doi.org/", doc \ "doi")
   @withPrefixedLink("URN", "https://nbn-resolving.org/", doc \ "urn")
   @result_field("Umfang", "extent", doc, TableRow.VALUES)
