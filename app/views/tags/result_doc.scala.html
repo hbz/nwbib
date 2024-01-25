@@ -32,7 +32,11 @@
         @if((pub \ "type").toString.contains("SecondaryPublicationEvent")){
           Sekundärpublikation
         } else {
-          Erschienen
+          @if(pub.toString.contains("manufacturedBy")) {
+            Hergestellt
+          } else {
+            Erschienen
+          }
         }
       </td>
       <td>
@@ -48,6 +52,7 @@
         <br/>
         @optional("", "location", pub)
         @optional("", "publishedBy", pub)
+        @optional("", "manufacturedBy", pub)
         @((pub\"frequency").asOpt[Seq[JsValue]].map { freq =>
           optional("", "label", freq.head)
         })
@@ -131,6 +136,7 @@
          components = (subject \ "componentList").asOpt[Seq[JsValue]].getOrElse(Seq(subject));
          component <- components;
          sourceLabel = (component\"source"\"label").asOpt[String];
+         if !sourceLabel.getOrElse("").contains("Freie Verschlagwortung");
          if !sourceLabel.getOrElse("").contains("Nordrhein-Westfälischen");
          if !sourceLabel.getOrElse("").contains("RPB-Sachgruppen");
          if !sourceLabel.getOrElse("").contains("Dewey");
@@ -255,6 +261,7 @@
   @result_field("", "thesisInformation", doc, TableRow.VALUES)
 
   @for(pub <- sortedPublications((doc\"publication").asOpt[Seq[JsValue]].getOrElse(Seq()))){ @publication(pub) }
+  @for(pub <- sortedPublications((doc\"manufacture").asOpt[Seq[JsValue]].getOrElse(Seq()))){ @publication(pub) }
   @result_field("Auflage", "edition", doc, TableRow.VALUES)
   @result_field("Inhalt", "abstract", doc, TableRow.VALUES)
   @result_field("Anmerkungen", "note", doc, TableRow.VALUES, node = Option(doc))
