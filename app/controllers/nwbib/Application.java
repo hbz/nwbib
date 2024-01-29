@@ -351,7 +351,7 @@ public class Application extends Controller {
 	}
 
 	private static String sortValue(Map<String, String> map, final String key) {
-		String value = map.get(key).replaceAll("^(Der|Die|Das|\\.\\.\\.)\\s", "");
+		String value = map.get(key).replaceAll("^(Der|Die|Das|De)\\s", "");
 		return Arrays.asList(value.split("\\s")).toString();
 	}
 
@@ -363,7 +363,7 @@ public class Application extends Controller {
 			label += ": " + doc.get(other).elements().next().asText();
 		if (doc.has(responsibility))
 			label += " / " + doc.get(responsibility).elements().next().asText();
-		return label;
+		return label.replaceAll("^\\.{3}\\s*", "");
 	}
 
 	/**
