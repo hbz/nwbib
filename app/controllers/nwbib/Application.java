@@ -351,7 +351,7 @@ public class Application extends Controller {
 	}
 
 	private static String sortValue(Map<String, String> map, final String key) {
-		String value = map.get(key).replaceAll("^(Der|Die|Das|De)\\s", "");
+		String value = map.get(key).replaceAll("^(Der|Die|Das|De|Dä)\\s", "");
 		return Arrays.asList(value.split("\\s")).toString();
 	}
 
