@@ -23,4 +23,4 @@ echo "#FORMAT: BEACON
 #EXAMPLES: 118515470
 " > $NWBIB_SUBJECTS
 
-cat $NWBIB_DUMP | jq -r '. | select(.subject[].componentList != null) | .subject[].componentList[].id' 2>/dev/null |grep -v 'null\|_:b' | sort | uniq -c | sort -n -r | sed 's#\(.*\)https://d-nb.info/gnd/\(.*\)#\2|\1#g' | tr -d ' ' >> $NWBIB_SUBJECTS
+cat $NWBIB_DUMP | jq -r '.|.subject[].componentList' |grep -v null | jq .[].gndIdentifier | sort |grep -v null | uniq -c | sort -n -r | tr -d ' ' | sed 's#\([0-9].*\)"\(.*\)"#\2|\1#g' >> $NWBIB_SUBJECTS
