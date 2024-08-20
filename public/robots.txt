@@ -1,2 +1,3 @@
 User-agent: *
-Disallow:
+Disallow: /HT016346647
+Disallow: /990180402490206441
