@@ -71,7 +71,7 @@
                       <li @if(title=="NWBib: Kontakt"){class="active"} class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Info"><span class="glyphicon glyphicon-info-sign"></span><b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                          <li><a href="https://www.landesbibliothek-nrw.de/aufgaben-der-landesbibliotheken/nordrhein-westfaelische-bibliographie">Über die NWBib</a></li>
+                          <li><a href="https://www.landesbibliotheken.nrw">Über die Landesbibliotheken</a></li>
                           <li><a href="@nwbib.routes.Application.journals()">Ausgewertete Zeitschriften</a></li>
                           <li><a href="mailto:lobid-admin@@hbz-nrw.de?subject=Feedback%20zur%20NWBib,%20aktuelle%20URL%20@controllers.nwbib.Application.currentUri()">Feedback</a></li>
                           <li class="divider"></li>
@@ -101,11 +101,20 @@
             <div class="panel panel-default nwbib-footer">
               <div class="panel-body">
                 @defining(controllers.nwbib.Lobid.getTotalHits("").get(Lobid.API_TIMEOUT)){ hits =>
-                <img class="media-object pull-left nrw-wappen" src="@controllers.routes.Assets.at("images/wappen.png")" alt="NRW-Wappen"> 
-                <img class="media-object pull-right hbz-logo" src="@controllers.routes.Assets.at("images/hbz.png")" alt="hbz-Logo">
                 Die NWBib bietet @if(hits>0){aktuell @hits}else{mehr als 400.000 (Stand: Januar 2018)} Literaturnachweise. Sie wird von der <a href="http://www.ulb.hhu.de/">Universitäts- und Landesbibliothek (ULB) Düsseldorf</a> und der <a href="http://www.ulb.uni-muenster.de/">ULB Münster</a> in Zusammenarbeit mit der <a href="http://www.ulb.uni-bonn.de/">ULB Bonn</a> und dem <a href="http://www.hbz-nrw.de/">Hochschulbibliothekszentrum des Landes Nordrhein-Westfalen (hbz)</a> herausgegeben.
                 }
               </div>
+            </div>
+            <div class="logos">
+                <p class="h6" style="margin-top:10px"><strong>
+                    <a target="_blank" style="color: inherit; text-decoration: inherit" href="https://www.landesbibliotheken.nrw">
+                        Landesbibliotheken.<span style="color:#109039">N</span><span style="color:#BDBCBC">R</span><span style="color:#E00A1D">W</span>
+                    </a>
+                </strong></p>
+                &nbsp;&nbsp;
+                <a target="_blank" href="https://www.hbz-nrw.de">
+                    <img class="media-object hbz-logo" src="@controllers.routes.Assets.at("images/hbz.png")" alt="hbz-Logo">
+                </a>
             </div>
         </div>
     </body>
