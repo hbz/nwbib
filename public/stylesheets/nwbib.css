@@ -122,14 +122,9 @@ table {
 	height: 80px;
 }
 
-.nrw-wappen {
-	height: 40px;
-	padding: 5px;
-}
-
 .hbz-logo {
-	height: 40px;
-	padding: 5px;
+	height: 30px;
+	padding: 5px 0px 5px 0px;
 }
 
 .intro {
@@ -138,7 +133,13 @@ table {
 
 .nwbib-footer {
 	margin-top: 15px;
+	margin-bottom: 0px;
 	text-align: center;
+}
+
+.logos{
+	display: flex;
+	justify-content: center;
 }
 
 .pagination {
