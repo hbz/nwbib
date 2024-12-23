@@ -18,6 +18,7 @@
         <span class="glyphicon glyphicon-repeat"></span></a> | 
       }
       <a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatial("register")}else{@nwbib.routes.Application.subjects("register")}"><span class="glyphicon glyphicon-sort-by-alphabet"></span> A-Z Register</a> | 
-      <a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatialTtl()}else{@nwbib.routes.Application.subjectsTtl()}"><span class="glyphicon glyphicon-download-alt"></span> SKOS-Datei</a>
+      SKOS-Version: <a href="https://skohub.io/hbz/lobid-vocabs/heads/master/nwbib.de/@if(t=="Raumsystematik"){spatial.html}else{subjects.html}">HTML</a>, 
+      <a href="@if(t=="Raumsystematik"){@nwbib.routes.Application.spatialTtl()}else{@nwbib.routes.Application.subjectsTtl()}"><span class="glyphicon glyphicon-download-alt"></span> Turtle</a>
     </p>
 }
