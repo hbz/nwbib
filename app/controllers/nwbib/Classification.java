@@ -175,7 +175,9 @@ public class Classification {
 	private enum Property {
 		LABEL("http://www.w3.org/2004/02/skos/core#prefLabel"), //
 		BROADER("http://www.w3.org/2004/02/skos/core#broader"), //
-		NOTATION("http://www.w3.org/2004/02/skos/core#notation");
+		NOTATION("http://www.w3.org/2004/02/skos/core#notation"), //
+		NARROW_MATCH("http://www.w3.org/2004/02/skos/core#narrowMatch"), //
+		EXACT_MATCH("http://www.w3.org/2004/02/skos/core#exactMatch");
 
 		String value;
 
@@ -449,16 +451,32 @@ public class Classification {
 		if (label != null) {
 			String id = toNwbibNamespace(hit.getId());
 			String notation = notation(json);
-			ImmutableMap<String, ?> map = ImmutableMap.of(//
-					"value", id, //
-					"label",
-					(style == Label.PLAIN || notation.isEmpty() ? ""
-							: "<span class='notation'>" + notation + "</span>" + " ")
-							+ label.findValue("@value").asText(), //
-					"hits", Lobid.getTotalHitsNwbibClassification(id), //
-					"notation", notation, //
-					"focus", focus(json));
+			ImmutableMap<String, Object> map = ImmutableMap.<String, Object> builder()//
+					.put("value", id) //
+					.put("label",
+							(style == Label.PLAIN || notation.isEmpty() ? ""
+									: "<span class='notation'>" + notation + "</span>" + " ")
+									+ label.findValue("@value").asText()) //
+					.put("hits", Lobid.getTotalHitsNwbibClassification(id)) //
+					.put("notation", notation) //
+					.put("focus", focus(json)) //
+					.put("matches", matches(json)).build();
 			result.add(Json.toJson(map));
+		}
+	}
+
+	private static List<String> matches(JsonNode json) {
+		List<String> result = new ArrayList<>();
+		addMatches(json, Property.NARROW_MATCH, result);
+		addMatches(json, Property.EXACT_MATCH, result);
+		return result;
+	}
+
+	private static void addMatches(JsonNode json, Property p,
+			List<String> result) {
+		JsonNode match = json.findValue(p.value);
+		if (match != null) {
+			match.forEach(m -> result.add(m.get("@id").textValue()));
 		}
 	}
 
