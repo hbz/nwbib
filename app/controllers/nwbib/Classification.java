@@ -174,6 +174,8 @@ public class Classification {
 
 	private enum Property {
 		LABEL("http://www.w3.org/2004/02/skos/core#prefLabel"), //
+		ALT_LABEL("http://www.w3.org/2004/02/skos/core#altLabel"), //
+		EXAMPLE("http://www.w3.org/2004/02/skos/core#example"), //
 		BROADER("http://www.w3.org/2004/02/skos/core#broader"), //
 		NOTATION("http://www.w3.org/2004/02/skos/core#notation"), //
 		NARROW_MATCH("http://www.w3.org/2004/02/skos/core#narrowMatch"), //
@@ -457,12 +459,19 @@ public class Classification {
 							(style == Label.PLAIN || notation.isEmpty() ? ""
 									: "<span class='notation'>" + notation + "</span>" + " ")
 									+ label.findValue("@value").asText()) //
+					.put("altLabel", findValues(json, Property.ALT_LABEL)) //
+					.put("example", findValues(json, Property.EXAMPLE)) //
 					.put("hits", Lobid.getTotalHitsNwbibClassification(id)) //
 					.put("notation", notation) //
 					.put("focus", focus(json)) //
 					.put("matches", matches(json)).build();
 			result.add(Json.toJson(map));
 		}
+	}
+
+	private static List<String> findValues(JsonNode json, Property p) {
+		return json.has(p.value) ? json.get(p.value).findValuesAsText("@value")
+				: Arrays.asList();
 	}
 
 	private static List<String> matches(JsonNode json) {
