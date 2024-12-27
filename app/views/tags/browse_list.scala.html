@@ -67,6 +67,8 @@
         </script>
         @for(json <- classes.getOrElse(Seq());
              entryLabel = label(json);
+             altLabel = (json\"altLabel").asOpt[Seq[String]].getOrElse(Seq()).mkString("; ");
+             example = (json\"example").asOpt[Seq[String]].getOrElse(Seq()).mkString("; ");
              normalized = entryLabel.replaceAll("ß", "ss") + entryLabel.replaceAll("ss", "ß");
              value = (json\"value").as[String];
              hits = (json\"hits").asOpt[scala.Long].getOrElse(0L);
@@ -107,7 +109,7 @@
                  </div>
                  }
                  @if(t!="Zeitschriften"){<span @if(t!="Wikidata"){class='copy-link'}><a data-toggle="tooltip" data-placement="right" title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy', $(this));return false;"><span class="octicon octicon-clippy"></span></a></span>}
-                <div style="display: none">@normalized</div>
+                <div style="display: none">@normalized @altLabel @example</div>
               }
               @if(t=="Wikidata"){
                     @if(anchor.startsWith("Q")) {
