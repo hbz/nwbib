@@ -47,7 +47,7 @@ import play.mvc.Http;
  * Generate a SKOS representation from the internal spatial classification data
  * (which itself originates from a SKOS file, but is enriched from different
  * sources, see https://github.com/hbz/lobid-vocabs/issues/85)
- * 
+ *
  * @author Fabian Steeg (fsteeg)
  *
  */
@@ -114,7 +114,7 @@ public class SpatialToSkos {
 
 	/**
 	 * Write a SKOS turtle file for nwbib-spatial to the conf/ folder
-	 * 
+	 *
 	 * @param args Not used
 	 */
 	public static void main(String[] args) {
@@ -220,7 +220,7 @@ public class SpatialToSkos {
 						model.createResource(
 								"http://creativecommons.org/publicdomain/zero/1.0/"))
 				.addProperty(DCTerms.description,
-						"This controlled vocabulary for areas in Northrhine-Westphalia was created for use in the North Rhine-Westphalian bibliography. The initial transformation to SKOS was carried out by Felix Ostrowski for the hbz.")
+						"This controlled vocabulary for areas in Northrhine-Westphalia was created for use in the North Rhine-Westphalian bibliography. The initial transformation to SKOS was carried out by Felix Ostrowski for the hbz.", "en")
 				.addProperty(DCTerms.issued, "2014-01-28")
 				.addProperty(DCTerms.modified,
 						ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE))
