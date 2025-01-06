@@ -91,7 +91,7 @@
                  }}">@hits</a>)
                  }
                  @if(!matches.isEmpty()) {
-                 <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#@matches.hashCode"><span class="octicon octicon-link"></span> @matches.size</button>
+                 <button type="button" class="btn btn-link btn-xs" data-toggle="modal" data-target="#@matches.hashCode"><span class="octicon octicon-link"></span></button>
                  <div id="@matches.hashCode" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="label-@matches.hashCode">
                     <div class="modal-dialog modal-lg" role="document">
                       <div class="modal-content">
@@ -100,7 +100,14 @@
                           <h4 class="modal-title" id="label-@matches.hashCode">Links für @Html(entryLabel)</h4>
                         </div>
                         <div class="modal-body">
-                          @for(link <- matches) { <p><a href="@link" target="_blank"><span class="octicon octicon-link"></span> @link</a></p> }
+                          @for(link <- matches) { <p><a href="@link" target="_blank">
+							@link match {
+								case x if x.contains("d-nb.info") => { <img src='@controllers.routes.Assets.at("images/dnb.png")' style="height:1em" alt="Deutsche Nationalbibliothek (DNB)"> }
+								case x if x.contains("wikidata.org") => { <img src='@controllers.routes.Assets.at("images/wikidata.png")' style="height:1em" alt="Wikidata"> }
+								case _ => { <span class="octicon octicon-link"></span> }
+							}
+							@link</a></p>
+						  }
                         </div>
                       </div>
                     </div>
