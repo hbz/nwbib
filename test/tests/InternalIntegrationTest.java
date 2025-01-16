@@ -101,6 +101,26 @@ public class InternalIntegrationTest {
 		searchLeadingBlankWith("word=");
 	}
 
+	@Test // See https://github.com/hbz/nwbib/issues/657
+	public void testSearchInAltLabel() {
+		running(testServer(3333), () -> {
+			assertIndexDataForIdContains("N566042", "Ortsteil"); // from altLabel
+		});
+	}
+
+	@Test // See https://github.com/hbz/nwbib/issues/657
+	public void testSearchInExample() {
+		running(testServer(3333), () -> {
+			assertIndexDataForIdContains("N543620", "Betriebsrat"); // from example
+		});
+	}
+
+	private static void assertIndexDataForIdContains(String id, String string) {
+		assertThat(
+				Classification.ids("https://nwbib.de/subjects#" + id, "").toString())
+						.as("index data for " + id).contains(string);
+	}
+
 	private static void searchLeadingBlankWith(String param) {
 		running(testServer(3333), () -> {
 			try {
