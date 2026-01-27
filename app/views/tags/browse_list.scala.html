@@ -115,7 +115,7 @@
                     </div>
                  </div>
                  }
-                 @if(t!="Zeitschriften" && !textToCopy.matches(".+0000$")){
+                 @if(t!="Zeitschriften" && (textToCopy.matches(".+240000$") || !textToCopy.matches(".+0000$"))){
                     <span @if(t!="Wikidata"){class='copy-link'}>
                         <a data-toggle="tooltip" data-placement="right" title="Identifikator und Bezeichnung in die Zwischenablage kopieren" href="#" onclick="copyToClipboard('@textToCopy', $(this));return false;">
                             <span class="octicon octicon-clippy"></span>
