@@ -31,10 +31,10 @@ JAVA_OPTS=$(echo "$JAVA_OPTS" |sed 's#,#\ #g')
 cd $HOME/git/$REPO
 case $ACTION in
 	start)
-	        if [ -f target/universal/stage/RUNNING_PID ]; then
-                    kill $(cat target/universal/stage/RUNNING_PID)
-                    rm target/universal/stage/RUNNING_PID
-                fi
+		if [ -f target/universal/stage/RUNNING_PID ]; then
+			kill $(cat target/universal/stage/RUNNING_PID)
+			rm target/universal/stage/RUNNING_PID
+		fi
 		sbt clean
 		sbt --java-home $JAVA_HOME stage
 		JAVA_OPTS="$JAVA_OPTS -XX:+ExitOnOutOfMemoryError" ./target/universal/stage/bin/nwbib -Dhttp.port=$PORT -no-version-check > monit_start.log &
