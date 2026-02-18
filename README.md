@@ -8,12 +8,13 @@ See the `.github/workflows/build.yml` file for details on the CI config used by 
 
 ## Setup
 
-Prerequisite: Java 8
+Prerequisite: Java 11
 
-`git clone https://github.com/hbz/nwbib.git ; cd nwbib`\
-`wget http://downloads.typesafe.com/typesafe-activator/1.2.10/typesafe-activator-1.2.10-minimal.zip`\
-`unzip typesafe-activator-1.2.10-minimal.zip`\
-`./activator-1.2.10-minimal/activator test`
+- `git clone https://github.com/hbz/nwbib.git ; cd nwbib`\
+- `sbt clean`
+- `sbt test`
+
+See the `.github/workflows/build.yml` file for details on the CI config used by Github Actions.
 
 ### Eclipse setup
 

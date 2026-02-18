@@ -34,7 +34,9 @@ case $ACTION in
                     kill $(cat target/universal/stage/RUNNING_PID)
                     rm target/universal/stage/RUNNING_PID
                 fi
-		JAVA_OPTS="$JAVA_OPTS -XX:+ExitOnOutOfMemoryError" $HOME/activator-dist-1.3.5/activator "start $PORT"
+		sbt clean
+		sbt --java-home $JAVA_HOME stage
+		JAVA_OPTS="$JAVA_OPTS -XX:+ExitOnOutOfMemoryError" ./target/universal/stage/bin/nwbib -Dhttp.port=$PORT
 		;;
 	stop)
 		kill $(cat target/universal/stage/RUNNING_PID)

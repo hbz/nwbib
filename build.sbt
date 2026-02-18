@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
-javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
+javacOptions ++= Seq("-source", "11", "-target", "11")
 
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys
 
