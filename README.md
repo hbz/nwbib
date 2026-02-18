@@ -14,6 +14,12 @@ Prerequisite: Java 11
 - `sbt clean`
 - `sbt test`
 
+Build the web application:
+
+- `sbt clean`
+- `sbt stage`
+- `./target/universal/stage/bin/nwbib -no-version-check`
+
 See the `.github/workflows/build.yml` file for details on the CI config used by Github Actions.
 
 ### Eclipse setup
