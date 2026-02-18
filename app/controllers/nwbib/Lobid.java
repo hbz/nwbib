@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.elasticsearch.common.collect.Lists;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.html.HtmlEscapers;
 
 import controllers.nwbib.Classification.Type;
