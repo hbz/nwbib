@@ -12,6 +12,7 @@ import java.net.URL;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -39,14 +40,17 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.node.InternalSettingsPreparer;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.node.NodeValidationException;
+import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.transport.Netty4Plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.jsonldjava.core.JsonLdError;
@@ -200,6 +204,12 @@ public class Classification {
 			(JsonNode o1, JsonNode o2) -> Collator.getInstance(Locale.GERMAN)
 					.compare(labelText(o1), labelText(o2));
 
+	private static class EmbeddedNode extends Node {
+		public EmbeddedNode(Settings preparedSettings, Collection<Class<? extends Plugin>> classpathPlugins) {
+			super(InternalSettingsPreparer.prepareEnvironment(preparedSettings, null), classpathPlugins);
+		}
+	}
+
 	private Classification() {
 		/* Use via static functions, no instantiation. */
 	}
@@ -238,7 +248,7 @@ public class Classification {
 	public static JsonNode ids(String q, String t) {
 		QueryBuilder queryBuilder = QueryBuilders.boolQuery()
 				.must(QueryBuilders.idsQuery(Type.NWBIB.elasticsearchType,
-						Type.SPATIAL.elasticsearchType).ids(q));
+						Type.SPATIAL.elasticsearchType).addIds(q));
 		SearchRequestBuilder requestBuilder = client.prepareSearch(INDEX)
 				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setQuery(queryBuilder);
 		if (t.isEmpty()) {
@@ -506,16 +516,21 @@ public class Classification {
 
 	/** Start up the embedded Elasticsearch classification index. */
 	public static void indexStartup() {
-		Settings clientSettings = ImmutableSettings.settingsBuilder()
-				.put("path.home", new File(".").getAbsolutePath())
-				.put("http.port",
-						play.Play.application().isTest() ? "8855"
-								: CONFIG.getString("index.es.port.http"))
-				.put("transport.tcp.port", play.Play.application().isTest() ? "8856"
-						: CONFIG.getString("index.es.port.tcp"))
-				.build();
-		node =
-				NodeBuilder.nodeBuilder().settings(clientSettings).local(true).node();
+		boolean isTest = play.Play.application().isTest();
+		String httpPort = isTest ? "8855" : CONFIG.getString("index.es.port.http");
+		String tcpPort = isTest ? "8856" : CONFIG.getString("index.es.port.tcp");
+		node = new EmbeddedNode(Settings.builder().put("transport.type", "netty4")//
+				.put("http.type", "netty4")//
+				.put("http.enabled", "true")//
+				.put("path.home", new File(".").getAbsolutePath())//
+				.put("http.port", httpPort)//
+				.put("transport.tcp.port", tcpPort)//
+				.build(), Arrays.asList(Netty4Plugin.class));
+		try {
+			node.start();
+		} catch (NodeValidationException e) {
+			e.printStackTrace();
+		}
 		client = node.client();
 		client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute()
 				.actionGet();
@@ -535,8 +550,8 @@ public class Classification {
 			List<String> jsonLd = toJsonLd(new URL(dataUrl));
 			for (String concept : jsonLd) {
 				String id = Json.parse(concept).findValue("@id").textValue();
-				IndexRequestBuilder indexRequest = client
-						.prepareIndex(INDEX, type.elasticsearchType, id).setSource(concept);
+				IndexRequestBuilder indexRequest = client.prepareIndex(INDEX, type.elasticsearchType, id)
+						.setSource(concept.getBytes(), XContentType.JSON);
 				bulkRequest.add(indexRequest);
 			}
 		} catch (MalformedURLException e) {
@@ -550,7 +565,11 @@ public class Classification {
 
 	/** Shut down the embedded Elasticsearch classification index. */
 	public static void indexShutdown() {
-		node.close();
+		try {
+			node.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

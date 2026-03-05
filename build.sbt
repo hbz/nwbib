@@ -2,24 +2,26 @@ name := "nwbib"
 
 version := "0.1.0-SNAPSHOT"
 
-scalaVersion := "2.11.11"
+scalaVersion := "2.11.12"
 
 libraryDependencies ++= Seq(
   cache,
   javaWs,
   "com.typesafe.play" % "play-test_2.11" % "2.4.11",
-  "org.elasticsearch" % "elasticsearch" % "1.7.5" withSources(),
+  "org.elasticsearch" % "elasticsearch" % "5.6.16" withSources(),
+  "org.elasticsearch.plugin" % "transport-netty4-client" % "5.6.16" withSources(),
   "org.mockito" % "mockito-core" % "1.9.5",
   "org.apache.commons" % "commons-rdf-jena" % "0.5.0",
   "org.apache.commons" % "commons-csv" % "1.6",
   "org.apache.jena" % "jena-arq" % "3.17.0" exclude ("com.github.jsonld-java","jsonld-java"),
   "org.apache.jena" % "jena-core" % "3.17.0",
-  "org.easytesting" % "fest-assert" % "1.4" % "test"
+  "org.easytesting" % "fest-assert" % "1.4" % "test",
+  "com.sun.xml.bind" % "jaxb-impl" % "2.3.3" withSources()
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
-javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
+javacOptions ++= Seq("-source", "11", "-target", "11")
 
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys
 
