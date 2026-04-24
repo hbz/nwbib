@@ -7,7 +7,7 @@ set -uo pipefail
 # 00 1 * * * ssh sol@quaoar1 "cd /home/sol/git/nwbib ; bash -x cron.sh >> logs/cron.sh.log 2>&1"
 
 IFS=$'\n\t'
-RECIPIENT=lobid-admin
+RECIPIENT=oi
 
 rm -rf ./data
 rm conf/wikidata.json
