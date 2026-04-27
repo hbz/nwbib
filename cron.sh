@@ -25,6 +25,6 @@ LOG="$(tail -n 50 logs/application.log)"
 
 MESSAGE="Missing in NWBib:\n$MISSING_NWBIB \n\nSee https://github.com/hbz/nwbib/wiki/Umgang-mit-Wikidata%E2%80%90Item%E2%80%90Merges how to fix it.\n\nMissing in Wikidata:\n$MISSING_WIKID\n\nLog:\n$LOG"
 
-echo -e "$MESSAGE" | mail -s "Alert nwbib-spatial" "$RECIPIENT@hbz-nrw.de"
+echo -e "$MESSAGE" | mail -s "[sysad] [nwbib] Alert nwbib-spatial" "$RECIPIENT@hbz-nrw.de"
 
 fi
